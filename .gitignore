@@ -1,0 +1,42 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.so
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+# Visual Studio bits (Added by PJC)
+*.pch
+*.suo
+*.obj
+*.ilk
+*.lib
+*.exe
+*.dep
+*.pdb
+*.ncb
+*.idb
+*.htm
+*.res
+*.map
+*.RES
+*.manifest
+*.cod
+*.user
+
+
+# Linux bits
+*.swp
+*.tar
+*.tar.gz
+*.0
+
+# Project specific ignores
+test/Reader-test-abc.txt
+fix-eol.*
