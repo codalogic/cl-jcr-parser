@@ -178,6 +178,22 @@
 				RelativePath="..\include\cl-jcr-parser\cl-jcr-parser.h"
 				>
 			</File>
+			<File
+				RelativePath="..\include\dsl-pa\dsl-pa-alphabet.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dsl-pa\dsl-pa-dsl-pa.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dsl-pa\dsl-pa-reader.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\dsl-pa\dsl-pa.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

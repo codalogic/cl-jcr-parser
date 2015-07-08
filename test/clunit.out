@@ -1,0 +1,50 @@
+Tests run on Wed Jul 08 16:21:26 2015
+
+    RuleOrDirective creation [test-object-creation.cpp:40]
+    ======================================================
+    ok: pu_rule_or_directive->is_rule() == true
+    ok: pu_rule_or_directive->is_directive() == false
+    ok: pu_rule_or_directive->rule() != 0
+    ok: true
+    ok: pu_rule_or_directive->is_directive() == true
+    ok: pu_rule_or_directive->is_rule() == false
+    ok: pu_rule_or_directive->directive() != 0
+    ok: true
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    Grammar creation / deletion [test-object-creation.cpp:78]
+    =========================================================
+    ok: i != end
+    ok: (*i)->is_directive()
+    ok: ! (*i)->is_rule()
+    ok: i != end
+    ok: ! (*i)->is_directive()
+    ok: (*i)->is_rule()
+    ok: i == end
+    ok: grammar[0].is_directive()
+    ok: ! grammar[0].is_rule()
+    ok: ! grammar[1].is_directive()
+    ok: grammar[1].is_rule()
+    ok: grammar.back_is_directive()
+    ok: ! grammar.back_is_rule()
+    ok: grammar.back_is_rule()
+    ok: ! grammar.back_is_directive()
+    ok: i != end
+    ok: (*i)->is_directive()
+    ok: ! (*i)->is_rule()
+    ok: i != end
+    ok: ! (*i)->is_directive()
+    ok: (*i)->is_rule()
+    ok: i == end
+    ok: grammar[0].is_directive()
+    ok: ! grammar[0].is_rule()
+    ok: ! grammar[1].is_directive()
+    ok: grammar[1].is_rule()
+    ok: true
+    ok: true
+    ok: true
+    ok: true
+    ok: true
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+    ok: _CrtCheckMemory() != 0
+0 error(s), 0 todo(s), 42 test(s)

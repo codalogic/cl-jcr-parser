@@ -8,3 +8,6 @@
 
 #include "cl-jcr-parser/cl-jcr-parser.h"
 
+namespace cljcr {
+
+}   // namespace cljcr

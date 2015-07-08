@@ -178,6 +178,10 @@
 				RelativePath=".\test-main.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\test-object-creation.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
