@@ -194,6 +194,10 @@
 				RelativePath="..\include\dsl-pa\dsl-pa.h"
 				>
 			</File>
+			<File
+				RelativePath="..\include\cl-utils\ptr-vector.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

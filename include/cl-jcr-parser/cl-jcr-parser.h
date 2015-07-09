@@ -11,6 +11,8 @@
 
 #include "dsl-pa/dsl-pa.h"
 
+#include "cl-utils/ptr-vector.h"
+
 #include <cassert>
 #include <memory>
 
@@ -25,15 +27,6 @@ struct uniq_ptr
     typedef std::unique_ptr<T> type;
 #endif
 };
-
-template< typename T >
-void delete_all( T ptr_container )
-{
-    for( T::iterator i = ptr_container.begin(), end = ptr_container.end();
-            i != end;
-            ++i )
-        delete *i;
-}
 
 class BadRuleOrDirectiveRequest : public std::exception {};
 class BadDirectiveRequest : public BadRuleOrDirectiveRequest {};
@@ -113,7 +106,7 @@ public:
 class Grammar
 {
 private:
-    typedef std::vector< RuleOrDirective * > container_t;
+    typedef clutils::ptr_vector< RuleOrDirective > container_t;
     struct Members {
         container_t rules_and_directives;
     } m;
@@ -121,45 +114,45 @@ private:
 public:
     typedef uniq_ptr<Grammar>::type uniq_ptr;
 
-    ~Grammar()
-    {
-        delete_all( m.rules_and_directives );
-    }
+    ~Grammar() {}
 
-    void append( RuleOrDirective * p_rule_or_directive )
+    RuleOrDirective * append( RuleOrDirective * p_rule_or_directive )
     {
         RuleOrDirective::uniq_ptr pu_rule_or_directive( p_rule_or_directive );
         append( pu_rule_or_directive );
+        return p_rule_or_directive;
     }
     void append( RuleOrDirective::uniq_ptr pu_rule_or_directive )
     {
         m.rules_and_directives.push_back( pu_rule_or_directive.get() );
         pu_rule_or_directive.release();
     }
-    void append( Directive * pu_directive )
+    Directive * append( Directive * p_directive )
     {
-        append( RuleOrDirective::make( pu_directive ) );
+        append( RuleOrDirective::make( p_directive ) );
+        return p_directive;
     }
-    void append( Rule * p_rule )
+    Rule * append( Rule * p_rule )
     {
         append( RuleOrDirective::make( p_rule ) );
+        return p_rule;
     }
-    void append_directive()
+    Directive * append_directive()
     {
-        append( RuleOrDirective::make_directive() );
+        return append( RuleOrDirective::make_directive() )->directive();
     }
-    void append_rule()
+    Rule * append_rule()
     {
-        append( RuleOrDirective::make_rule() );
+        return append( RuleOrDirective::make_rule() )->rule();
     }
 
     const RuleOrDirective & back() const
     {
-        return *(m.rules_and_directives.back());
+        return m.rules_and_directives.back();
     }
     RuleOrDirective & back()
     {
-        return *(m.rules_and_directives.back());
+        return m.rules_and_directives.back();
     }
     bool back_is_directive() const
     {
@@ -193,8 +186,8 @@ public:
     const_iterator end() const { return m.rules_and_directives.end(); }
     iterator end() { return m.rules_and_directives.end(); }
 
-    const RuleOrDirective & operator [] ( size_t i ) const { return *(m.rules_and_directives[i]); }
-    RuleOrDirective & operator [] ( size_t i ) { return *(m.rules_and_directives[i]); }
+    const RuleOrDirective & operator [] ( size_t i ) const { return m.rules_and_directives[i]; }
+    RuleOrDirective & operator [] ( size_t i ) { return m.rules_and_directives[i]; }
 };
 
 class JCRParser : public cl::dsl_pa

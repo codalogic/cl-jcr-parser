@@ -1,4 +1,4 @@
-Tests run on Wed Jul 08 16:21:26 2015
+Tests run on Thu Jul 09 18:11:52 2015
 
     RuleOrDirective creation [test-object-creation.cpp:40]
     ======================================================
@@ -12,14 +12,14 @@ Tests run on Wed Jul 08 16:21:26 2015
     ok: true
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Grammar creation / deletion [test-object-creation.cpp:78]
+    Grammar creation / deletion [test-object-creation.cpp:77]
     =========================================================
     ok: i != end
-    ok: (*i)->is_directive()
-    ok: ! (*i)->is_rule()
+    ok: i->is_directive()
+    ok: ! (*i).is_rule()
     ok: i != end
-    ok: ! (*i)->is_directive()
-    ok: (*i)->is_rule()
+    ok: ! i->is_directive()
+    ok: i->is_rule()
     ok: i == end
     ok: grammar[0].is_directive()
     ok: ! grammar[0].is_rule()
@@ -30,16 +30,20 @@ Tests run on Wed Jul 08 16:21:26 2015
     ok: grammar.back_is_rule()
     ok: ! grammar.back_is_directive()
     ok: i != end
-    ok: (*i)->is_directive()
-    ok: ! (*i)->is_rule()
+    ok: i->is_directive()
+    ok: ! i->is_rule()
     ok: i != end
-    ok: ! (*i)->is_directive()
-    ok: (*i)->is_rule()
+    ok: ! i->is_directive()
+    ok: i->is_rule()
     ok: i == end
     ok: grammar[0].is_directive()
     ok: ! grammar[0].is_rule()
     ok: ! grammar[1].is_directive()
     ok: grammar[1].is_rule()
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    Grammar exception throwing on bad selection [test-object-creation.cpp:128]
+    ==========================================================================
     ok: true
     ok: true
     ok: true
@@ -47,4 +51,4 @@ Tests run on Wed Jul 08 16:21:26 2015
     ok: true
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
-0 error(s), 0 todo(s), 42 test(s)
+0 error(s), 0 todo(s), 43 test(s)

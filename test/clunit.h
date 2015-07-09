@@ -110,6 +110,7 @@ main-test.cpp:
 #include <vector>
 #include <string>
 #include <ctime>
+#include <cstring>
 
 #ifdef _MSC_VER
     #include <crtdbg.h>

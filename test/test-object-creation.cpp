@@ -74,22 +74,21 @@ TFEATURE( "RuleOrDirective creation" )
     }
 }
 
-
 TFEATURE( "Grammar creation / deletion" )
 {
     {
     Grammar grammar;
-    grammar.append_directive();
-    grammar.append_rule();
+    Directive * p_directive = grammar.append_directive();
+    Rule * p_rule = grammar.append_rule();
 
     Grammar::const_iterator i = grammar.begin(), end = grammar.end();
     TTEST( i != end );
-    TTEST( (*i)->is_directive() )
-    TTEST( ! (*i)->is_rule() )
+    TTEST( i->is_directive() )
+    TTEST( ! (*i).is_rule() )
     ++i;
     TTEST( i != end );
-    TTEST( ! (*i)->is_directive() )
-    TTEST( (*i)->is_rule() )
+    TTEST( ! i->is_directive() )
+    TTEST( i->is_rule() )
     ++i;
     TTEST( i == end );
 
@@ -108,14 +107,14 @@ TFEATURE( "Grammar creation / deletion" )
     TTEST( grammar.back_is_rule() );
     TTEST( ! grammar.back_is_directive() );
 
-    Grammar::const_iterator i = grammar.begin(), end = grammar.end();
+    Grammar::iterator i = grammar.begin(), end = grammar.end();
     TTEST( i != end );
-    TTEST( (*i)->is_directive() )
-    TTEST( ! (*i)->is_rule() )
+    TTEST( i->is_directive() )
+    TTEST( ! i->is_rule() )
     ++i;
     TTEST( i != end );
-    TTEST( ! (*i)->is_directive() )
-    TTEST( (*i)->is_rule() )
+    TTEST( ! i->is_directive() )
+    TTEST( i->is_rule() )
     ++i;
     TTEST( i == end );
 
@@ -124,7 +123,10 @@ TFEATURE( "Grammar creation / deletion" )
     TTEST( ! grammar[1].is_directive() )
     TTEST( grammar[1].is_rule() )
     }
+}
 
+TFEATURE( "Grammar exception throwing on bad selection" )
+{
     {
     Grammar grammar;
     grammar.append( new Directive() );
