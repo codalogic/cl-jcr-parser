@@ -183,3 +183,5 @@ TFEATURE( "Grammar exception throwing on bad selection" )
     }
     }
 }
+
+TFEATURETODO( "Verify if we really need Grammar::append_directive() & append_rule()" )

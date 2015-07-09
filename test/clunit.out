@@ -1,4 +1,4 @@
-Tests run on Thu Jul 09 18:11:52 2015
+Tests run on Thu Jul 09 21:01:39 2015
 
     RuleOrDirective creation [test-object-creation.cpp:40]
     ======================================================
@@ -50,5 +50,12 @@ Tests run on Thu Jul 09 18:11:52 2015
     ok: true
     ok: true
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
-0 error(s), 0 todo(s), 43 test(s)
+
+TODOs (1):
+------------------------
+- Verify if we really need Grammar::append_directive() & append_rule() [test-object-creation.cpp:187]
+
+0 error(s), 1 todo(s), 44 test(s)
