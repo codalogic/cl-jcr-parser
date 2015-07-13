@@ -9,8 +9,6 @@
 #ifndef CL_JCR_PARSER
 #define CL_JCR_PARSER
 
-#include "dsl-pa/dsl-pa.h"
-
 #include "cl-utils/ptr-vector.h"
 
 #include <cassert>
@@ -190,14 +188,29 @@ public:
     RuleOrDirective & operator [] ( size_t i ) { return m.rules_and_directives[i]; }
 };
 
-class JCRParser : public cl::dsl_pa
+class JCRParser
 {
+public:
+    enum Status { S_OK };
+
 private:
     struct Members {
+        Grammar * p_grammar;
+        const char * p_file_name;
+        Status status;
+
+        Members( Grammar * p_grammar_in, const char * p_file_name_in )
+            :
+            p_grammar( p_grammar_in ),
+            p_file_name( p_file_name_in ),
+            status( S_OK )
+        {}
     } m;
 
 public:
-private:
+    JCRParser( Grammar * p_grammar, const char * p_file_name ) : m( p_grammar, p_file_name ) {}
+    Status parse();
+    virtual void error( size_t line, const char * p_message );  // Inherit this class to get error message fed back to you
 };
 
 }   // namespace cljcr
