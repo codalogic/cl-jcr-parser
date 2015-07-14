@@ -36,5 +36,4 @@
 
 TFEATURE( "Miscellaneous TODOs" )
 {
-    TTODO( "Implement cl::reader_file::is_open() in dsl_pa project! - TODO_is_open" );
 }

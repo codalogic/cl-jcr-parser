@@ -191,7 +191,7 @@ public:
 class JCRParser
 {
 public:
-    enum Status { S_OK };
+    enum Status { S_OK, S_UNABLE_TO_OPEN_FILE };
 
 private:
     struct Members {

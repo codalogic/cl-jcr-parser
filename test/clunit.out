@@ -1,4 +1,4 @@
-Tests run on Mon Jul 13 16:55:26 2015
+Tests run on Tue Jul 14 17:20:57 2015
 
     Miscellaneous TODOs [test-main.cpp:37]
     ======================================
@@ -58,9 +58,8 @@ Tests run on Mon Jul 13 16:55:26 2015
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
 
-TODOs (2):
+TODOs (1):
 ------------------------
-- Implement cl::reader_file::is_open() in dsl_pa project! - TODO_is_open [test-main.cpp:39]
 - Verify if we really need Grammar::append_directive() & append_rule() [test-object-creation.cpp:187]
 
-0 error(s), 2 todo(s), 45 test(s)
+0 error(s), 1 todo(s), 45 test(s)

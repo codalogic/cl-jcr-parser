@@ -202,10 +202,10 @@ namespace cljcr {
 JCRParser::Status JCRParser::parse()
 {
     cl::reader_file reader( m.p_file_name );
-    //if( reader.is_open() )    // TODO_is_open
-    {
-        JCRP parser( this, m.p_file_name, reader, m.p_grammar );
-    }
+    if( ! reader.is_open() )
+		return S_UNABLE_TO_OPEN_FILE;
+
+    JCRP parser( this, m.p_file_name, reader, m.p_grammar );
 
     return m.status;
 }
