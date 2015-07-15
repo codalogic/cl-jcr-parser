@@ -231,7 +231,7 @@ public:
 class JCRParser
 {
 public:
-    enum Status { S_OK, S_UNABLE_TO_OPEN_FILE };
+    enum Status { S_OK, S_UNABLE_TO_OPEN_FILE, S_EXPECTED_END_OF_RULES };
 
 private:
     struct Members {
@@ -248,7 +248,9 @@ public:
     Status add_grammar( const char * p_file_name );
     Status add_grammar( const std::string & rules );
     Status add_grammar( const char * p_rules, size_t size );
-    virtual void error( size_t line, const char * p_message );  // Inherit this class to get error message fed back to you
+    Status link();
+
+    virtual void error( size_t line, size_t column, Status code, const char * p_message );  // Inherit this class to get error message fed back to you
 
 private:
     Status parse_grammar( cl::reader & reader );

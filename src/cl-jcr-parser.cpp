@@ -10,6 +10,14 @@
 
 #include "dsl-pa/dsl-pa.h"
 
+#if defined(_MSC_VER)
+// Require error when nonstandard extension used :
+//      'token' : conversion from 'type' to 'type'
+//      e.g. disallow foo( /*const*/ foo & ) for copy constructor
+//      and           foo( /*const*/ bar() ) for bar object constructed in-situ
+#pragma warning(error: 4239)
+#endif
+
 namespace cljcr {
 
 namespace { // Anonymous namespace for detail
@@ -36,27 +44,81 @@ private:
     } m;
 
 public:
-    GrammarParser(
-            JCRParser * p_parent,
-            cl::reader & r_reader,
-            Grammar * p_grammar )
-        :
-        cl::dsl_pa( r_reader ),
-        m( p_parent, r_reader, p_grammar )
-    {}
+    GrammarParser( JCRParser * p_parent, cl::reader & r_reader, Grammar * p_grammar );
     bool parse();
-    void error( size_t line, const char * p_message );
     JCRParser::Status status() const { return m.status; }
 
 private:
+    bool error( JCRParser::Status code, const char * p_message );
     bool c_wsp();
+    bool opt_c_wsp();
+    bool rule_or_directive();
+    void directive();
+    void rule();
+    void recover_bad_rule_or_directive();
+    void recover_badly();
 };
+
+GrammarParser::GrammarParser(
+                        JCRParser * p_parent,
+                        cl::reader & r_reader,
+                        Grammar * p_grammar )
+    :
+    cl::dsl_pa( r_reader ),
+    m( p_parent, r_reader, p_grammar )
+{}
 
 bool GrammarParser::parse()
 {
     //  grammar         = 1*( *c-wsp (rule / directive) ) *c-wsp
+    while( opt_c_wsp() && rule_or_directive() )
+    {}
+
+    opt_c_wsp();
+
+    if( ! is_current_at_end() )
+        error( JCRParser::S_EXPECTED_END_OF_RULES, "Unexpected input at end of rules" );
 
     return m.status == JCRParser::S_OK;
+}
+
+bool GrammarParser::rule_or_directive()
+{
+    using namespace cl::alphabet_helpers;
+
+    if( is_current_at_end() )
+        return false;
+
+    else if( current_is( '#' ) )
+        directive();
+
+    else if( is_alpha( current() ) )
+        rule();
+
+    else
+        recover_bad_rule_or_directive();
+
+    return true;
+}
+
+void GrammarParser::directive()
+{
+    Directive * p_directive = m.p_grammar->append_directive();
+}
+
+void GrammarParser::rule()
+{
+}
+
+void GrammarParser::recover_bad_rule_or_directive()
+{
+    recover_badly();
+}
+
+void GrammarParser::recover_badly()
+{
+    while( get() && ! is_current_at_end() )
+    {}
 }
     //
     //  rule            = rulename *c-wsp definition
@@ -188,10 +250,6 @@ bool GrammarParser::parse()
     //  ; start of a newline to form a valid continuation line, and
     //  ; EOL might not be a full CRLF
     //
-    //  c-wsp           = WSP / c-nl
-    //  c-nl            = comment / EOL
-    //  comment         =  ";" *(WSP / VCHAR) EOL
-    //  EOL             = 1*( CR / LF )
     //
     //  ; core rules
     //  ALPHA          =  %x41-5A / %x61-7A   ; A-Z / a-z
@@ -200,15 +258,49 @@ bool GrammarParser::parse()
     //  HEXDIG         =  DIGIT / "A" / "B" / "C" / "D" / "E" / "F"
     //  LF             =  %x0A
     //  VCHAR          =  %x21-7E
+
+
+bool GrammarParser::error( JCRParser::Status code, const char * p_message )
+{
+    if( m.status == JCRParser::S_OK )
+        m.status = code;
+    m.p_parent->error( m.r_reader.get_line_number(), m.r_reader.get_column_number(), code, p_message );
+    return false;
+}
+
+bool GrammarParser::c_wsp()
+{
+    //  c-wsp           = WSP / c-nl
+    //  c-nl            = comment / EOL
+    //  comment         =  ";" *(WSP / VCHAR) EOL
+    //  EOL             = 1*( CR / LF )
     //  WSP            =  SP / HTAB
     //  SP             =  %x20
     //  HTAB           =  %x09
 
-}   // namespace cljcr
+    size_t n_skipped = 0;
+    bool is_comment_found = true;
+    while( is_comment_found )
+    {
+        is_comment_found = false;
+        n_skipped += wsp();
+
+        if( peek_is( ';' ) )
+        {
+            is_comment_found = true;
+            n_skipped += skip_until( cl::alphabet_eol() );
+        }
+    }
+
+    return n_skipped > 0;
+}
+
+bool GrammarParser::opt_c_wsp()
+{
+    return optional( c_wsp() );
+}
 
 } // End of Anonymous namespace
-
-namespace cljcr {
 
 JCRParser::Status JCRParser::add_grammar( const char * p_file_name )
 {
@@ -231,6 +323,11 @@ JCRParser::Status JCRParser::add_grammar( const char * p_rules, size_t size )
     cl::reader_mem_buf reader( p_rules, size );
 
     return parse_grammar( reader );
+}
+
+JCRParser::Status JCRParser::link()
+{
+    return S_OK;
 }
 
 JCRParser::Status JCRParser::parse_grammar( cl::reader & reader )

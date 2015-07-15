@@ -1,4 +1,4 @@
-Tests run on Tue Jul 14 17:20:57 2015
+Tests run on Wed Jul 15 17:16:39 2015
 
     Miscellaneous TODOs [test-main.cpp:37]
     ======================================
@@ -56,10 +56,21 @@ Tests run on Tue Jul 14 17:20:57 2015
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    GrammarSet TODOS [test-grammar-set.cpp:40]
+    ==========================================
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    GrammarParser - parsing c-wsp [test-grammar-parser.cpp:40]
+    ==========================================================
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
 
-TODOs (1):
+TODOs (4):
 ------------------------
-- Verify if we really need Grammar::append_directive() & append_rule() [test-object-creation.cpp:187]
+- Verify if we really need Grammar::append_rule() [test-object-creation.cpp:187]
+- Test GrammarSet class [test-grammar-set.cpp:42]
+- Implement and test GrammarSet::link() [test-grammar-set.cpp:44]
+- Test GrammarParser - parsing c-wsp [test-grammar-parser.cpp:42]
 
-0 error(s), 1 todo(s), 45 test(s)
+0 error(s), 4 todo(s), 47 test(s)
