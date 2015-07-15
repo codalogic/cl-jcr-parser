@@ -14,6 +14,8 @@
 #include <cassert>
 #include <memory>
 
+namespace cl { class reader; }
+
 namespace cljcr {
 
 template<typename T>
@@ -188,6 +190,44 @@ public:
     RuleOrDirective & operator [] ( size_t i ) { return m.rules_and_directives[i]; }
 };
 
+class GrammarSet
+{
+private:
+    typedef clutils::ptr_vector< Grammar > container_t;
+    struct Members {
+        container_t grammars;
+    } m;
+
+public:
+    GrammarSet() {}
+    Grammar * append( Grammar * p_grammar )
+    {
+        Grammar::uniq_ptr pu_grammar( p_grammar );
+        append( pu_grammar );
+        return p_grammar;
+    }
+    void append( Grammar::uniq_ptr pu_grammar )
+    {
+        m.grammars.push_back( pu_grammar.get() );
+        pu_grammar.release();
+    }
+    Grammar * append_grammar()
+    {
+        append( new Grammar() );
+        return &(m.grammars.back());
+    }
+
+    typedef container_t::const_iterator const_iterator;
+    typedef container_t::iterator iterator;
+    const_iterator begin() const { return m.grammars.begin(); }
+    iterator begin() { return m.grammars.begin(); }
+    const_iterator end() const { return m.grammars.end(); }
+    iterator end() { return m.grammars.end(); }
+
+    const Grammar & operator [] ( size_t i ) const { return m.grammars[i]; }
+    Grammar & operator [] ( size_t i ) { return m.grammars[i]; }
+};
+
 class JCRParser
 {
 public:
@@ -195,22 +235,23 @@ public:
 
 private:
     struct Members {
-        Grammar * p_grammar;
-        const char * p_file_name;
-        Status status;
+        GrammarSet * p_grammar_set;
 
-        Members( Grammar * p_grammar_in, const char * p_file_name_in )
+        Members( GrammarSet * p_grammar_set_in )
             :
-            p_grammar( p_grammar_in ),
-            p_file_name( p_file_name_in ),
-            status( S_OK )
+            p_grammar_set( p_grammar_set_in )
         {}
     } m;
 
 public:
-    JCRParser( Grammar * p_grammar, const char * p_file_name ) : m( p_grammar, p_file_name ) {}
-    Status parse();
+    JCRParser( GrammarSet * p_grammar_set ) : m( p_grammar_set ) {}
+    Status add_grammar( const char * p_file_name );
+    Status add_grammar( const std::string & rules );
+    Status add_grammar( const char * p_rules, size_t size );
     virtual void error( size_t line, const char * p_message );  // Inherit this class to get error message fed back to you
+
+private:
+    Status parse_grammar( cl::reader & reader );
 };
 
 }   // namespace cljcr

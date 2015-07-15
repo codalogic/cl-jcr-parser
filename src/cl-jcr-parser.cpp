@@ -14,43 +14,45 @@ namespace cljcr {
 
 namespace { // Anonymous namespace for detail
 
-class JCRP : public cl::dsl_pa
+class GrammarParser : public cl::dsl_pa
 {
 private:
     struct Members {
         JCRParser * p_parent;
-        const char * p_file_name;
-        cl::reader_file & r_reader;
+        GrammarSet * p_grammar_set;
         Grammar * p_grammar;
+        cl::reader & r_reader;
         JCRParser::Status status;
 
         Members( JCRParser * p_parent_in,
-                const char * p_file_name_in,
-                cl::reader_file & r_reader_in,
+                cl::reader & r_reader_in,
                 Grammar * p_grammar_in )
             :
             p_parent( p_parent_in ),
-            p_file_name( p_file_name_in ),
-            r_reader( r_reader_in ),
             p_grammar( p_grammar_in ),
+            r_reader( r_reader_in ),
             status( JCRParser::S_OK )
         {}
     } m;
 
 public:
-    JCRP( JCRParser * p_parent,
-            const char * p_file_name,
-            cl::reader_file & r_reader,
+    GrammarParser(
+            JCRParser * p_parent,
+            cl::reader & r_reader,
             Grammar * p_grammar )
         :
         cl::dsl_pa( r_reader ),
-        m( p_parent, p_file_name, r_reader, p_grammar )
+        m( p_parent, r_reader, p_grammar )
     {}
     bool parse();
     void error( size_t line, const char * p_message );
+    JCRParser::Status status() const { return m.status; }
+
+private:
+    bool c_wsp();
 };
 
-bool JCRP::parse()
+bool GrammarParser::parse()
 {
     //  grammar         = 1*( *c-wsp (rule / directive) ) *c-wsp
 
@@ -147,6 +149,15 @@ bool JCRP::parse()
     //
     //  directive       = "#" *( VCHAR / WSP / %x7F-10FFFF ) EOL
     //
+    // Supported definitions:
+    //      #name
+    //      #import
+    //      #jcr-version
+    //      #root
+    //      #pedantic
+    //      #language-compatible-members
+    //      #include
+    //
     //  ; Adapted from the ABNF for JSON, RFC 4627 s 2.4
     //  float           = [ "-" ] int [ frac ] [ exp ]
     //  integer         = [ "-" ] int [ exp ]
@@ -199,15 +210,36 @@ bool JCRP::parse()
 
 namespace cljcr {
 
-JCRParser::Status JCRParser::parse()
+JCRParser::Status JCRParser::add_grammar( const char * p_file_name )
 {
-    cl::reader_file reader( m.p_file_name );
+    cl::reader_file reader( p_file_name );
     if( ! reader.is_open() )
-		return S_UNABLE_TO_OPEN_FILE;
+        return S_UNABLE_TO_OPEN_FILE;
 
-    JCRP parser( this, m.p_file_name, reader, m.p_grammar );
+    return parse_grammar( reader );
+}
 
-    return m.status;
+JCRParser::Status JCRParser::add_grammar( const std::string & rules )
+{
+    cl::reader_string reader( rules );
+
+    return parse_grammar( reader );
+}
+
+JCRParser::Status JCRParser::add_grammar( const char * p_rules, size_t size )
+{
+    cl::reader_mem_buf reader( p_rules, size );
+
+    return parse_grammar( reader );
+}
+
+JCRParser::Status JCRParser::parse_grammar( cl::reader & reader )
+{
+    GrammarParser parser( this, reader, m.p_grammar_set->append_grammar() );
+
+    parser.parse();
+
+    return parser.status();
 }
 
 }   // namespace cljcr
