@@ -59,7 +59,7 @@ public:
 private:
     bool error( JCRParser::Status code, const char * p_message );
     bool one_star_c_wsp();
-	bool comment();
+    bool comment();
     bool star_c_wsp();
     bool rule_or_directive();
     void directive();
@@ -94,7 +94,7 @@ bool GrammarParser::parse()
 bool GrammarParser::rule_or_directive()
 {
     using namespace cl::alphabet_helpers;
-    
+
     get();
 
     if( is_current_at_end() )
@@ -123,7 +123,7 @@ void GrammarParser::directive()
 
 void GrammarParser::rule()
 {
-	// First character is in current()
+    // First character is in current()
 }
 
 void GrammarParser::recover_bad_rule_or_directive()
@@ -141,7 +141,9 @@ void GrammarParser::recover_badly()
     //
     //  ; rulenames must be unique, and may not be a reserved word
     //  ; rulenames are case sensitive
-    //  rulename        = ALPHA *(ALPHA / DIGIT / "-" / "_")
+    //  rulename        = name
+    //
+    //  name            = ALPHA *(ALPHA / DIGIT / "-" / "_")
     //
     //  definition      = member-rule / definition-rule
     //
@@ -154,7 +156,7 @@ void GrammarParser::recover_badly()
     //                            object-rule /
     //                            array-rule /
     //                            group-rule /
-    //                            rule-name )
+    //                            rule-ref )
     //
     //  value-rule      = ":" *c-wsp type-rule
     //
@@ -201,8 +203,12 @@ void GrammarParser::recover_badly()
     //                                      ) *c-wsp "}"
     //
     //  object-member   = ["?" *c-wsp ] object-item
-    //  object-item     = ( rulename / member-rule / group-rule )
+    //  object-item     = ( rule-ref / member-rule / group-rule )
     //  and-or          = ( "," / "/" )
+    //
+    //  rule-ref        = [ module-name '#' ] rule-name
+    //
+    //  module-name     = name
     //
     //  array-rule      = "[" *c-wsp array-member *(
     //                                       *c-wsp
@@ -296,7 +302,7 @@ bool GrammarParser::one_star_c_wsp()
 
     bool is_found = false;
     while( space() || comment() )
-		is_found = true;
+        is_found = true;
 
     return is_found;
 }
@@ -325,22 +331,22 @@ bool GrammarParser::star_c_wsp()
 
 void Directive::set( const std::string & r_directive )
 {
-	using namespace cl::short_alphabets;
+    using namespace cl::short_alphabets;
 
-	m.directive = r_directive;
-	cl::reader_string reader( r_directive );
-	cl::dsl_pa line_parser( reader );
-	for(;;)
-	{
-		line_parser.space();
-		std::string part;
-		line_parser.get( &part, and( not( space() ), not( semicolon() ) ) );
-		if( part.empty() )
-			break;
-		m.parts.push_back( part );
-		if( line_parser.current_is( ';' ) )
-			break;
-	}
+    m.directive = r_directive;
+    cl::reader_string reader( r_directive );
+    cl::dsl_pa line_parser( reader );
+    for(;;)
+    {
+        line_parser.space();
+        std::string part;
+        line_parser.get( &part, and( not( space() ), not( semicolon() ) ) );
+        if( part.empty() )
+            break;
+        m.parts.push_back( part );
+        if( line_parser.current_is( ';' ) )
+            break;
+    }
 }
 
 //----------------------------------------------------------------------------
