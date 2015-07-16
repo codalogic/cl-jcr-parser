@@ -40,8 +40,20 @@ public:
 
 class Directive
 {
+private:
+    typedef clutils::ptr_vector< std::string > container_t;
+    struct Members {
+        std::string directive;
+        container_t parts;
+    } m;
+
 public:
     typedef uniq_ptr<Directive>::type uniq_ptr;
+
+    void set( const std::string & r_directive );
+    const std::string & get() const { return m.directive; }
+    size_t size() const { return m.parts.size(); }
+    const std::string & operator [] ( size_t i ) const  { return m.parts[i]; }
 };
 
 class RuleOrDirective
@@ -186,6 +198,7 @@ public:
     const_iterator end() const { return m.rules_and_directives.end(); }
     iterator end() { return m.rules_and_directives.end(); }
 
+    size_t size() const { return m.rules_and_directives.size(); }
     const RuleOrDirective & operator [] ( size_t i ) const { return m.rules_and_directives[i]; }
     RuleOrDirective & operator [] ( size_t i ) { return m.rules_and_directives[i]; }
 };
@@ -224,6 +237,7 @@ public:
     const_iterator end() const { return m.grammars.end(); }
     iterator end() { return m.grammars.end(); }
 
+    size_t size() const { return m.grammars.size(); }
     const Grammar & operator [] ( size_t i ) const { return m.grammars[i]; }
     Grammar & operator [] ( size_t i ) { return m.grammars[i]; }
 };
@@ -250,7 +264,7 @@ public:
     Status add_grammar( const char * p_rules, size_t size );
     Status link();
 
-    virtual void error( size_t line, size_t column, Status code, const char * p_message );  // Inherit this class to get error message fed back to you
+    virtual void error( size_t line, size_t column, Status code, const char * p_message ) {}  // Inherit this class to get error message fed back to you
 
 private:
     Status parse_grammar( cl::reader & reader );

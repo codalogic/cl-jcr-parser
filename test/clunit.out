@@ -1,4 +1,86 @@
-Tests run on Wed Jul 15 17:16:39 2015
+Tests run on Thu Jul 16 14:49:31 2015
+
+    GrammarParser - parsing c-wsp [test-grammar-parser.cpp:78]
+    ==========================================================
+      Calling: test_c_wsp( "#pedantic" ) (80)
+    ok: h.grammar().size() == 1
+    ok: h.grammar()[0].is_directive()
+    ok: h.grammar()[0].directive()->get() == "pedantic"
+      Calling: test_c_wsp( "    #pedantic" ) (81)
+    ok: h.grammar().size() == 1
+    ok: h.grammar()[0].is_directive()
+    ok: h.grammar()[0].directive()->get() == "pedantic"
+      Calling: test_c_wsp( ";My first jcr\n" "#pedantic" ) (83)
+    ok: h.grammar().size() == 1
+    ok: h.grammar()[0].is_directive()
+    ok: h.grammar()[0].directive()->get() == "pedantic"
+      Calling: test_c_wsp( "   ;My first jcr\n" "#pedantic" ) (85)
+    ok: h.grammar().size() == 1
+    ok: h.grammar()[0].is_directive()
+    ok: h.grammar()[0].directive()->get() == "pedantic"
+      Calling: test_c_wsp( "   ;My first jcr\n" ";More grammars\r\n" "#pedantic" ) (88)
+    ok: h.grammar().size() == 1
+    ok: h.grammar()[0].is_directive()
+    ok: h.grammar()[0].directive()->get() == "pedantic"
+      Calling: test_c_wsp( "   \n" "   ;My first jcr\n" ";More grammars\r\n" "#pedantic" ) (92)
+    ok: h.grammar().size() == 1
+    ok: h.grammar()[0].is_directive()
+    ok: h.grammar()[0].directive()->get() == "pedantic"
+      Calling: test_c_wsp( "   ;My first jcr\n" ";More grammars\r\n" "#pedantic\n" "  ; Stuff at end" ) (96)
+    ok: h.grammar().size() == 1
+    ok: h.grammar()[0].is_directive()
+    ok: h.grammar()[0].directive()->get() == "pedantic"
+      Calling: test_c_wsp_2_directives( "#pedantic\n" "#language-compatible-members" ) (100)
+    ok: h.grammar().size() == 2
+    ok: h.grammar()[0].is_directive()
+    ok: h.grammar()[0].directive()->get() == "pedantic"
+    ok: h.grammar()[1].is_directive()
+    ok: h.grammar()[1].directive()->get() == "language-compatible-members"
+      Calling: test_c_wsp_2_directives( "    #pedantic\n" "    #language-compatible-members" ) (103)
+    ok: h.grammar().size() == 2
+    ok: h.grammar()[0].is_directive()
+    ok: h.grammar()[0].directive()->get() == "pedantic"
+    ok: h.grammar()[1].is_directive()
+    ok: h.grammar()[1].directive()->get() == "language-compatible-members"
+      Calling: test_c_wsp_2_directives( "; A comment\n" "#pedantic\n" "; Another comment\n" "#language-compatible-members" ) (108)
+    ok: h.grammar().size() == 2
+    ok: h.grammar()[0].is_directive()
+    ok: h.grammar()[0].directive()->get() == "pedantic"
+    ok: h.grammar()[1].is_directive()
+    ok: h.grammar()[1].directive()->get() == "language-compatible-members"
+      Calling: test_c_wsp_2_directives( "   ; A comment\n" "#pedantic\n" "   ; Another comment\n" "#language-compatible-members" ) (113)
+    ok: h.grammar().size() == 2
+    ok: h.grammar()[0].is_directive()
+    ok: h.grammar()[0].directive()->get() == "pedantic"
+    ok: h.grammar()[1].is_directive()
+    ok: h.grammar()[1].directive()->get() == "language-compatible-members"
+      Calling: test_c_wsp_2_directives( "   ; A comment\n" "#pedantic\n" "   ; Another comment\n" "#language-compatible-members\r\n" ";More comments\n" ) (119)
+    ok: h.grammar().size() == 2
+    ok: h.grammar()[0].is_directive()
+    ok: h.grammar()[0].directive()->get() == "pedantic"
+    ok: h.grammar()[1].is_directive()
+    ok: h.grammar()[1].directive()->get() == "language-compatible-members"
+      Calling: test_c_wsp_2_directives( "   ; A comment\n" "#pedantic\n" "   ; Another comment\n" "#language-compatible-members\r\n" "    ;More comments\n" ) (125)
+    ok: h.grammar().size() == 2
+    ok: h.grammar()[0].is_directive()
+    ok: h.grammar()[0].directive()->get() == "pedantic"
+    ok: h.grammar()[1].is_directive()
+    ok: h.grammar()[1].directive()->get() == "language-compatible-members"
+      Calling: test_c_wsp_2_directives( "   ; A comment\n" "#pedantic\n" "   ; Another comment\n" "   ; Also a comment\n" "#language-compatible-members\r\n" "    ;More comments\n" ) (132)
+    ok: h.grammar().size() == 2
+    ok: h.grammar()[0].is_directive()
+    ok: h.grammar()[0].directive()->get() == "pedantic"
+    ok: h.grammar()[1].is_directive()
+    ok: h.grammar()[1].directive()->get() == "language-compatible-members"
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    GrammarParser - parsing directives [test-grammar-parser.cpp:135]
+    ================================================================
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    GrammarSet TODOS [test-grammar-set.cpp:40]
+    ==========================================
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
     Miscellaneous TODOs [test-main.cpp:37]
     ======================================
@@ -56,21 +138,13 @@ Tests run on Wed Jul 15 17:16:39 2015
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
-
-    GrammarSet TODOS [test-grammar-set.cpp:40]
-    ==========================================
-    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
-
-    GrammarParser - parsing c-wsp [test-grammar-parser.cpp:40]
-    ==========================================================
-    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
 
 TODOs (4):
 ------------------------
-- Verify if we really need Grammar::append_rule() [test-object-creation.cpp:187]
+- Test GrammarParser - parsing directives [test-grammar-parser.cpp:137]
 - Test GrammarSet class [test-grammar-set.cpp:42]
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:44]
-- Test GrammarParser - parsing c-wsp [test-grammar-parser.cpp:42]
+- Verify if we really need Grammar::append_rule() [test-object-creation.cpp:187]
 
-0 error(s), 4 todo(s), 47 test(s)
+0 error(s), 4 todo(s), 104 test(s)

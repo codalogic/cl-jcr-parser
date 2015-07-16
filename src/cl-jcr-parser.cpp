@@ -20,7 +20,15 @@
 
 namespace cljcr {
 
+//----------------------------------------------------------------------------
+//                           Internal detail
+//----------------------------------------------------------------------------
+
 namespace { // Anonymous namespace for detail
+
+//----------------------------------------------------------------------------
+//                           class GrammarParser
+//----------------------------------------------------------------------------
 
 class GrammarParser : public cl::dsl_pa
 {
@@ -50,8 +58,9 @@ public:
 
 private:
     bool error( JCRParser::Status code, const char * p_message );
-    bool c_wsp();
-    bool opt_c_wsp();
+    bool one_star_c_wsp();
+	bool comment();
+    bool star_c_wsp();
     bool rule_or_directive();
     void directive();
     void rule();
@@ -71,10 +80,10 @@ GrammarParser::GrammarParser(
 bool GrammarParser::parse()
 {
     //  grammar         = 1*( *c-wsp (rule / directive) ) *c-wsp
-    while( opt_c_wsp() && rule_or_directive() )
+    while( star_c_wsp() && rule_or_directive() )
     {}
 
-    opt_c_wsp();
+    star_c_wsp();
 
     if( ! is_current_at_end() )
         error( JCRParser::S_EXPECTED_END_OF_RULES, "Unexpected input at end of rules" );
@@ -85,6 +94,8 @@ bool GrammarParser::parse()
 bool GrammarParser::rule_or_directive()
 {
     using namespace cl::alphabet_helpers;
+    
+    get();
 
     if( is_current_at_end() )
         return false;
@@ -104,10 +115,15 @@ bool GrammarParser::rule_or_directive()
 void GrammarParser::directive()
 {
     Directive * p_directive = m.p_grammar->append_directive();
+    std::string directive_line;
+    get_until( &directive_line, cl::alphabet_eol() );
+    p_directive->set( directive_line );
+    skip( cl::alphabet_eol() );
 }
 
 void GrammarParser::rule()
 {
+	// First character is in current()
 }
 
 void GrammarParser::recover_bad_rule_or_directive()
@@ -268,7 +284,7 @@ bool GrammarParser::error( JCRParser::Status code, const char * p_message )
     return false;
 }
 
-bool GrammarParser::c_wsp()
+bool GrammarParser::one_star_c_wsp()
 {
     //  c-wsp           = WSP / c-nl
     //  c-nl            = comment / EOL
@@ -278,29 +294,58 @@ bool GrammarParser::c_wsp()
     //  SP             =  %x20
     //  HTAB           =  %x09
 
-    size_t n_skipped = 0;
-    bool is_comment_found = true;
-    while( is_comment_found )
-    {
-        is_comment_found = false;
-        n_skipped += wsp();
+    bool is_found = false;
+    while( space() || comment() )
+		is_found = true;
 
-        if( peek_is( ';' ) )
-        {
-            is_comment_found = true;
-            n_skipped += skip_until( cl::alphabet_eol() );
-        }
-    }
-
-    return n_skipped > 0;
+    return is_found;
 }
 
-bool GrammarParser::opt_c_wsp()
+bool GrammarParser::comment()
 {
-    return optional( c_wsp() );
+    if( peek_is( ';' ) )
+    {
+        skip_until( cl::alphabet_eol() );
+        skip( cl::alphabet_eol() );
+        return true;
+    }
+    return false;
+}
+
+bool GrammarParser::star_c_wsp()
+{
+    return optional( one_star_c_wsp() );
 }
 
 } // End of Anonymous namespace
+
+//----------------------------------------------------------------------------
+//                           class Directive
+//----------------------------------------------------------------------------
+
+void Directive::set( const std::string & r_directive )
+{
+	using namespace cl::short_alphabets;
+
+	m.directive = r_directive;
+	cl::reader_string reader( r_directive );
+	cl::dsl_pa line_parser( reader );
+	for(;;)
+	{
+		line_parser.space();
+		std::string part;
+		line_parser.get( &part, and( not( space() ), not( semicolon() ) ) );
+		if( part.empty() )
+			break;
+		m.parts.push_back( part );
+		if( line_parser.current_is( ';' ) )
+			break;
+	}
+}
+
+//----------------------------------------------------------------------------
+//                           class JCRParser
+//----------------------------------------------------------------------------
 
 JCRParser::Status JCRParser::add_grammar( const char * p_file_name )
 {
