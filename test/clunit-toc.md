@@ -1,10 +1,10 @@
-Tests table of contents generated on Mon Jul 20 13:25:20 2015
+Tests table of contents generated on Mon Jul 20 19:00:43 2015
 
 # test-grammar-parser.cpp
 | Description | Line |
 |-------------|------|
-| GrammarParser - parsing c-wsp | 78 |
-| GrammarParser - parsing directives | 135 |
+| GrammarParser - parsing c-wsp | 82 |
+| GrammarParser - parsing directives | 160 |
 
 # test-grammar-set.cpp
 | Description | Line |
@@ -20,5 +20,5 @@ Tests table of contents generated on Mon Jul 20 13:25:20 2015
 | Description | Line |
 |-------------|------|
 | RuleOrDirective creation | 40 |
-| Grammar creation / deletion | 77 |
-| Grammar exception throwing on bad selection | 128 |
+| Grammar creation / deletion | 75 |
+| Grammar exception throwing on bad selection | 126 |

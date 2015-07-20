@@ -1,81 +1,170 @@
-Tests run on Mon Jul 20 13:25:20 2015
+Tests run on Mon Jul 20 19:00:43 2015
 
-    GrammarParser - parsing c-wsp [test-grammar-parser.cpp:78]
+    GrammarParser - parsing c-wsp [test-grammar-parser.cpp:82]
     ==========================================================
-      Calling: test_c_wsp( "#pedantic" ) (80)
+      Calling: test_c_wsp( "#pedantic" ) (84)
+    ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
     ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive()->get() == "pedantic"
-      Calling: test_c_wsp( "    #pedantic" ) (81)
+    ok: h.grammar()[0].directive().get() == "pedantic"
+      Calling: test_c_wsp( "    #pedantic" ) (85)
+    ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
     ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive()->get() == "pedantic"
-      Calling: test_c_wsp( ";My first jcr\n" "#pedantic" ) (83)
+    ok: h.grammar()[0].directive().get() == "pedantic"
+      Calling: test_c_wsp( ";My first jcr\n" "#pedantic" ) (87)
+    ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
     ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive()->get() == "pedantic"
-      Calling: test_c_wsp( "   ;My first jcr\n" "#pedantic" ) (85)
+    ok: h.grammar()[0].directive().get() == "pedantic"
+      Calling: test_c_wsp( "   ;My first jcr\n" "#pedantic" ) (89)
+    ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
     ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive()->get() == "pedantic"
-      Calling: test_c_wsp( "   ;My first jcr\n" ";More grammars\r\n" "#pedantic" ) (88)
+    ok: h.grammar()[0].directive().get() == "pedantic"
+      Calling: test_c_wsp( "   ;My first jcr\n" ";More grammars\r\n" "#pedantic" ) (92)
+    ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
     ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive()->get() == "pedantic"
-      Calling: test_c_wsp( "   \n" "   ;My first jcr\n" ";More grammars\r\n" "#pedantic" ) (92)
+    ok: h.grammar()[0].directive().get() == "pedantic"
+      Calling: test_c_wsp( "   \n" "   ;My first jcr\n" ";More grammars\r\n" "#pedantic" ) (96)
+    ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
     ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive()->get() == "pedantic"
-      Calling: test_c_wsp( "   ;My first jcr\n" ";More grammars\r\n" "#pedantic\n" "  ; Stuff at end" ) (96)
+    ok: h.grammar()[0].directive().get() == "pedantic"
+      Calling: test_c_wsp( "   ;My first jcr\n" ";More grammars\r\n" "#pedantic\n" "  ; Stuff at end" ) (100)
+    ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
     ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive()->get() == "pedantic"
-      Calling: test_c_wsp_2_directives( "#pedantic\n" "#language-compatible-members" ) (100)
+    ok: h.grammar()[0].directive().get() == "pedantic"
+      Calling: test_c_wsp_2_directives( "#pedantic\n" "#language-compatible-members" ) (104)
+    ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 2
     ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive()->get() == "pedantic"
+    ok: h.grammar()[0].directive().get() == "pedantic"
     ok: h.grammar()[1].is_directive()
-    ok: h.grammar()[1].directive()->get() == "language-compatible-members"
-      Calling: test_c_wsp_2_directives( "    #pedantic\n" "    #language-compatible-members" ) (103)
+    ok: h.grammar()[1].directive().get() == "language-compatible-members"
+      Calling: test_c_wsp_2_directives( "    #pedantic\n" "    #language-compatible-members" ) (107)
+    ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 2
     ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive()->get() == "pedantic"
+    ok: h.grammar()[0].directive().get() == "pedantic"
     ok: h.grammar()[1].is_directive()
-    ok: h.grammar()[1].directive()->get() == "language-compatible-members"
-      Calling: test_c_wsp_2_directives( "; A comment\n" "#pedantic\n" "; Another comment\n" "#language-compatible-members" ) (108)
+    ok: h.grammar()[1].directive().get() == "language-compatible-members"
+      Calling: test_c_wsp_2_directives( "; A comment\n" "#pedantic\n" "; Another comment\n" "#language-compatible-members" ) (112)
+    ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 2
     ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive()->get() == "pedantic"
+    ok: h.grammar()[0].directive().get() == "pedantic"
     ok: h.grammar()[1].is_directive()
-    ok: h.grammar()[1].directive()->get() == "language-compatible-members"
-      Calling: test_c_wsp_2_directives( "   ; A comment\n" "#pedantic\n" "   ; Another comment\n" "#language-compatible-members" ) (113)
+    ok: h.grammar()[1].directive().get() == "language-compatible-members"
+      Calling: test_c_wsp_2_directives( "   ; A comment\n" "#pedantic\n" "   ; Another comment\n" "#language-compatible-members" ) (117)
+    ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 2
     ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive()->get() == "pedantic"
+    ok: h.grammar()[0].directive().get() == "pedantic"
     ok: h.grammar()[1].is_directive()
-    ok: h.grammar()[1].directive()->get() == "language-compatible-members"
-      Calling: test_c_wsp_2_directives( "   ; A comment\n" "#pedantic\n" "   ; Another comment\n" "#language-compatible-members\r\n" ";More comments\n" ) (119)
+    ok: h.grammar()[1].directive().get() == "language-compatible-members"
+      Calling: test_c_wsp_2_directives( "   ; A comment\n" "#pedantic\n" "   ; Another comment\n" "#language-compatible-members\r\n" ";More comments\n" ) (123)
+    ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 2
     ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive()->get() == "pedantic"
+    ok: h.grammar()[0].directive().get() == "pedantic"
     ok: h.grammar()[1].is_directive()
-    ok: h.grammar()[1].directive()->get() == "language-compatible-members"
-      Calling: test_c_wsp_2_directives( "   ; A comment\n" "#pedantic\n" "   ; Another comment\n" "#language-compatible-members\r\n" "    ;More comments\n" ) (125)
+    ok: h.grammar()[1].directive().get() == "language-compatible-members"
+      Calling: test_c_wsp_2_directives( "   ; A comment\n" "#pedantic\n" "   ; Another comment\n" "#language-compatible-members\r\n" "    ;More comments\n" ) (129)
+    ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 2
     ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive()->get() == "pedantic"
+    ok: h.grammar()[0].directive().get() == "pedantic"
     ok: h.grammar()[1].is_directive()
-    ok: h.grammar()[1].directive()->get() == "language-compatible-members"
-      Calling: test_c_wsp_2_directives( "   ; A comment\n" "#pedantic\n" "   ; Another comment\n" "   ; Also a comment\n" "#language-compatible-members\r\n" "    ;More comments\n" ) (132)
+    ok: h.grammar()[1].directive().get() == "language-compatible-members"
+      Calling: test_c_wsp_2_directives( "   ; A comment\n" "#pedantic\n" "   ; Another comment\n" "   ; Also a comment\n" "#language-compatible-members\r\n" "    ;More comments\n" ) (136)
+    ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 2
     ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive()->get() == "pedantic"
+    ok: h.grammar()[0].directive().get() == "pedantic"
     ok: h.grammar()[1].is_directive()
-    ok: h.grammar()[1].directive()->get() == "language-compatible-members"
+    ok: h.grammar()[1].directive().get() == "language-compatible-members"
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - parsing directives [test-grammar-parser.cpp:135]
+    GrammarParser - parsing directives [test-grammar-parser.cpp:160]
     ================================================================
+      Calling: test_2_directives( "#name http://example.com/myjcr.jcr\n" "#import http://example.com/otherjcr.jcr as other" ) (164)
+    ok: h.status() == JCRParser::S_OK
+    ok: h.grammar().size() == 2
+    ok: h.grammar()[0].is_directive()
+    ok: h.grammar()[0].directive().get() == "name http://example.com/myjcr.jcr"
+    ok: h.grammar()[0].directive().size() == 2
+    ok: h.grammar()[0].directive()[0] == "name"
+    ok: h.grammar()[0].directive().get(1) == "http://example.com/myjcr.jcr"
+    ok: h.grammar()[1].is_directive()
+    ok: h.grammar()[1].directive().size() == 4
+    ok: h.grammar()[1].directive().get() == "import http://example.com/otherjcr.jcr as other"
+    ok: h.grammar()[1].directive()[0] == "import"
+    ok: h.grammar()[1].directive().get(1) == "http://example.com/otherjcr.jcr"
+    ok: h.grammar()[1].directive().get(2) == "as"
+    ok: h.grammar()[1].directive().get(3) == "other"
+      Calling: test_2_directives( "#name http://example.com/myjcr.jcr\n" "#import http://example.com/otherjcr.jcr as other\n" ) (167)
+    ok: h.status() == JCRParser::S_OK
+    ok: h.grammar().size() == 2
+    ok: h.grammar()[0].is_directive()
+    ok: h.grammar()[0].directive().get() == "name http://example.com/myjcr.jcr"
+    ok: h.grammar()[0].directive().size() == 2
+    ok: h.grammar()[0].directive()[0] == "name"
+    ok: h.grammar()[0].directive().get(1) == "http://example.com/myjcr.jcr"
+    ok: h.grammar()[1].is_directive()
+    ok: h.grammar()[1].directive().size() == 4
+    ok: h.grammar()[1].directive().get() == "import http://example.com/otherjcr.jcr as other"
+    ok: h.grammar()[1].directive()[0] == "import"
+    ok: h.grammar()[1].directive().get(1) == "http://example.com/otherjcr.jcr"
+    ok: h.grammar()[1].directive().get(2) == "as"
+    ok: h.grammar()[1].directive().get(3) == "other"
+      Calling: test_2_directives( "\n" "#name http://example.com/myjcr.jcr\n" "\n" "#import http://example.com/otherjcr.jcr as other\n" "\n" ) (173)
+    ok: h.status() == JCRParser::S_OK
+    ok: h.grammar().size() == 2
+    ok: h.grammar()[0].is_directive()
+    ok: h.grammar()[0].directive().get() == "name http://example.com/myjcr.jcr"
+    ok: h.grammar()[0].directive().size() == 2
+    ok: h.grammar()[0].directive()[0] == "name"
+    ok: h.grammar()[0].directive().get(1) == "http://example.com/myjcr.jcr"
+    ok: h.grammar()[1].is_directive()
+    ok: h.grammar()[1].directive().size() == 4
+    ok: h.grammar()[1].directive().get() == "import http://example.com/otherjcr.jcr as other"
+    ok: h.grammar()[1].directive()[0] == "import"
+    ok: h.grammar()[1].directive().get(1) == "http://example.com/otherjcr.jcr"
+    ok: h.grammar()[1].directive().get(2) == "as"
+    ok: h.grammar()[1].directive().get(3) == "other"
+      Calling: test_2_directives( "; with comments\n" "#name http://example.com/myjcr.jcr\n" "; Another comment\n" "#import http://example.com/otherjcr.jcr as other\n" "\n" ) (179)
+    ok: h.status() == JCRParser::S_OK
+    ok: h.grammar().size() == 2
+    ok: h.grammar()[0].is_directive()
+    ok: h.grammar()[0].directive().get() == "name http://example.com/myjcr.jcr"
+    ok: h.grammar()[0].directive().size() == 2
+    ok: h.grammar()[0].directive()[0] == "name"
+    ok: h.grammar()[0].directive().get(1) == "http://example.com/myjcr.jcr"
+    ok: h.grammar()[1].is_directive()
+    ok: h.grammar()[1].directive().size() == 4
+    ok: h.grammar()[1].directive().get() == "import http://example.com/otherjcr.jcr as other"
+    ok: h.grammar()[1].directive()[0] == "import"
+    ok: h.grammar()[1].directive().get(1) == "http://example.com/otherjcr.jcr"
+    ok: h.grammar()[1].directive().get(2) == "as"
+    ok: h.grammar()[1].directive().get(3) == "other"
+      Calling: test_2_directives( "; with comments\n" "   \n" "#name http://example.com/myjcr.jcr\n" "\n" "; Another comment\n" "\n" "#import http://example.com/otherjcr.jcr as other\n" "; Yet another comment\n" "\n" ) (189)
+    ok: h.status() == JCRParser::S_OK
+    ok: h.grammar().size() == 2
+    ok: h.grammar()[0].is_directive()
+    ok: h.grammar()[0].directive().get() == "name http://example.com/myjcr.jcr"
+    ok: h.grammar()[0].directive().size() == 2
+    ok: h.grammar()[0].directive()[0] == "name"
+    ok: h.grammar()[0].directive().get(1) == "http://example.com/myjcr.jcr"
+    ok: h.grammar()[1].is_directive()
+    ok: h.grammar()[1].directive().size() == 4
+    ok: h.grammar()[1].directive().get() == "import http://example.com/otherjcr.jcr as other"
+    ok: h.grammar()[1].directive()[0] == "import"
+    ok: h.grammar()[1].directive().get(1) == "http://example.com/otherjcr.jcr"
+    ok: h.grammar()[1].directive().get(2) == "as"
+    ok: h.grammar()[1].directive().get(3) == "other"
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
     GrammarSet TODOS [test-grammar-set.cpp:40]
@@ -90,15 +179,13 @@ Tests run on Mon Jul 20 13:25:20 2015
     ======================================================
     ok: pu_rule_or_directive->is_rule() == true
     ok: pu_rule_or_directive->is_directive() == false
-    ok: pu_rule_or_directive->rule() != 0
     ok: true
     ok: pu_rule_or_directive->is_directive() == true
     ok: pu_rule_or_directive->is_rule() == false
-    ok: pu_rule_or_directive->directive() != 0
     ok: true
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Grammar creation / deletion [test-object-creation.cpp:77]
+    Grammar creation / deletion [test-object-creation.cpp:75]
     =========================================================
     ok: i != end
     ok: i->is_directive()
@@ -128,7 +215,7 @@ Tests run on Mon Jul 20 13:25:20 2015
     ok: grammar[1].is_rule()
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Grammar exception throwing on bad selection [test-object-creation.cpp:128]
+    Grammar exception throwing on bad selection [test-object-creation.cpp:126]
     ==========================================================================
     ok: true
     ok: true
@@ -140,11 +227,10 @@ Tests run on Mon Jul 20 13:25:20 2015
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
 
-TODOs (4):
+TODOs (3):
 ------------------------
-- Test GrammarParser - parsing directives [test-grammar-parser.cpp:137]
 - Test GrammarSet class [test-grammar-set.cpp:42]
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:44]
-- Verify if we really need Grammar::append_rule() [test-object-creation.cpp:187]
+- Verify if we really need Grammar::append_rule() [test-object-creation.cpp:185]
 
-0 error(s), 4 todo(s), 104 test(s)
+0 error(s), 3 todo(s), 186 test(s)

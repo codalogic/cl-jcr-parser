@@ -43,6 +43,7 @@ private:
     struct Members {
         GrammarSet grammar_set;
         JCRParser jcr_parser;
+        JCRParser::Status status;
 
         Members() : jcr_parser( &grammar_set ) {}
     } m;
@@ -50,8 +51,9 @@ private:
 public:
     ParserHarness( const char * p_jcr )
     {
-        m.jcr_parser.add_grammar( p_jcr, strlen( p_jcr ) );
+        m.status = m.jcr_parser.add_grammar( p_jcr, strlen( p_jcr ) );
     }
+    const JCRParser::Status status() const { return m.status; }
     const Grammar & grammar() const { return m.grammar_set[0]; }
 };
 
@@ -59,20 +61,22 @@ void test_c_wsp( const char * p_jcr )
 {
     ParserHarness h( p_jcr );
 
+    TCRITICALTEST( h.status() == JCRParser::S_OK );
     TCRITICALTEST( h.grammar().size() == 1 );
     TCRITICALTEST( h.grammar()[0].is_directive() );
-    TCRITICALTEST( h.grammar()[0].directive()->get() == "pedantic" );
+    TCRITICALTEST( h.grammar()[0].directive().get() == "pedantic" );
 }
 
 void test_c_wsp_2_directives( const char * p_jcr )
 {
     ParserHarness h( p_jcr );
 
+    TCRITICALTEST( h.status() == JCRParser::S_OK );
     TCRITICALTEST( h.grammar().size() == 2 );
     TCRITICALTEST( h.grammar()[0].is_directive() );
-    TCRITICALTEST( h.grammar()[0].directive()->get() == "pedantic" );
+    TCRITICALTEST( h.grammar()[0].directive().get() == "pedantic" );
     TCRITICALTEST( h.grammar()[1].is_directive() );
-    TCRITICALTEST( h.grammar()[1].directive()->get() == "language-compatible-members" );
+    TCRITICALTEST( h.grammar()[1].directive().get() == "language-compatible-members" );
 }
 
 TFEATURE( "GrammarParser - parsing c-wsp" )
@@ -132,7 +136,55 @@ TFEATURE( "GrammarParser - parsing c-wsp" )
                         "    ;More comments\n" ) );
 }
 
+void test_2_directives( const char * p_jcr )
+{
+    ParserHarness h( p_jcr );
+    TCRITICALTEST( h.status() == JCRParser::S_OK );
+    TCRITICALTEST( h.grammar().size() == 2 );
+
+    TCRITICALTEST( h.grammar()[0].is_directive() );
+    TTEST( h.grammar()[0].directive().get() == "name http://example.com/myjcr.jcr" );
+    TCRITICALTEST( h.grammar()[0].directive().size() == 2 );
+    TTEST( h.grammar()[0].directive()[0] == "name" );
+    TTEST( h.grammar()[0].directive().get(1) == "http://example.com/myjcr.jcr" );
+
+    TCRITICALTEST( h.grammar()[1].is_directive() );
+    TCRITICALTEST( h.grammar()[1].directive().size() == 4 );
+    TTEST( h.grammar()[1].directive().get() == "import http://example.com/otherjcr.jcr as other" );
+    TTEST( h.grammar()[1].directive()[0] == "import" );
+    TTEST( h.grammar()[1].directive().get(1) == "http://example.com/otherjcr.jcr" );
+    TTEST( h.grammar()[1].directive().get(2) == "as" );
+    TTEST( h.grammar()[1].directive().get(3) == "other" );
+}
+
 TFEATURE( "GrammarParser - parsing directives" )
 {
-    TTODO( "Test GrammarParser - parsing directives" );
+    TCALL( test_2_directives(
+                "#name http://example.com/myjcr.jcr\n"
+                "#import http://example.com/otherjcr.jcr as other" ) );
+    TCALL( test_2_directives(
+                "#name http://example.com/myjcr.jcr\n"
+                "#import http://example.com/otherjcr.jcr as other\n" ) );
+    TCALL( test_2_directives(
+                "\n"
+                "#name http://example.com/myjcr.jcr\n"
+                "\n"
+                "#import http://example.com/otherjcr.jcr as other\n"
+                "\n" ) );
+    TCALL( test_2_directives(
+                "; with comments\n"
+                "#name http://example.com/myjcr.jcr\n"
+                "; Another comment\n"
+                "#import http://example.com/otherjcr.jcr as other\n"
+                "\n" ) );
+    TCALL( test_2_directives(
+                "; with comments\n"
+                "   \n"
+                "#name http://example.com/myjcr.jcr\n"
+                "\n"
+                "; Another comment\n"
+                "\n"
+                "#import http://example.com/otherjcr.jcr as other\n"
+                "; Yet another comment\n"
+                "\n" ) );
 }

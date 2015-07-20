@@ -53,7 +53,8 @@ public:
     void set( const std::string & r_directive );
     const std::string & get() const { return m.directive; }
     size_t size() const { return m.parts.size(); }
-    const std::string & operator [] ( size_t i ) const  { return m.parts[i]; }
+    const std::string & get( size_t i ) const  { return m.parts[i]; }
+    const std::string & operator [] ( size_t i ) const  { return get( i ); }
 };
 
 class RuleOrDirective
@@ -88,30 +89,30 @@ public:
     }
 
     virtual bool is_directive() const { return m.p_directive != 0; }
-    virtual const Directive * directive() const
+    virtual const Directive & directive() const
     {
         if( ! is_directive() )
             throw BadDirectiveRequest();
-        return m.p_directive;
+        return *m.p_directive;
     }
-    virtual Directive * directive()
+    virtual Directive & directive()
     {
         if( ! is_directive() )
             throw BadDirectiveRequest();
-        return m.p_directive;
+        return *m.p_directive;
     }
     virtual bool is_rule() const { return m.p_rule != 0; }
-    virtual const Rule * rule() const
+    virtual const Rule & rule() const
     {
         if( ! is_rule() )
             throw BadRuleRequest();
-        return m.p_rule;
+        return *m.p_rule;
     }
-    virtual Rule * rule()
+    virtual Rule & rule()
     {
         if( ! is_rule() )
             throw BadRuleRequest();
-        return m.p_rule;
+        return *m.p_rule;
     }
 };
 
@@ -128,34 +129,34 @@ public:
 
     ~Grammar() {}
 
-    RuleOrDirective * append( RuleOrDirective * p_rule_or_directive )
+    RuleOrDirective & append( RuleOrDirective * p_rule_or_directive )
     {
         RuleOrDirective::uniq_ptr pu_rule_or_directive( p_rule_or_directive );
         append( pu_rule_or_directive );
-        return p_rule_or_directive;
+        return *p_rule_or_directive;
     }
     void append( RuleOrDirective::uniq_ptr pu_rule_or_directive )
     {
         m.rules_and_directives.push_back( pu_rule_or_directive.get() );
         pu_rule_or_directive.release();
     }
-    Directive * append( Directive * p_directive )
+    Directive & append( Directive * p_directive )
     {
         append( RuleOrDirective::make( p_directive ) );
-        return p_directive;
+        return *p_directive;
     }
-    Rule * append( Rule * p_rule )
+    Rule & append( Rule * p_rule )
     {
         append( RuleOrDirective::make( p_rule ) );
-        return p_rule;
+        return *p_rule;
     }
-    Directive * append_directive()
+    Directive & append_directive()
     {
-        return append( RuleOrDirective::make_directive() )->directive();
+        return append( RuleOrDirective::make_directive() ).directive();
     }
-    Rule * append_rule()
+    Rule & append_rule()
     {
-        return append( RuleOrDirective::make_rule() )->rule();
+        return append( RuleOrDirective::make_rule() ).rule();
     }
 
     const RuleOrDirective & back() const
@@ -176,19 +177,19 @@ public:
     }
     const Directive & back_directive() const
     {
-        return *back().directive();
+        return back().directive();
     }
     Directive & back_directive()
     {
-        return *back().directive();
+        return back().directive();
     }
     const Rule & back_rule() const
     {
-        return *back().rule();
+        return back().rule();
     }
     Rule & back_rule()
     {
-        return *back().rule();
+        return back().rule();
     }
 
     typedef container_t::const_iterator const_iterator;
@@ -213,21 +214,21 @@ private:
 
 public:
     GrammarSet() {}
-    Grammar * append( Grammar * p_grammar )
+    Grammar & append( Grammar * p_grammar )
     {
         Grammar::uniq_ptr pu_grammar( p_grammar );
         append( pu_grammar );
-        return p_grammar;
+        return *p_grammar;
     }
     void append( Grammar::uniq_ptr pu_grammar )
     {
         m.grammars.push_back( pu_grammar.get() );
         pu_grammar.release();
     }
-    Grammar * append_grammar()
+    Grammar & append_grammar()
     {
         append( new Grammar() );
-        return &(m.grammars.back());
+        return m.grammars.back();
     }
 
     typedef container_t::const_iterator const_iterator;

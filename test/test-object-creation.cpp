@@ -44,7 +44,6 @@ TFEATURE( "RuleOrDirective creation" )
 
     TTEST( pu_rule_or_directive->is_rule() == true );
     TTEST( pu_rule_or_directive->is_directive() == false );
-    TTEST( pu_rule_or_directive->rule() != 0 );
     try
     {
         pu_rule_or_directive->directive();
@@ -61,7 +60,6 @@ TFEATURE( "RuleOrDirective creation" )
 
     TTEST( pu_rule_or_directive->is_directive() == true );
     TTEST( pu_rule_or_directive->is_rule() == false );
-    TTEST( pu_rule_or_directive->directive() != 0 );
     try
     {
         pu_rule_or_directive->rule();
@@ -78,8 +76,8 @@ TFEATURE( "Grammar creation / deletion" )
 {
     {
     Grammar grammar;
-    Directive * p_directive = grammar.append_directive();
-    Rule * p_rule = grammar.append_rule();
+    Directive & r_directive = grammar.append_directive();
+    Rule & r_rule = grammar.append_rule();
 
     Grammar::const_iterator i = grammar.begin(), end = grammar.end();
     TTEST( i != end );

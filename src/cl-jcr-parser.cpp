@@ -40,9 +40,10 @@ private:
         cl::reader & r_reader;
         JCRParser::Status status;
 
-        Members( JCRParser * p_parent_in,
-                cl::reader & r_reader_in,
-                Grammar * p_grammar_in )
+        Members(
+            JCRParser * p_parent_in,
+            cl::reader & r_reader_in,
+            Grammar * p_grammar_in )
             :
             p_parent( p_parent_in ),
             p_grammar( p_grammar_in ),
@@ -57,15 +58,15 @@ public:
     JCRParser::Status status() const { return m.status; }
 
 private:
-    bool error( JCRParser::Status code, const char * p_message );
-    bool one_star_c_wsp();
-    bool comment();
-    bool star_c_wsp();
     bool rule_or_directive();
     void directive();
     void rule();
+    bool one_star_c_wsp();
+    bool comment();
+    bool star_c_wsp();
     void recover_bad_rule_or_directive();
     void recover_badly();
+    bool error( JCRParser::Status code, const char * p_message );
 };
 
 GrammarParser::GrammarParser(
@@ -114,27 +115,16 @@ bool GrammarParser::rule_or_directive()
 
 void GrammarParser::directive()
 {
-    Directive * p_directive = m.p_grammar->append_directive();
+    Directive & r_directive = m.p_grammar->append_directive();
     std::string directive_line;
     get_until( &directive_line, cl::alphabet_eol() );
-    p_directive->set( directive_line );
+    r_directive.set( directive_line );
     skip( cl::alphabet_eol() );
 }
 
 void GrammarParser::rule()
 {
     // First character is in current()
-}
-
-void GrammarParser::recover_bad_rule_or_directive()
-{
-    recover_badly();
-}
-
-void GrammarParser::recover_badly()
-{
-    while( get() && ! is_current_at_end() )
-    {}
 }
     //
     //  rule            = rulename *c-wsp definition
@@ -204,7 +194,7 @@ void GrammarParser::recover_badly()
     //
     //  object-member   = ["?" *c-wsp ] object-item
     //  object-item     = ( rule-ref / member-rule / group-rule )
-    //  and-or          = ( "," / "/" )
+    //  and-or          = ( "," / "|" )
     //
     //  rule-ref        = [ module-name '#' ] rule-name
     //
@@ -218,7 +208,6 @@ void GrammarParser::recover_badly()
     //                                     ) *c-wsp "]"
     //
     //  array-member    = [ array-count *c-wsp ] definition-rule
-    //                   [ *c-wsp "/" *c-wsp array-member ]
     //
     //  array-count     = [int] *c-wsp "*" *c-wsp [int]
     //
@@ -282,14 +271,6 @@ void GrammarParser::recover_badly()
     //  VCHAR          =  %x21-7E
 
 
-bool GrammarParser::error( JCRParser::Status code, const char * p_message )
-{
-    if( m.status == JCRParser::S_OK )
-        m.status = code;
-    m.p_parent->error( m.r_reader.get_line_number(), m.r_reader.get_column_number(), code, p_message );
-    return false;
-}
-
 bool GrammarParser::one_star_c_wsp()
 {
     //  c-wsp           = WSP / c-nl
@@ -321,6 +302,25 @@ bool GrammarParser::comment()
 bool GrammarParser::star_c_wsp()
 {
     return optional( one_star_c_wsp() );
+}
+
+void GrammarParser::recover_bad_rule_or_directive()
+{
+    recover_badly();
+}
+
+void GrammarParser::recover_badly()
+{
+    while( get() && ! is_current_at_end() )
+    {}
+}
+
+bool GrammarParser::error( JCRParser::Status code, const char * p_message )
+{
+    if( m.status == JCRParser::S_OK )
+        m.status = code;
+    m.p_parent->error( m.r_reader.get_line_number(), m.r_reader.get_column_number(), code, p_message );
+    return false;
 }
 
 } // End of Anonymous namespace
@@ -383,7 +383,7 @@ JCRParser::Status JCRParser::link()
 
 JCRParser::Status JCRParser::parse_grammar( cl::reader & reader )
 {
-    GrammarParser parser( this, reader, m.p_grammar_set->append_grammar() );
+    GrammarParser parser( this, reader, &m.p_grammar_set->append_grammar() );
 
     parser.parse();
 
