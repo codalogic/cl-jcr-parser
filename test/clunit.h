@@ -49,6 +49,7 @@ example-test.cpp:
     TFEATURE( "Example tests" )         // Register test with descriptive name
     {
         TDOC( "Test description" );     // Add any documentation (anywhere in function)
+        TTOC( "Example description" );  // Output table of contents entry to toc file
         TSETUP( int t=1 );              // Do any lines needed to setup a test
         int b=1;                        // Use of TSETUP for test setup is optional
         TTODO( "Need todo this" );      // Log any tests that need to be done
@@ -131,6 +132,7 @@ namespace cl {
 #define TFUNCTION( f ) static void f(); TREGISTER( f ); void f()
 #define TREGISTER( f ) static cl::clunit f ## _registered_clunit_test( f );
 #define TBEGIN( d ) cl::clunit::tbegin( d, __FILE__, __LINE__ )
+#define TTOC( d ) cl::clunit::ttoc( d, __FILE__, __LINE__ )
 #define TDOC( d ) cl::clunit::tdoc( d )
 #define TSETUP( x ) cl::clunit::tsetup_log( #x ); x
 #define TTODO( d ) cl::clunit::ttodo( d, __FILE__, __LINE__ )
@@ -220,7 +222,7 @@ private:
 
         job_list & get_jobs();
         std::ostream & tout();
-        std::ostream & ttoc();
+        std::ostream & ttocout();
 
     public:
         singleton()
@@ -255,15 +257,19 @@ private:
             std::string heading( documentation.str() );
             std::string underline( heading.size(), '=' );
             print_to_all_outputs( indent + heading + "\n" + indent + underline + "\n" );
+            ttoc( what, file, line);
+        }
+        void ttoc( const char * what, const char * file, int line )
+        {
             if( ! p_current_test_file || strcmp( p_current_test_file, file ) != 0 )
             {
-                ttoc() << "\n";
-                ttoc() << "# " << file_base( file ) << "\n";
-                ttoc() << "| Description | Line |\n";
-                ttoc() << "|-------------|------|\n";
+                ttocout() << "\n";
+                ttocout() << "# " << file_base( file ) << "\n";
+                ttocout() << "| Description | Line |\n";
+                ttocout() << "|-------------|------|\n";
                 p_current_test_file = file;
             }
-            ttoc() << "| " << what << " | " << line << " |\n";
+            ttocout() << "| " << what << " | " << line << " |\n";
         }
         void tdoc( const char * what )
         {
@@ -445,6 +451,8 @@ public:
         { my_singleton.tregister( job, p_description, p_file, line ); }
     static void tbegin( const char * what, const char * file, int line )
         { my_singleton.tbegin( what, file, line ); }
+    static void ttoc( const char * what, const char * file, int line )
+        { my_singleton.ttoc( what, file, line ); }
     static void tdoc( const char * what )
         { my_singleton.tdoc( what ); }
     static void tsetup_log( const char * what )
@@ -506,7 +514,7 @@ public:
         }
         return os;
     }
-    std::ostream & clunit::singleton::ttoc()
+    std::ostream & clunit::singleton::ttocout()
     {
         static std::ofstream os( "clunit-toc.md" );
         if( is_first_ttoc )
