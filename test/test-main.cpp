@@ -36,4 +36,11 @@
 
 TFEATURE( "Miscellaneous TODOs" )
 {
+    TTODO( "Implement ValueRuleAdapters" );
+
+    TTODO( "Make RefRule set method split input into module and local parts" );
+
+    TTODO( "Test ValueType class" );
+
+    TTODO( "Test ValueRule class and derivatives" );
 }

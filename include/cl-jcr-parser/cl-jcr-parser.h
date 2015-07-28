@@ -13,6 +13,7 @@
 
 #include <cassert>
 #include <memory>
+#include <map>
 
 namespace cl { class reader; }
 
@@ -28,14 +29,258 @@ struct uniq_ptr
 #endif
 };
 
-class BadRuleOrDirectiveRequest : public std::exception {};
-class BadDirectiveRequest : public BadRuleOrDirectiveRequest {};
-class BadRuleRequest : public BadRuleOrDirectiveRequest {};
+class BadSelectorRequest : public std::exception {};
+
+class SimpleType;
+class UnionType;
+class EnumType;
+
+class BadValueTypeRequest : public BadSelectorRequest {};
+class BadSimpleTypeRequest : public BadValueTypeRequest {};
+class BadUnionTypeRequest : public BadValueTypeRequest {};
+class BadEnumTypeRequest : public BadValueTypeRequest {};
+
+class ValueType
+{
+public:
+    virtual bool is_simple_type() const { return false; }
+    virtual const SimpleType & simple_type() const { assert(0); throw BadSimpleTypeRequest(); }
+    virtual SimpleType & simple_type() { assert(0); throw BadSimpleTypeRequest(); }
+
+    virtual bool is_union_type() const { return false; }
+    virtual const UnionType & union_type() const { assert(0); throw BadUnionTypeRequest(); }
+    virtual UnionType & union_type() { assert(0); throw BadUnionTypeRequest(); }
+
+    virtual bool is_enum_type() const { return false; }
+    virtual const EnumType & enum_type() const { assert(0); throw BadEnumTypeRequest(); }
+    virtual EnumType & enum_type() { assert(0); throw BadEnumTypeRequest(); }
+};
+
+class SimpleType : public ValueType
+{
+public:
+    enum Type {
+            NONE, TNULL, BOOLEAN, INTEGER, FLOAT, STRING, URI, IP4, IP6,
+            FQDN, IDN, DATETIME, DATE, TIME, EMAIL, PHONE, BASE64, ANY };
+
+private:
+    struct Members {
+        Type type;
+        std::map< std::string, std::string > parameters;
+
+        Members() : type( NONE ) {}
+    } m;
+
+public:
+    virtual bool is_simple_type() const { return true; }
+    virtual const SimpleType & simple_type() const { return *this; }
+    virtual SimpleType & simple_type() { return *this; }
+
+    void type( Type t ) { m.type = t; }
+    Type type() const { return m.type; }
+
+    // TODO: Add parameter accessors
+};
+
+class UnionType : public ValueType
+{
+private:
+    typedef clutils::ptr_vector< ValueType > value_type_container_t;
+    struct Members {
+        value_type_container_t values;
+    } m;
+
+    virtual bool is_union_type() const { return true; }
+    virtual const UnionType & union_type() const { return *this; }
+    virtual UnionType & union_type() { return *this; }
+};
+
+class EnumType : public ValueType
+{
+private:
+    struct Members {
+    } m;
+
+    virtual bool is_enum_type() const { return true; }
+    virtual const EnumType & enum_type() const { return *this; }
+    virtual EnumType & enum_type() { return *this; }
+};
+
+class BadSimpleTypeAdapter : public BadSelectorRequest {};
+
+class IntegerSimpleTypeAdapter
+{
+private:
+    struct Members {
+        const SimpleType & simple_type;
+
+        Members( const SimpleType & simple_type_in ) : simple_type( simple_type_in ) {}
+    } m;
+
+public:
+    IntegerSimpleTypeAdapter( const SimpleType & simple_type ) : m( simple_type )
+    {
+        if( m.simple_type.type() != SimpleType::INTEGER )
+            throw BadSimpleTypeAdapter();
+    }
+
+    bool has_min() const { assert(0); return false; }
+    int min() const { assert(0); return 0; }
+    bool has_max() const { assert(0); return false; }
+    int max() const { assert(0); return 0; }
+};
+
+class FloatSimpleTypeAdapter
+{
+private:
+    struct Members {
+        const SimpleType & simple_type;
+
+        Members( const SimpleType & simple_type_in ) : simple_type( simple_type_in ) {}
+    } m;
+
+public:
+    FloatSimpleTypeAdapter( const SimpleType & simple_type ) : m( simple_type )
+    {
+        if( m.simple_type.type() != SimpleType::FLOAT )
+            throw BadSimpleTypeAdapter();
+    }
+
+    bool has_min() const { assert(0); return false; }
+    double min() const { assert(0); return 0; }
+    bool has_max() const { assert(0); return false; }
+    double max() const { assert(0); return 0; }
+};
+
+class StringSimpleTypeAdapter
+{
+private:
+    struct Members {
+        const SimpleType & simple_type;
+
+        Members( const SimpleType & simple_type_in ) : simple_type( simple_type_in ) {}
+    } m;
+
+public:
+    StringSimpleTypeAdapter( const SimpleType & simple_type ) : m( simple_type )
+    {
+        if( m.simple_type.type() != SimpleType::STRING )
+            throw BadSimpleTypeAdapter();
+    }
+
+    bool has_pattern() const { assert(0); return false; }
+    const std::string & pattern() const { assert(0); static std::string empty; return empty; }
+};
+
+class RefRule;
+class ValueRule;
+class ObjectRule;
+class ArrayRule;
+
+class BadRuleSelectorRequest : public BadSelectorRequest {};
+class BadRefRuleRequest : public BadRuleSelectorRequest {};
+class BadValueRuleRequest : public BadRuleSelectorRequest {};
+class BadObjectRequest : public BadRuleSelectorRequest {};
+class BadArrayRequest : public BadRuleSelectorRequest {};
 
 class Rule
 {
+private:
+    struct Members {
+        std::string rule_name;
+        std::string member_name;
+    } m;
+
 public:
     typedef uniq_ptr<Rule>::type uniq_ptr;
+
+    void rule_name( const std::string & name ) { m.rule_name = name; }
+    const std::string & rule_name() const { return m.rule_name; }
+    void member_name( const std::string & name ) { m.member_name = name; }
+    const std::string & member_name() const { return m.member_name; }
+
+    virtual bool is_ref_rule() const { return false; }
+    virtual const RefRule & ref_rule() const { assert(0); throw BadRefRuleRequest(); }
+    virtual RefRule & ref_rule() { assert(0); throw BadRefRuleRequest(); }
+
+    virtual bool is_value_rule() const { return false; }
+    virtual const ValueRule & value_rule() const { assert(0); throw BadValueRuleRequest(); }
+    virtual ValueRule & value_rule() { assert(0); throw BadValueRuleRequest(); }
+
+    virtual bool is_object_rule() const { return false; }
+    virtual const ObjectRule & object_rule() const { assert(0); throw BadObjectRequest(); }
+    virtual ObjectRule & object_rule() { assert(0); throw BadObjectRequest(); }
+
+    virtual bool is_array_rule() const { return false; }
+    virtual const ArrayRule & array_rule() const { assert(0); throw BadArrayRequest(); }
+    virtual ArrayRule & array_rule() { assert(0); throw BadArrayRequest(); }
+};
+
+class RefRule : public Rule
+{
+private:
+    struct Members {
+        std::string module;
+        std::string local;
+    } m;
+
+public:
+    virtual bool is_ref_rule() const { return true; }
+    virtual const RefRule & ref_rule() const { return *this; }
+    virtual RefRule & ref_rule() { return *this; }
+
+    void ref( const std::string & ref ) { m.local = ref; }
+
+    const std::string & module() const { return m.module; }
+    const std::string & local() const { return m.local; }
+};
+
+class ValueRule : public Rule
+{
+private:
+    struct Members {
+        ValueType * p_value_type;
+
+        Members() : p_value_type( 0 ) {}
+    } m;
+
+public:
+    virtual bool is_value_rule() const { return true; }
+    virtual const ValueRule & value_rule() const { return *this; }
+    virtual ValueRule & value_rule() { return *this; }
+
+    ValueRule() {}
+    ~ValueRule() { delete m.p_value_type; }
+
+    void value_type( ValueType * p_value_type ) { m.p_value_type = p_value_type; }
+    const ValueType * value_type() const { return m.p_value_type; }
+    ValueType * value_type() { return m.p_value_type; }
+};
+
+class ObjectRule : public Rule
+{
+private:
+    typedef clutils::ptr_vector< Rule > rule_container_t;
+    struct Members {
+        rule_container_t children;
+    } m;
+
+    virtual bool is_object_rule() const { return true; }
+    virtual const ObjectRule & object_rule() const { return *this; }
+    virtual ObjectRule & object_rule() { return *this; }
+};
+
+class ArrayRule : public Rule
+{
+private:
+    typedef clutils::ptr_vector< Rule > rule_container_t;
+    struct Members {
+        rule_container_t children;
+    } m;
+
+    virtual bool is_array_rule() const { return true; }
+    virtual const ArrayRule & array_rule() const { return *this; }
+    virtual ArrayRule & array_rule() { return *this; }
 };
 
 class Directive
@@ -56,6 +301,10 @@ public:
     const std::string & get( size_t i ) const  { return m.parts[i]; }
     const std::string & operator [] ( size_t i ) const  { return get( i ); }
 };
+
+class BadRuleOrDirectiveRequest : public BadSelectorRequest {};
+class BadDirectiveRequest : public BadRuleOrDirectiveRequest {};
+class BadRuleRequest : public BadRuleOrDirectiveRequest {};
 
 class RuleOrDirective
 {

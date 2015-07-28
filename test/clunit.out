@@ -1,4 +1,4 @@
-Tests run on Mon Jul 20 19:00:43 2015
+Tests run on Tue Jul 28 17:38:15 2015
 
     GrammarParser - parsing c-wsp [test-grammar-parser.cpp:82]
     ==========================================================
@@ -227,10 +227,14 @@ Tests run on Mon Jul 20 19:00:43 2015
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
 
-TODOs (3):
+TODOs (7):
 ------------------------
 - Test GrammarSet class [test-grammar-set.cpp:42]
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:44]
+- Implement ValueRuleAdapters [test-main.cpp:39]
+- Make RefRule set method split input into module and local parts [test-main.cpp:41]
+- Test ValueType class [test-main.cpp:43]
+- Test ValueRule class and derivatives [test-main.cpp:45]
 - Verify if we really need Grammar::append_rule() [test-object-creation.cpp:185]
 
-0 error(s), 3 todo(s), 186 test(s)
+0 error(s), 7 todo(s), 186 test(s)
