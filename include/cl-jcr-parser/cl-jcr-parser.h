@@ -42,6 +42,10 @@ class BadEnumTypeRequest : public BadValueTypeRequest {};
 
 class ValueType
 {
+private:
+    ValueType( const ValueType & rhs ) /* = delete */;
+    ValueType & operator = ( const ValueType & rhs ) /* = delete */;
+
 public:
     virtual bool is_simple_type() const { return false; }
     virtual const SimpleType & simple_type() const { assert(0); throw BadSimpleTypeRequest(); }
@@ -191,8 +195,13 @@ private:
         std::string member_name;
     } m;
 
+    Rule( const Rule & rhs ) /* = delete */;
+    Rule & operator = ( const Rule & rhs ) /* = delete */;
+
 public:
     typedef uniq_ptr<Rule>::type uniq_ptr;
+
+    Rule() {}
 
     void rule_name( const std::string & name ) { m.rule_name = name; }
     const std::string & rule_name() const { return m.rule_name; }
@@ -244,6 +253,9 @@ private:
         Members() : p_value_type( 0 ) {}
     } m;
 
+    ValueRule( const ValueRule & );
+    ValueRule & operator = ( const ValueRule & );
+
 public:
     virtual bool is_value_rule() const { return true; }
     virtual const ValueRule & value_rule() const { return *this; }
@@ -255,6 +267,54 @@ public:
     void value_type( ValueType * p_value_type ) { m.p_value_type = p_value_type; }
     const ValueType * value_type() const { return m.p_value_type; }
     ValueType * value_type() { return m.p_value_type; }
+
+    virtual bool is_simple_type() const { return m.p_value_type && m.p_value_type->is_simple_type(); }
+    virtual const SimpleType & simple_type() const
+    {
+        assert( m.p_value_type );
+        if( ! m.p_value_type )
+            throw BadSimpleTypeRequest();
+        return m.p_value_type->simple_type();
+    }
+    virtual SimpleType & simple_type()
+    {
+        assert( m.p_value_type );
+        if( ! m.p_value_type )
+            throw BadSimpleTypeRequest();
+        return m.p_value_type->simple_type();
+    }
+
+    virtual bool is_union_type() const { return m.p_value_type && m.p_value_type->is_union_type(); }
+    virtual const UnionType & union_type() const
+    {
+        assert( m.p_value_type );
+        if( ! m.p_value_type )
+            throw BadSimpleTypeRequest();
+        return m.p_value_type->union_type();
+    }
+    virtual UnionType & union_type()
+    {
+        assert( m.p_value_type );
+        if( ! m.p_value_type )
+            throw BadUnionTypeRequest();
+        return m.p_value_type->union_type();
+    }
+
+    virtual bool is_enum_type() const { return m.p_value_type && m.p_value_type->is_enum_type(); }
+    virtual const EnumType & enum_type() const
+    {
+        assert( m.p_value_type );
+        if( ! m.p_value_type )
+            throw BadEnumTypeRequest();
+        return m.p_value_type->enum_type();
+    }
+    virtual EnumType & enum_type()
+    {
+        assert( m.p_value_type );
+        if( ! m.p_value_type )
+            throw BadEnumTypeRequest();
+        return m.p_value_type->enum_type();
+    }
 };
 
 class ObjectRule : public Rule
@@ -292,8 +352,13 @@ private:
         container_t parts;
     } m;
 
+    Directive( const Directive & rhs ) /* = delete */;
+    Directive & operator = ( const Directive & rhs ) /* = delete */;
+
 public:
     typedef uniq_ptr<Directive>::type uniq_ptr;
+
+    Directive() {}
 
     void set( const std::string & r_directive );
     const std::string & get() const { return m.directive; }
@@ -314,6 +379,9 @@ private:
         Rule * p_rule;
         Members() : p_directive( 0 ), p_rule( 0 ) {}
     } m;
+
+    RuleOrDirective( const RuleOrDirective & rhs ) /* = delete */;
+    RuleOrDirective & operator = ( const RuleOrDirective & rhs ) /* = delete */;
 
 public:
     typedef uniq_ptr<RuleOrDirective>::type uniq_ptr;
@@ -373,9 +441,13 @@ private:
         container_t rules_and_directives;
     } m;
 
+    Grammar( const Grammar & rhs ) /* = delete */;
+    Grammar & operator = ( const Grammar & rhs ) /* = delete */;
+
 public:
     typedef uniq_ptr<Grammar>::type uniq_ptr;
 
+    Grammar() {}
     ~Grammar() {}
 
     RuleOrDirective & append( RuleOrDirective * p_rule_or_directive )
@@ -461,6 +533,9 @@ private:
         container_t grammars;
     } m;
 
+    GrammarSet( const GrammarSet & rhs ) /* = delete */;
+    GrammarSet & operator = ( const GrammarSet & rhs ) /* = delete */;
+
 public:
     GrammarSet() {}
     Grammar & append( Grammar * p_grammar )
@@ -506,6 +581,9 @@ private:
             p_grammar_set( p_grammar_set_in )
         {}
     } m;
+
+    JCRParser( const JCRParser & rhs ) /* = delete */;
+    JCRParser & operator = ( const JCRParser & rhs ) /* = delete */;
 
 public:
     JCRParser( GrammarSet * p_grammar_set ) : m( p_grammar_set ) {}
