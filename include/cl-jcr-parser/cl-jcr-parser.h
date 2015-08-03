@@ -47,6 +47,8 @@ private:
     ValueType & operator = ( const ValueType & rhs ) /* = delete */;
 
 public:
+    ValueType() {}
+
     virtual bool is_simple_type() const { return false; }
     virtual const SimpleType & simple_type() const { assert(0); throw BadSimpleTypeRequest(); }
     virtual SimpleType & simple_type() { assert(0); throw BadSimpleTypeRequest(); }
@@ -268,6 +270,7 @@ public:
     const ValueType * value_type() const { return m.p_value_type; }
     ValueType * value_type() { return m.p_value_type; }
 
+    SimpleType & select_simple_type() { return select< SimpleType >(); }
     virtual bool is_simple_type() const { return m.p_value_type && m.p_value_type->is_simple_type(); }
     virtual const SimpleType & simple_type() const
     {
@@ -284,6 +287,7 @@ public:
         return m.p_value_type->simple_type();
     }
 
+    UnionType & select_union_type() { return select< UnionType >(); }
     virtual bool is_union_type() const { return m.p_value_type && m.p_value_type->is_union_type(); }
     virtual const UnionType & union_type() const
     {
@@ -300,6 +304,7 @@ public:
         return m.p_value_type->union_type();
     }
 
+    EnumType & select_enum_type() { return select< EnumType >(); }
     virtual bool is_enum_type() const { return m.p_value_type && m.p_value_type->is_enum_type(); }
     virtual const EnumType & enum_type() const
     {
@@ -314,6 +319,16 @@ public:
         if( ! m.p_value_type )
             throw BadEnumTypeRequest();
         return m.p_value_type->enum_type();
+    }
+
+private:
+    template< class Ttype >
+    Ttype & select()
+    {
+        Ttype * p = new Ttype;
+        delete m.p_value_type;
+        m.p_value_type = p;
+        return *p;
     }
 };
 
