@@ -19,6 +19,18 @@ namespace cl { class reader; }
 
 namespace cljcr {
 
+namespace detail {
+class NonCopyable   // Avoid requiring inclusion of boost for this
+{
+private:
+    NonCopyable( const NonCopyable & );
+    NonCopyable & operator = ( const NonCopyable & );
+
+protected:	// Intended to be inherited
+    NonCopyable() {}
+};
+} // namespace detail
+
 template<typename T>
 struct uniq_ptr
 {
@@ -40,15 +52,9 @@ class BadSimpleTypeRequest : public BadValueTypeRequest {};
 class BadUnionTypeRequest : public BadValueTypeRequest {};
 class BadEnumTypeRequest : public BadValueTypeRequest {};
 
-class ValueType
+class ValueType : private detail::NonCopyable
 {
-private:
-    ValueType( const ValueType & rhs ) /* = delete */;
-    ValueType & operator = ( const ValueType & rhs ) /* = delete */;
-
 public:
-    ValueType() {}
-
     virtual bool is_simple_type() const { return false; }
     virtual const SimpleType & simple_type() const { assert(0); throw BadSimpleTypeRequest(); }
     virtual SimpleType & simple_type() { assert(0); throw BadSimpleTypeRequest(); }
@@ -189,7 +195,7 @@ class BadValueRuleRequest : public BadRuleSelectorRequest {};
 class BadObjectRequest : public BadRuleSelectorRequest {};
 class BadArrayRequest : public BadRuleSelectorRequest {};
 
-class Rule
+class Rule : private detail::NonCopyable
 {
 private:
     struct Members {
@@ -197,13 +203,8 @@ private:
         std::string member_name;
     } m;
 
-    Rule( const Rule & rhs ) /* = delete */;
-    Rule & operator = ( const Rule & rhs ) /* = delete */;
-
 public:
     typedef uniq_ptr<Rule>::type uniq_ptr;
-
-    Rule() {}
 
     void rule_name( const std::string & name ) { m.rule_name = name; }
     const std::string & rule_name() const { return m.rule_name; }
@@ -255,15 +256,11 @@ private:
         Members() : p_value_type( 0 ) {}
     } m;
 
-    ValueRule( const ValueRule & );
-    ValueRule & operator = ( const ValueRule & );
-
 public:
     virtual bool is_value_rule() const { return true; }
     virtual const ValueRule & value_rule() const { return *this; }
     virtual ValueRule & value_rule() { return *this; }
 
-    ValueRule() {}
     ~ValueRule() { delete m.p_value_type; }
 
     void value_type( ValueType * p_value_type ) { m.p_value_type = p_value_type; }
@@ -358,7 +355,7 @@ private:
     virtual ArrayRule & array_rule() { return *this; }
 };
 
-class Directive
+class Directive : private detail::NonCopyable
 {
 private:
     typedef clutils::ptr_vector< std::string > container_t;
@@ -367,13 +364,8 @@ private:
         container_t parts;
     } m;
 
-    Directive( const Directive & rhs ) /* = delete */;
-    Directive & operator = ( const Directive & rhs ) /* = delete */;
-
 public:
     typedef uniq_ptr<Directive>::type uniq_ptr;
-
-    Directive() {}
 
     void set( const std::string & r_directive );
     const std::string & get() const { return m.directive; }
@@ -386,7 +378,7 @@ class BadRuleOrDirectiveRequest : public BadSelectorRequest {};
 class BadDirectiveRequest : public BadRuleOrDirectiveRequest {};
 class BadRuleRequest : public BadRuleOrDirectiveRequest {};
 
-class RuleOrDirective
+class RuleOrDirective : private detail::NonCopyable
 {
 private:
     struct Members {
@@ -394,9 +386,6 @@ private:
         Rule * p_rule;
         Members() : p_directive( 0 ), p_rule( 0 ) {}
     } m;
-
-    RuleOrDirective( const RuleOrDirective & rhs ) /* = delete */;
-    RuleOrDirective & operator = ( const RuleOrDirective & rhs ) /* = delete */;
 
 public:
     typedef uniq_ptr<RuleOrDirective>::type uniq_ptr;
@@ -448,7 +437,7 @@ public:
     }
 };
 
-class Grammar
+class Grammar : private detail::NonCopyable
 {
 private:
     typedef clutils::ptr_vector< RuleOrDirective > container_t;
@@ -456,14 +445,8 @@ private:
         container_t rules_and_directives;
     } m;
 
-    Grammar( const Grammar & rhs ) /* = delete */;
-    Grammar & operator = ( const Grammar & rhs ) /* = delete */;
-
 public:
     typedef uniq_ptr<Grammar>::type uniq_ptr;
-
-    Grammar() {}
-    ~Grammar() {}
 
     RuleOrDirective & append( RuleOrDirective * p_rule_or_directive )
     {
@@ -540,7 +523,7 @@ public:
     RuleOrDirective & operator [] ( size_t i ) { return m.rules_and_directives[i]; }
 };
 
-class GrammarSet
+class GrammarSet : private detail::NonCopyable
 {
 private:
     typedef clutils::ptr_vector< Grammar > container_t;
@@ -548,11 +531,7 @@ private:
         container_t grammars;
     } m;
 
-    GrammarSet( const GrammarSet & rhs ) /* = delete */;
-    GrammarSet & operator = ( const GrammarSet & rhs ) /* = delete */;
-
 public:
-    GrammarSet() {}
     Grammar & append( Grammar * p_grammar )
     {
         Grammar::uniq_ptr pu_grammar( p_grammar );
@@ -582,7 +561,7 @@ public:
     Grammar & operator [] ( size_t i ) { return m.grammars[i]; }
 };
 
-class JCRParser
+class JCRParser : private detail::NonCopyable
 {
 public:
     enum Status { S_OK, S_UNABLE_TO_OPEN_FILE, S_EXPECTED_END_OF_RULES };
@@ -596,9 +575,6 @@ private:
             p_grammar_set( p_grammar_set_in )
         {}
     } m;
-
-    JCRParser( const JCRParser & rhs ) /* = delete */;
-    JCRParser & operator = ( const JCRParser & rhs ) /* = delete */;
 
 public:
     JCRParser( GrammarSet * p_grammar_set ) : m( p_grammar_set ) {}
