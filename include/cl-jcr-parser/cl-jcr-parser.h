@@ -26,7 +26,7 @@ private:
     NonCopyable( const NonCopyable & );
     NonCopyable & operator = ( const NonCopyable & );
 
-protected:	// Intended to be inherited
+protected:  // Intended to be inherited
     NonCopyable() {}
 };
 } // namespace detail
@@ -55,6 +55,8 @@ class BadEnumTypeRequest : public BadValueTypeRequest {};
 class ValueType : private detail::NonCopyable
 {
 public:
+    virtual ~ValueType() {}
+
     virtual bool is_simple_type() const { return false; }
     virtual const SimpleType & simple_type() const { assert(0); throw BadSimpleTypeRequest(); }
     virtual SimpleType & simple_type() { assert(0); throw BadSimpleTypeRequest(); }
@@ -102,6 +104,7 @@ private:
         value_type_container_t values;
     } m;
 
+public:
     virtual bool is_union_type() const { return true; }
     virtual const UnionType & union_type() const { return *this; }
     virtual UnionType & union_type() { return *this; }
@@ -113,6 +116,7 @@ private:
     struct Members {
     } m;
 
+public:
     virtual bool is_enum_type() const { return true; }
     virtual const EnumType & enum_type() const { return *this; }
     virtual EnumType & enum_type() { return *this; }
@@ -184,6 +188,8 @@ public:
     const std::string & pattern() const { assert(0); static std::string empty; return empty; }
 };
 
+class Grammar;
+
 class RefRule;
 class ValueRule;
 class ObjectRule;
@@ -205,6 +211,8 @@ private:
 
 public:
     typedef uniq_ptr<Rule>::type uniq_ptr;
+
+    virtual ~Rule() {}
 
     void rule_name( const std::string & name ) { m.rule_name = name; }
     const std::string & rule_name() const { return m.rule_name; }
@@ -237,6 +245,8 @@ private:
     } m;
 
 public:
+    static RefRule & make_and_append( Grammar & );
+
     virtual bool is_ref_rule() const { return true; }
     virtual const RefRule & ref_rule() const { return *this; }
     virtual RefRule & ref_rule() { return *this; }
@@ -257,11 +267,13 @@ private:
     } m;
 
 public:
+    static ValueRule & make_and_append( Grammar & );
+
+    ~ValueRule() { delete m.p_value_type; }
+
     virtual bool is_value_rule() const { return true; }
     virtual const ValueRule & value_rule() const { return *this; }
     virtual ValueRule & value_rule() { return *this; }
-
-    ~ValueRule() { delete m.p_value_type; }
 
     void value_type( ValueType * p_value_type ) { m.p_value_type = p_value_type; }
     const ValueType * value_type() const { return m.p_value_type; }
@@ -337,6 +349,9 @@ private:
         rule_container_t children;
     } m;
 
+public:
+    static ObjectRule & make_and_append( Grammar & );
+
     virtual bool is_object_rule() const { return true; }
     virtual const ObjectRule & object_rule() const { return *this; }
     virtual ObjectRule & object_rule() { return *this; }
@@ -349,6 +364,9 @@ private:
     struct Members {
         rule_container_t children;
     } m;
+
+public:
+    static ArrayRule & make_and_append( Grammar & );
 
     virtual bool is_array_rule() const { return true; }
     virtual const ArrayRule & array_rule() const { return *this; }
@@ -459,23 +477,37 @@ public:
         m.rules_and_directives.push_back( pu_rule_or_directive.get() );
         pu_rule_or_directive.release();
     }
+    Directive & append( Directive::uniq_ptr pu_directive )
+    {
+        Directive * p_directive = pu_directive.get();
+        append( p_directive );
+        pu_directive.release();
+        return *p_directive;
+    }
     Directive & append( Directive * p_directive )
     {
         append( RuleOrDirective::make( p_directive ) );
         return *p_directive;
+    }
+    Directive & append_directive()
+    {
+        return append( RuleOrDirective::make_directive() ).directive();
+    }
+    Rule & append( Rule::uniq_ptr pu_rule )
+    {
+        Rule * p_rule = pu_rule.get();
+        append( p_rule );
+        pu_rule.release();
+        return *p_rule;
     }
     Rule & append( Rule * p_rule )
     {
         append( RuleOrDirective::make( p_rule ) );
         return *p_rule;
     }
-    Directive & append_directive()
+    Rule & append_rule( Rule * p_rule )
     {
-        return append( RuleOrDirective::make_directive() ).directive();
-    }
-    Rule & append_rule()
-    {
-        return append( RuleOrDirective::make_rule() ).rule();
+        return append( p_rule );
     }
 
     const RuleOrDirective & back() const

@@ -1,4 +1,4 @@
-Tests run on Tue Aug 04 12:11:06 2015
+Tests run on Mon Aug 17 14:17:41 2015
 
     GrammarParser - parsing c-wsp [test-grammar-parser.cpp:82]
     ==========================================================
@@ -225,6 +225,43 @@ Tests run on Tue Aug 04 12:11:06 2015
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    Creating various types of Rules in Grammars [test-object-creation.cpp:187]
+    ==========================================================================
+    ok: r_rule.is_array_rule()
+    ok: ! r_rule.is_object_rule()
+    ok: ! r_rule.is_ref_rule()
+    ok: ! r_rule.is_value_rule()
+    ok: ! r_rule.is_array_rule()
+    ok: r_rule.is_object_rule()
+    ok: ! r_rule.is_ref_rule()
+    ok: ! r_rule.is_value_rule()
+    ok: ! r_rule.is_array_rule()
+    ok: ! r_rule.is_object_rule()
+    ok: r_rule.is_ref_rule()
+    ok: ! r_rule.is_value_rule()
+    ok: ! r_rule.is_array_rule()
+    ok: ! r_rule.is_object_rule()
+    ok: ! r_rule.is_ref_rule()
+    ok: r_rule.is_value_rule()
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    Creating various types of ValueRule, e.g. SimpleType, EnumType etc. [test-object-creation.cpp:226]
+    ==================================================================================================
+    ok: r_value_rule.is_value_rule()
+    ok: ! r_value_rule.is_simple_type()
+    ok: ! r_value_rule.is_enum_type()
+    ok: ! r_value_rule.is_union_type()
+    ok: r_value_rule.is_simple_type()
+    ok: ! r_value_rule.is_enum_type()
+    ok: ! r_value_rule.is_union_type()
+    ok: ! r_value_rule.is_simple_type()
+    ok: r_value_rule.is_enum_type()
+    ok: ! r_value_rule.is_union_type()
+    ok: ! r_value_rule.is_simple_type()
+    ok: ! r_value_rule.is_enum_type()
+    ok: r_value_rule.is_union_type()
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
 
 TODOs (7):
@@ -237,4 +274,4 @@ TODOs (7):
 - Test ValueRule class and derivatives [test-main.cpp:45]
 - Verify if we really need Grammar::append_rule() [test-object-creation.cpp:185]
 
-0 error(s), 7 todo(s), 186 test(s)
+0 error(s), 7 todo(s), 217 test(s)

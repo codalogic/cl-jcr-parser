@@ -1,4 +1,4 @@
-Tests table of contents generated on Tue Aug 04 12:11:06 2015
+Tests table of contents generated on Mon Aug 17 14:17:41 2015
 
 # test-grammar-parser.cpp
 | Description | Line |
@@ -22,3 +22,5 @@ Tests table of contents generated on Tue Aug 04 12:11:06 2015
 | RuleOrDirective creation | 40 |
 | Grammar creation / deletion | 75 |
 | Grammar exception throwing on bad selection | 126 |
+| Creating various types of Rules in Grammars | 187 |
+| Creating various types of ValueRule, e.g. SimpleType, EnumType etc. | 226 |

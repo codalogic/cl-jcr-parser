@@ -326,6 +326,42 @@ bool GrammarParser::error( JCRParser::Status code, const char * p_message )
 } // End of Anonymous namespace
 
 //----------------------------------------------------------------------------
+//                           class RefRule
+//----------------------------------------------------------------------------
+
+RefRule & RefRule::make_and_append( Grammar & r_grammar )
+{
+    return r_grammar.append( new RefRule ).ref_rule();
+}
+
+//----------------------------------------------------------------------------
+//                           class ValueRule
+//----------------------------------------------------------------------------
+
+ValueRule & ValueRule::make_and_append( Grammar & r_grammar )
+{
+    return r_grammar.append( new ValueRule ).value_rule();
+}
+
+//----------------------------------------------------------------------------
+//                           class ObjectRule
+//----------------------------------------------------------------------------
+
+ObjectRule & ObjectRule::make_and_append( Grammar & r_grammar )
+{
+    return r_grammar.append( new ObjectRule ).object_rule();
+}
+
+//----------------------------------------------------------------------------
+//                           class ArrayRule
+//----------------------------------------------------------------------------
+
+ArrayRule & ArrayRule::make_and_append( Grammar & r_grammar )
+{
+    return r_grammar.append( new ArrayRule ).array_rule();
+}
+
+//----------------------------------------------------------------------------
 //                           class Directive
 //----------------------------------------------------------------------------
 
