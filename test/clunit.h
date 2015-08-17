@@ -330,6 +330,13 @@ private:
         }
         void run()
         {
+#ifdef CLUNIT_ALLOC_BREAK_COUNT
+            // On Windows, to break on a particular memory allocation, before
+            // #include "clunit.h", do, for example:
+            // #define CLUNIT_ALLOC_BREAK_COUNT 2101
+
+            _CrtSetBreakAlloc( CLUNIT_ALLOC_BREAK_COUNT );
+#endif
             {
             // The iostream (and possibly string) functions dynamically allocate memory
             // -the first time they are called.  They are not cleared until the program
