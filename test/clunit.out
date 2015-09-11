@@ -1,85 +1,85 @@
-Tests run on Fri Sep 11 12:47:27 2015
+Tests run on Fri Sep 11 12:52:02 2015
 
-    GrammarParser - parsing c-wsp [test-directives-parser.cpp:82]
+    GrammarParser - parsing c-wsp [test-directives-parser.cpp:64]
     =============================================================
-      Calling: test_c_wsp( "#pedantic" ) (84)
+      Calling: test_c_wsp( "#pedantic" ) (66)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
     ok: h.grammar()[0].is_directive()
     ok: h.grammar()[0].directive().get() == "pedantic"
-      Calling: test_c_wsp( "    #pedantic" ) (85)
+      Calling: test_c_wsp( "    #pedantic" ) (67)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
     ok: h.grammar()[0].is_directive()
     ok: h.grammar()[0].directive().get() == "pedantic"
-      Calling: test_c_wsp( ";My first jcr\n" "#pedantic" ) (87)
+      Calling: test_c_wsp( ";My first jcr\n" "#pedantic" ) (69)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
     ok: h.grammar()[0].is_directive()
     ok: h.grammar()[0].directive().get() == "pedantic"
-      Calling: test_c_wsp( "   ;My first jcr\n" "#pedantic" ) (89)
+      Calling: test_c_wsp( "   ;My first jcr\n" "#pedantic" ) (71)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
     ok: h.grammar()[0].is_directive()
     ok: h.grammar()[0].directive().get() == "pedantic"
-      Calling: test_c_wsp( "   ;My first jcr\n" ";More grammars\r\n" "#pedantic" ) (92)
+      Calling: test_c_wsp( "   ;My first jcr\n" ";More grammars\r\n" "#pedantic" ) (74)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
     ok: h.grammar()[0].is_directive()
     ok: h.grammar()[0].directive().get() == "pedantic"
-      Calling: test_c_wsp( "   \n" "   ;My first jcr\n" ";More grammars\r\n" "#pedantic" ) (96)
+      Calling: test_c_wsp( "   \n" "   ;My first jcr\n" ";More grammars\r\n" "#pedantic" ) (78)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
     ok: h.grammar()[0].is_directive()
     ok: h.grammar()[0].directive().get() == "pedantic"
-      Calling: test_c_wsp( "   ;My first jcr\n" ";More grammars\r\n" "#pedantic\n" "  ; Stuff at end" ) (100)
+      Calling: test_c_wsp( "   ;My first jcr\n" ";More grammars\r\n" "#pedantic\n" "  ; Stuff at end" ) (82)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
     ok: h.grammar()[0].is_directive()
     ok: h.grammar()[0].directive().get() == "pedantic"
-      Calling: test_c_wsp_2_directives( "#pedantic\n" "#language-compatible-members" ) (104)
+      Calling: test_c_wsp_2_directives( "#pedantic\n" "#language-compatible-members" ) (86)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 2
     ok: h.grammar()[0].is_directive()
     ok: h.grammar()[0].directive().get() == "pedantic"
     ok: h.grammar()[1].is_directive()
     ok: h.grammar()[1].directive().get() == "language-compatible-members"
-      Calling: test_c_wsp_2_directives( "    #pedantic\n" "    #language-compatible-members" ) (107)
+      Calling: test_c_wsp_2_directives( "    #pedantic\n" "    #language-compatible-members" ) (89)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 2
     ok: h.grammar()[0].is_directive()
     ok: h.grammar()[0].directive().get() == "pedantic"
     ok: h.grammar()[1].is_directive()
     ok: h.grammar()[1].directive().get() == "language-compatible-members"
-      Calling: test_c_wsp_2_directives( "; A comment\n" "#pedantic\n" "; Another comment\n" "#language-compatible-members" ) (112)
+      Calling: test_c_wsp_2_directives( "; A comment\n" "#pedantic\n" "; Another comment\n" "#language-compatible-members" ) (94)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 2
     ok: h.grammar()[0].is_directive()
     ok: h.grammar()[0].directive().get() == "pedantic"
     ok: h.grammar()[1].is_directive()
     ok: h.grammar()[1].directive().get() == "language-compatible-members"
-      Calling: test_c_wsp_2_directives( "   ; A comment\n" "#pedantic\n" "   ; Another comment\n" "#language-compatible-members" ) (117)
+      Calling: test_c_wsp_2_directives( "   ; A comment\n" "#pedantic\n" "   ; Another comment\n" "#language-compatible-members" ) (99)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 2
     ok: h.grammar()[0].is_directive()
     ok: h.grammar()[0].directive().get() == "pedantic"
     ok: h.grammar()[1].is_directive()
     ok: h.grammar()[1].directive().get() == "language-compatible-members"
-      Calling: test_c_wsp_2_directives( "   ; A comment\n" "#pedantic\n" "   ; Another comment\n" "#language-compatible-members\r\n" ";More comments\n" ) (123)
+      Calling: test_c_wsp_2_directives( "   ; A comment\n" "#pedantic\n" "   ; Another comment\n" "#language-compatible-members\r\n" ";More comments\n" ) (105)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 2
     ok: h.grammar()[0].is_directive()
     ok: h.grammar()[0].directive().get() == "pedantic"
     ok: h.grammar()[1].is_directive()
     ok: h.grammar()[1].directive().get() == "language-compatible-members"
-      Calling: test_c_wsp_2_directives( "   ; A comment\n" "#pedantic\n" "   ; Another comment\n" "#language-compatible-members\r\n" "    ;More comments\n" ) (129)
+      Calling: test_c_wsp_2_directives( "   ; A comment\n" "#pedantic\n" "   ; Another comment\n" "#language-compatible-members\r\n" "    ;More comments\n" ) (111)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 2
     ok: h.grammar()[0].is_directive()
     ok: h.grammar()[0].directive().get() == "pedantic"
     ok: h.grammar()[1].is_directive()
     ok: h.grammar()[1].directive().get() == "language-compatible-members"
-      Calling: test_c_wsp_2_directives( "   ; A comment\n" "#pedantic\n" "   ; Another comment\n" "   ; Also a comment\n" "#language-compatible-members\r\n" "    ;More comments\n" ) (136)
+      Calling: test_c_wsp_2_directives( "   ; A comment\n" "#pedantic\n" "   ; Another comment\n" "   ; Also a comment\n" "#language-compatible-members\r\n" "    ;More comments\n" ) (118)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 2
     ok: h.grammar()[0].is_directive()
@@ -88,9 +88,9 @@ Tests run on Fri Sep 11 12:47:27 2015
     ok: h.grammar()[1].directive().get() == "language-compatible-members"
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - parsing directives [test-directives-parser.cpp:160]
+    GrammarParser - parsing directives [test-directives-parser.cpp:142]
     ===================================================================
-      Calling: test_2_directives( "#name http://example.com/myjcr.jcr\n" "#import http://example.com/otherjcr.jcr as other" ) (164)
+      Calling: test_2_directives( "#name http://example.com/myjcr.jcr\n" "#import http://example.com/otherjcr.jcr as other" ) (146)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 2
     ok: h.grammar()[0].is_directive()
@@ -105,7 +105,7 @@ Tests run on Fri Sep 11 12:47:27 2015
     ok: h.grammar()[1].directive().get(1) == "http://example.com/otherjcr.jcr"
     ok: h.grammar()[1].directive().get(2) == "as"
     ok: h.grammar()[1].directive().get(3) == "other"
-      Calling: test_2_directives( "#name http://example.com/myjcr.jcr\n" "#import http://example.com/otherjcr.jcr as other\n" ) (167)
+      Calling: test_2_directives( "#name http://example.com/myjcr.jcr\n" "#import http://example.com/otherjcr.jcr as other\n" ) (149)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 2
     ok: h.grammar()[0].is_directive()
@@ -120,7 +120,7 @@ Tests run on Fri Sep 11 12:47:27 2015
     ok: h.grammar()[1].directive().get(1) == "http://example.com/otherjcr.jcr"
     ok: h.grammar()[1].directive().get(2) == "as"
     ok: h.grammar()[1].directive().get(3) == "other"
-      Calling: test_2_directives( "\n" "#name http://example.com/myjcr.jcr\n" "\n" "#import http://example.com/otherjcr.jcr as other\n" "\n" ) (173)
+      Calling: test_2_directives( "\n" "#name http://example.com/myjcr.jcr\n" "\n" "#import http://example.com/otherjcr.jcr as other\n" "\n" ) (155)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 2
     ok: h.grammar()[0].is_directive()
@@ -135,7 +135,7 @@ Tests run on Fri Sep 11 12:47:27 2015
     ok: h.grammar()[1].directive().get(1) == "http://example.com/otherjcr.jcr"
     ok: h.grammar()[1].directive().get(2) == "as"
     ok: h.grammar()[1].directive().get(3) == "other"
-      Calling: test_2_directives( "; with comments\n" "#name http://example.com/myjcr.jcr\n" "; Another comment\n" "#import http://example.com/otherjcr.jcr as other\n" "\n" ) (179)
+      Calling: test_2_directives( "; with comments\n" "#name http://example.com/myjcr.jcr\n" "; Another comment\n" "#import http://example.com/otherjcr.jcr as other\n" "\n" ) (161)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 2
     ok: h.grammar()[0].is_directive()
@@ -150,7 +150,7 @@ Tests run on Fri Sep 11 12:47:27 2015
     ok: h.grammar()[1].directive().get(1) == "http://example.com/otherjcr.jcr"
     ok: h.grammar()[1].directive().get(2) == "as"
     ok: h.grammar()[1].directive().get(3) == "other"
-      Calling: test_2_directives( "; with comments\n" "   \n" "#name http://example.com/myjcr.jcr\n" "\n" "; Another comment\n" "\n" "#import http://example.com/otherjcr.jcr as other\n" "; Yet another comment\n" "\n" ) (189)
+      Calling: test_2_directives( "; with comments\n" "   \n" "#name http://example.com/myjcr.jcr\n" "\n" "; Another comment\n" "\n" "#import http://example.com/otherjcr.jcr as other\n" "; Yet another comment\n" "\n" ) (171)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 2
     ok: h.grammar()[0].is_directive()

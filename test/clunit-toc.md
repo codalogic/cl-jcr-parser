@@ -1,10 +1,10 @@
-Tests table of contents generated on Fri Sep 11 12:47:27 2015
+Tests table of contents generated on Fri Sep 11 12:52:02 2015
 
 # test-directives-parser.cpp
 | Description | Line |
 |-------------|------|
-| GrammarParser - parsing c-wsp | 82 |
-| GrammarParser - parsing directives | 160 |
+| GrammarParser - parsing c-wsp | 64 |
+| GrammarParser - parsing directives | 142 |
 
 # test-grammar-set.cpp
 | Description | Line |

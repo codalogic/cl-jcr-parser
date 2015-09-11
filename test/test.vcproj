@@ -190,6 +190,14 @@
 				RelativePath=".\test-object-creation.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\test-parser-harness.h"
+				>
+			</File>
+			<File
+				RelativePath=".\test-rules-parser.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"

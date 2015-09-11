@@ -37,27 +37,9 @@
 
 using namespace cljcr;
 
-class ParserHarness
-{
-private:
-    struct Members {
-        GrammarSet grammar_set;
-        JCRParser jcr_parser;
-        JCRParser::Status status;
+#include "test-parser-harness.h"
 
-        Members() : jcr_parser( &grammar_set ) {}
-    } m;
-
-public:
-    ParserHarness( const char * p_jcr )
-    {
-        m.status = m.jcr_parser.add_grammar( p_jcr, strlen( p_jcr ) );
-    }
-    const JCRParser::Status status() const { return m.status; }
-    const Grammar & grammar() const { return m.grammar_set[0]; }
-};
-
-void test_c_wsp( const char * p_jcr )
+void test_c_wsp_1_directive( const char * p_jcr )
 {
     ParserHarness h( p_jcr );
 
@@ -79,22 +61,29 @@ void test_c_wsp_2_directives( const char * p_jcr )
     TCRITICALTEST( h.grammar()[1].directive().get() == "language-compatible-members" );
 }
 
-TFEATURE( "GrammarParser - parsing c-wsp" )
+TFEATURE( "GrammarParser - parsing c-wsp with directives" )
 {
-    TCALL( test_c_wsp( "#pedantic" ) );
-    TCALL( test_c_wsp( "    #pedantic" ) );
-    TCALL( test_c_wsp( ";My first jcr\n"
+    TCALL( test_c_wsp_1_directive( 
+						"#pedantic" ) );
+    TCALL( test_c_wsp_1_directive(
+						"    #pedantic" ) );
+    TCALL( test_c_wsp_1_directive(
+						";My first jcr\n"
                         "#pedantic" ) );
-    TCALL( test_c_wsp( "   ;My first jcr\n"
+    TCALL( test_c_wsp_1_directive(
+						"   ;My first jcr\n"
                         "#pedantic" ) );
-    TCALL( test_c_wsp( "   ;My first jcr\n"
+    TCALL( test_c_wsp_1_directive(
+						"   ;My first jcr\n"
                         ";More grammars\r\n"
                         "#pedantic" ) );
-    TCALL( test_c_wsp( "   \n"
+    TCALL( test_c_wsp_1_directive(
+						"   \n"
                         "   ;My first jcr\n"
                         ";More grammars\r\n"
                         "#pedantic" ) );
-    TCALL( test_c_wsp( "   ;My first jcr\n"
+    TCALL( test_c_wsp_1_directive(
+						"   ;My first jcr\n"
                         ";More grammars\r\n"
                         "#pedantic\n"
                         "  ; Stuff at end" ) );
