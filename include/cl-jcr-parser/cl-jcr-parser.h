@@ -216,8 +216,11 @@ public:
 
     void rule_name( const std::string & name ) { m.rule_name = name; }
     const std::string & rule_name() const { return m.rule_name; }
+    std::string & rule_name() { return m.rule_name; }
     void member_name( const std::string & name ) { m.member_name = name; }
     const std::string & member_name() const { return m.member_name; }
+    std::string & member_name() { return m.member_name; }
+    bool is_any_member_name() const;
 
     virtual bool is_ref_rule() const { return false; }
     virtual const RefRule & ref_rule() const { assert(0); throw BadRefRuleRequest(); }
@@ -596,7 +599,7 @@ public:
 class JCRParser : private detail::NonCopyable
 {
 public:
-    enum Status { S_OK, S_UNABLE_TO_OPEN_FILE, S_EXPECTED_END_OF_RULES };
+    enum Status { S_OK, S_INTERNAL_ERROR, S_UNABLE_TO_OPEN_FILE, S_EXPECTED_END_OF_RULES };
 
 private:
     struct Members {

@@ -43,4 +43,6 @@ TFEATURE( "Miscellaneous TODOs" )
     TTODO( "Test ValueType class" );
 
     TTODO( "Test ValueRule class and derivatives" );
+    
+    TTODO( "Enhance GrammarParser::q_string() and QStringParsert o full spec" );
 }

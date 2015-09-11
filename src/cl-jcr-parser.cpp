@@ -26,6 +26,8 @@ namespace cljcr {
 
 namespace { // Anonymous namespace for detail
 
+const std::string any_member_name = "\x30";	// ASCII Cancel char - unlikely to appear in a real name
+
 //----------------------------------------------------------------------------
 //                           class GrammarParser
 //----------------------------------------------------------------------------
@@ -39,6 +41,9 @@ private:
         Grammar * p_grammar;
         cl::reader & r_reader;
         JCRParser::Status status;
+        
+        std::string rule_name;
+        std::string member_name;
 
         Members(
             JCRParser * p_parent_in,
@@ -59,14 +64,30 @@ public:
 
 private:
     bool rule_or_directive();
-    void directive();
-    void rule();
+    bool directive();
+    bool rule();
+
+	bool rulename();
+	bool definition();
+	bool member_rule();
+	bool member_name();
+	bool definition_rule();
+	bool value_rule();
+	bool object_rule();
+	bool array_rule();
+	bool group_rule();
+	bool rule_ref();
+
     bool one_star_c_wsp();
     bool comment();
     bool star_c_wsp();
-    void recover_bad_rule_or_directive();
-    void recover_badly();
+
+	bool q_string( std::string * );
+
     bool error( JCRParser::Status code, const char * p_message );
+    bool recover_bad_rule_or_directive();
+    bool recover_definition();
+    bool recover_badly();
 };
 
 GrammarParser::GrammarParser(
@@ -78,18 +99,47 @@ GrammarParser::GrammarParser(
     m( p_parent, r_reader, p_grammar )
 {}
 
+class UnspecifiedRetreat : public std::exception {};
+class SurrenderRetreat : public UnspecifiedRetreat {};
+class TopLevelRetreat : public UnspecifiedRetreat {};
+
 bool GrammarParser::parse()
 {
-    //  grammar         = 1*( *c-wsp (rule / directive) ) *c-wsp
-    while( star_c_wsp() && rule_or_directive() )
-    {}
+	try
+	{
+		//  grammar         = 1*( *c-wsp (rule / directive) ) *c-wsp
+		
+		bool is_parsing_to_contine = true;
+		while( is_parsing_to_contine )
+		{
+			try
+			{
+				is_parsing_to_contine = star_c_wsp() && rule_or_directive();
+			}
+			catch( TopLevelRetreat & )
+			{
+				// Recovery to resume top-level parsing should be complete before retreat invoked
+				is_parsing_to_contine = true;
+			}
+		}
 
-    star_c_wsp();
+		star_c_wsp();
 
-    if( ! is_current_at_end() )
-        error( JCRParser::S_EXPECTED_END_OF_RULES, "Unexpected input at end of rules" );
+		if( ! is_current_at_end() )
+			error( JCRParser::S_EXPECTED_END_OF_RULES, "Unexpected input at end of rules" );
+	}
+	
+	catch( SurrenderRetreat & )
+	{
+		// error() should already be reported when error detected
+	}
+	
+	catch( UnspecifiedRetreat & )
+	{
+		error( JCRParser::S_INTERNAL_ERROR, "Internal: Faulty recovery from errored input" );
+	}
 
-    return m.status == JCRParser::S_OK;
+	return m.status == JCRParser::S_OK;
 }
 
 bool GrammarParser::rule_or_directive()
@@ -102,52 +152,109 @@ bool GrammarParser::rule_or_directive()
         return false;
 
     else if( current_is( '#' ) )
-        directive();
+        return directive();
 
     else if( is_alpha( current() ) )
-        rule();
+        return rule();
 
-    else
-        recover_bad_rule_or_directive();
-
-    return true;
+    return recover_bad_rule_or_directive();
 }
 
-void GrammarParser::directive()
+bool GrammarParser::directive()
 {
+    //  directive       = "#" *( VCHAR / WSP / %x7F-10FFFF ) EOL
+    //
+    // Supported definitions:
+    //      #name
+    //      #import
+    //      #jcr-version
+    //      #root
+    //      #pedantic
+    //      #language-compatible-members
+    //      #include
+
     Directive & r_directive = m.p_grammar->append_directive();
     std::string directive_line;
     get_until( &directive_line, cl::alphabet_eol() );
     r_directive.set( directive_line );
     skip( cl::alphabet_eol() );
+    
+    return true;
 }
 
-void GrammarParser::rule()
+bool GrammarParser::rule()
 {
     // First character is in current()
-}
-    //
+
     //  rule            = rulename *c-wsp definition
+
+    return rulename() &&
+			star_c_wsp() &&
+			definition();
+}
+
+bool GrammarParser::rulename()
+{
+    // First character is in current()
+
+    //  rulename        = name
     //
     //  ; rulenames must be unique, and may not be a reserved word
     //  ; rulenames are case sensitive
-    //  rulename        = name
     //
     //  name            = ALPHA *(ALPHA / DIGIT / "-" / "_")
-    //
+    
+    m.rule_name += current();
+    
+    return read( &m.rule_name, cl::alphabet_name_char() ) >= 0;
+}
+
+class DefinitionRetreat : public UnspecifiedRetreat {};
+
+bool GrammarParser::definition()
+{
     //  definition      = member-rule / definition-rule
     //
+    try
+    {
+		return member_rule() || definition_rule();
+    }
+    catch( DefinitionRetreat & )
+    {
+		return true;
+    }
+}
+
+bool GrammarParser::member_rule()
+{
     //  member-rule     = member-name *c-wsp definition-rule
-    //
+
+	return member_name() && ( star_c_wsp() && definition_rule() || recover_definition() && retreat< DefinitionRetreat >() );
+}
+
+bool GrammarParser::member_name()
+{
     //  member-name     = ( "^" %x22.22 ) /
     //                     ( %x22 *q-string %x22 )
-    //
+
+	return fixed( "^\"\"" ) && set( m.member_name, any_member_name )
+			|| q_string( &m.member_name );
+}
+
+bool GrammarParser::definition_rule()
+{
     //  definition-rule =  ( value-rule /
     //                            object-rule /
     //                            array-rule /
     //                            group-rule /
     //                            rule-ref )
-    //
+
+	return value_rule() || object_rule() || array_rule() ||
+			group_rule() || rule_ref();
+}
+
+bool GrammarParser::value_rule()
+{
     //  value-rule      = ":" *c-wsp type-rule
     //
     //  type-rule       = boolean-type /
@@ -184,7 +291,12 @@ void GrammarParser::rule()
     //                   "1" / "0" / "true" / "false" /
     //                   "null" /
     //                   q-string
-    //
+
+	return false;	// TODO
+}
+
+bool GrammarParser::object_rule()
+{
     //  object-rule     = "{" *c-wsp object-member *(
     //                                        *c-wsp
     //                                        and-or
@@ -195,11 +307,12 @@ void GrammarParser::rule()
     //  object-member   = ["?" *c-wsp ] object-item
     //  object-item     = ( rule-ref / member-rule / group-rule )
     //  and-or          = ( "," / "|" )
-    //
-    //  rule-ref        = [ module-name '#' ] rule-name
-    //
-    //  module-name     = name
-    //
+
+	return false;	// TODO
+}
+
+bool GrammarParser::array_rule()
+{
     //  array-rule      = "[" *c-wsp array-member *(
     //                                       *c-wsp
     //                                       and-or
@@ -210,7 +323,12 @@ void GrammarParser::rule()
     //  array-member    = [ array-count *c-wsp ] definition-rule
     //
     //  array-count     = [int] *c-wsp "*" *c-wsp [int]
-    //
+
+	return false;	// TODO
+}
+
+bool GrammarParser::group_rule()
+{
     //  group-rule      = "(" *c-wsp group-member *(
     //                                        1*c-wsp
     //                                        and-or
@@ -219,17 +337,20 @@ void GrammarParser::rule()
     //                                     ) *c-wsp ")"
     //
     //  group-member    = [ ("?" / array-count ) ] *c-wsp definition
+
+	return false;	// TODO
+}
+
+bool GrammarParser::rule_ref()
+{
+    //  rule-ref        = [ module-name '#' ] rule-name
     //
-    //  directive       = "#" *( VCHAR / WSP / %x7F-10FFFF ) EOL
+    //  module-name     = name
+
+	return false;	// TODO
+}
+
     //
-    // Supported definitions:
-    //      #name
-    //      #import
-    //      #jcr-version
-    //      #root
-    //      #pedantic
-    //      #language-compatible-members
-    //      #include
     //
     //  ; Adapted from the ABNF for JSON, RFC 4627 s 2.4
     //  float           = [ "-" ] int [ frac ] [ exp ]
@@ -244,17 +365,6 @@ void GrammarParser::rule()
     //  regex-char      = %x21-2E / %x30-5D / %x5E-7E / WSP /
     //                   CR / LF / "\/" / "\\"
     //
-    //  ; The defintion of a JSON string, from RFC 4627 s 2
-    //  q-string        = %x20-21 / %x23-5B / %x5D-10FFFF / "\" (
-    //                     %x22 /      ; "  u+0022
-    //                     %x5C /      ; \  u+005C
-    //                     %x2F /      ; /  u+002F
-    //                     %x62 /      ; BS u+0008
-    //                     %x66 /      ; FF u+000C
-    //                     %x6E /      ; LF u+000A
-    //                     %x72 /      ; CR u+000D
-    //                     %x74 /      ; HT u+0009
-    //                     ( %x75 4HEXDIG ) ) ; uXXXX u+XXXX
     //
     //  ; Taken from the ABNF for ABNF (RFC 4627 section 4) and slightly
     //  ; adapted newlines in a c-wsp do not need whitespace at the
@@ -304,15 +414,70 @@ bool GrammarParser::star_c_wsp()
     return optional( one_star_c_wsp() );
 }
 
-void GrammarParser::recover_bad_rule_or_directive()
+class QStringParser
 {
-    recover_badly();
-}
+    //  ; The defintion of a JSON string, from RFC 4627 s 2
+    //  q-string        = %x20-21 / %x23-5B / %x5D-10FFFF / "\" (
+    //                     %x22 /      ; "  u+0022
+    //                     %x5C /      ; \  u+005C
+    //                     %x2F /      ; /  u+002F
+    //                     %x62 /      ; BS u+0008
+    //                     %x66 /      ; FF u+000C
+    //                     %x6E /      ; LF u+000A
+    //                     %x72 /      ; CR u+000D
+    //                     %x74 /      ; HT u+0009
+    //                     ( %x75 4HEXDIG ) ) ; uXXXX u+XXXX
 
-void GrammarParser::recover_badly()
+private:
+	struct Members
+	{
+		cl::dsl_pa * p_dsl_pa;
+		std::string * p_v;
+		
+		Members( cl::dsl_pa * p_dsl_pa_in, std::string * p_v_in )
+			: p_dsl_pa( p_dsl_pa_in ), p_v( p_v_in )
+		{}
+	} m;
+	
+	QStringParser( cl::dsl_pa * p_dsl_pa, std::string * p_v )
+		: m( p_dsl_pa, p_v )
+	{}
+
+	bool read()
+	{
+		if( ! m.p_dsl_pa->is_get_char( '"' ) )
+			return false;
+
+		return read_post_quote();
+	}
+
+	bool read_post_quote()
+	{
+		int c;
+		while( (c = m.p_dsl_pa->get()) != '"' )
+		{
+			if( m.p_dsl_pa->is_current_at_end() )
+				return false;
+			*m.p_v += c;
+		}
+		return true;
+	}
+
+public:
+	static bool read( cl::dsl_pa * p_dsl_pa, std::string * p_v )
+	{
+		return QStringParser( p_dsl_pa, p_v ).read();
+	}
+
+	static bool read_post_quote( cl::dsl_pa * p_dsl_pa, std::string * p_v )
+	{
+		return QStringParser( p_dsl_pa, p_v ).read_post_quote();
+	}
+};
+
+bool GrammarParser::q_string( std::string * p_v )
 {
-    while( get() && ! is_current_at_end() )
-    {}
+	return QStringParser::read( this, p_v );
 }
 
 bool GrammarParser::error( JCRParser::Status code, const char * p_message )
@@ -323,7 +488,32 @@ bool GrammarParser::error( JCRParser::Status code, const char * p_message )
     return false;
 }
 
+bool GrammarParser::recover_bad_rule_or_directive()
+{
+    return recover_badly();
+}
+
+bool GrammarParser::recover_definition()
+{
+    return recover_badly();
+}
+
+bool GrammarParser::recover_badly()
+{
+    retreat< SurrenderRetreat >();
+    return true;	// We want to continue parsing after recovery
+}
+
 } // End of Anonymous namespace
+
+//----------------------------------------------------------------------------
+//                           class Rule
+//----------------------------------------------------------------------------
+
+bool Rule::is_any_member_name() const
+{
+	return m.member_name == any_member_name;
+}
 
 //----------------------------------------------------------------------------
 //                           class RefRule

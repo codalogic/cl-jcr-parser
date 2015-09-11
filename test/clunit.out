@@ -1,7 +1,7 @@
-Tests run on Mon Aug 17 14:17:41 2015
+Tests run on Fri Sep 11 12:47:27 2015
 
-    GrammarParser - parsing c-wsp [test-grammar-parser.cpp:82]
-    ==========================================================
+    GrammarParser - parsing c-wsp [test-directives-parser.cpp:82]
+    =============================================================
       Calling: test_c_wsp( "#pedantic" ) (84)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
@@ -88,8 +88,8 @@ Tests run on Mon Aug 17 14:17:41 2015
     ok: h.grammar()[1].directive().get() == "language-compatible-members"
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - parsing directives [test-grammar-parser.cpp:160]
-    ================================================================
+    GrammarParser - parsing directives [test-directives-parser.cpp:160]
+    ===================================================================
       Calling: test_2_directives( "#name http://example.com/myjcr.jcr\n" "#import http://example.com/otherjcr.jcr as other" ) (164)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 2
@@ -264,7 +264,7 @@ Tests run on Mon Aug 17 14:17:41 2015
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
 
-TODOs (7):
+TODOs (8):
 ------------------------
 - Test GrammarSet class [test-grammar-set.cpp:42]
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:44]
@@ -272,6 +272,7 @@ TODOs (7):
 - Make RefRule set method split input into module and local parts [test-main.cpp:41]
 - Test ValueType class [test-main.cpp:43]
 - Test ValueRule class and derivatives [test-main.cpp:45]
+- Enhance GrammarParser::q_string() and QStringParsert o full spec [test-main.cpp:47]
 - Verify if we really need Grammar::append_rule() [test-object-creation.cpp:185]
 
-0 error(s), 7 todo(s), 217 test(s)
+0 error(s), 8 todo(s), 217 test(s)
