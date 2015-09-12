@@ -1,4 +1,4 @@
-Tests run on Sat Sep 12 15:49:35 2015
+Tests run on Sat Sep 12 16:16:15 2015
 
     GrammarParser - parsing c-wsp with directives [test-directives-parser.cpp:64]
     =============================================================================
@@ -233,31 +233,31 @@ Tests run on Sat Sep 12 15:49:35 2015
     ok: ! r_rule.is_object_rule()
     ok: ! r_rule.is_group_rule()
     ok: ! r_rule.is_ref_rule()
-    ok: r_rule.rule_form() == UNDEFINED_VALUE_RULE_FORM
+    ok: r_rule.rule_kind() == RuleKind::UNDEFINED_VALUE
     ok: ! r_rule.is_value_rule()
     ok: r_rule.is_array_rule()
     ok: ! r_rule.is_object_rule()
     ok: ! r_rule.is_group_rule()
     ok: ! r_rule.is_ref_rule()
-    ok: r_rule.rule_form() == ARRAY_RULE_FORM
+    ok: r_rule.rule_kind() == RuleKind::ARRAY
     ok: ! r_rule.is_value_rule()
     ok: ! r_rule.is_array_rule()
     ok: r_rule.is_object_rule()
     ok: ! r_rule.is_group_rule()
     ok: ! r_rule.is_ref_rule()
-    ok: r_rule.rule_form() == OBJECT_RULE_FORM
+    ok: r_rule.rule_kind() == RuleKind::OBJECT
     ok: ! r_rule.is_value_rule()
     ok: ! r_rule.is_array_rule()
     ok: ! r_rule.is_object_rule()
     ok: r_rule.is_group_rule()
     ok: ! r_rule.is_ref_rule()
-    ok: r_rule.rule_form() == GROUP_RULE_FORM
+    ok: r_rule.rule_kind() == RuleKind::GROUP
     ok: ! r_rule.is_value_rule()
     ok: ! r_rule.is_array_rule()
     ok: ! r_rule.is_object_rule()
     ok: ! r_rule.is_group_rule()
     ok: r_rule.is_ref_rule()
-    ok: r_rule.rule_form() == REF_RULE_FORM
+    ok: r_rule.rule_kind() == RuleKind::REF
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
     Creating various types of ValueRule, e.g. SimpleType, EnumType etc. [test-object-creation.cpp:245]
@@ -266,19 +266,19 @@ Tests run on Sat Sep 12 15:49:35 2015
     ok: ! r_value_rule.is_simple_type()
     ok: ! r_value_rule.is_enum_type()
     ok: ! r_value_rule.is_union_type()
-    ok: r_value_rule.rule_form() == UNDEFINED_VALUE_RULE_FORM
+    ok: r_value_rule.rule_kind() == RuleKind::UNDEFINED_VALUE
     ok: r_value_rule.is_simple_type()
     ok: ! r_value_rule.is_enum_type()
     ok: ! r_value_rule.is_union_type()
-    ok: r_value_rule.rule_form() == SIMPLE_VALUE_RULE_FORM
+    ok: r_value_rule.rule_kind() == RuleKind::SIMPLE_VALUE
     ok: ! r_value_rule.is_simple_type()
     ok: r_value_rule.is_enum_type()
     ok: ! r_value_rule.is_union_type()
-    ok: r_value_rule.rule_form() == ENUM_VALUE_RULE_FORM
+    ok: r_value_rule.rule_kind() == RuleKind::ENUM_VALUE
     ok: ! r_value_rule.is_simple_type()
     ok: ! r_value_rule.is_enum_type()
     ok: r_value_rule.is_union_type()
-    ok: r_value_rule.rule_form() == UNION_VALUE_RULE_FORM
+    ok: r_value_rule.rule_kind() == RuleKind::UNION_VALUE
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
     GrammarParser - parsing trivial simple value rules [test-rules-parser.cpp:57]

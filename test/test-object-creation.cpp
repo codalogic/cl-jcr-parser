@@ -194,7 +194,7 @@ TFEATURE( "Creating various types of Rules in Grammars" )
     TTEST( ! r_rule.is_object_rule() );
     TTEST( ! r_rule.is_group_rule() );
     TTEST( ! r_rule.is_ref_rule() );
-    TTEST( r_rule.rule_form() == UNDEFINED_VALUE_RULE_FORM );
+    TTEST( r_rule.rule_kind() == RuleKind::UNDEFINED_VALUE );
     }
 
     {
@@ -205,7 +205,7 @@ TFEATURE( "Creating various types of Rules in Grammars" )
     TTEST( ! r_rule.is_object_rule() );
     TTEST( ! r_rule.is_group_rule() );
     TTEST( ! r_rule.is_ref_rule() );
-    TTEST( r_rule.rule_form() == ARRAY_RULE_FORM );
+    TTEST( r_rule.rule_kind() == RuleKind::ARRAY );
     }
 
     {
@@ -216,7 +216,7 @@ TFEATURE( "Creating various types of Rules in Grammars" )
     TTEST( r_rule.is_object_rule() );
     TTEST( ! r_rule.is_group_rule() );
     TTEST( ! r_rule.is_ref_rule() );
-    TTEST( r_rule.rule_form() == OBJECT_RULE_FORM );
+    TTEST( r_rule.rule_kind() == RuleKind::OBJECT );
     }
 
     {
@@ -227,7 +227,7 @@ TFEATURE( "Creating various types of Rules in Grammars" )
     TTEST( ! r_rule.is_object_rule() );
     TTEST( r_rule.is_group_rule() );
     TTEST( ! r_rule.is_ref_rule() );
-    TTEST( r_rule.rule_form() == GROUP_RULE_FORM );
+    TTEST( r_rule.rule_kind() == RuleKind::GROUP );
     }
 
     {
@@ -238,7 +238,7 @@ TFEATURE( "Creating various types of Rules in Grammars" )
     TTEST( ! r_rule.is_object_rule() );
     TTEST( ! r_rule.is_group_rule() );
     TTEST( r_rule.is_ref_rule() );
-    TTEST( r_rule.rule_form() == REF_RULE_FORM );
+    TTEST( r_rule.rule_kind() == RuleKind::REF );
     }
 }
 
@@ -251,7 +251,7 @@ TFEATURE( "Creating various types of ValueRule, e.g. SimpleType, EnumType etc." 
     TTEST( ! r_value_rule.is_simple_type() );
     TTEST( ! r_value_rule.is_enum_type() );
     TTEST( ! r_value_rule.is_union_type() );
-    TTEST( r_value_rule.rule_form() == UNDEFINED_VALUE_RULE_FORM );
+    TTEST( r_value_rule.rule_kind() == RuleKind::UNDEFINED_VALUE );
 #ifdef NDEBUG
     // Exceptions are thrown if wrong type is chosen after selection
 
@@ -300,7 +300,7 @@ TFEATURE( "Creating various types of ValueRule, e.g. SimpleType, EnumType etc." 
     TTEST( r_value_rule.is_simple_type() );
     TTEST( ! r_value_rule.is_enum_type() );
     TTEST( ! r_value_rule.is_union_type() );
-    TTEST( r_value_rule.rule_form() == SIMPLE_VALUE_RULE_FORM );
+    TTEST( r_value_rule.rule_kind() == RuleKind::SIMPLE_VALUE );
 
 #ifdef NDEBUG
     // Exceptions are thrown if wrong type is chosen after selection
@@ -349,7 +349,7 @@ TFEATURE( "Creating various types of ValueRule, e.g. SimpleType, EnumType etc." 
     TTEST( ! r_value_rule.is_simple_type() );
     TTEST( r_value_rule.is_enum_type() );
     TTEST( ! r_value_rule.is_union_type() );
-    TTEST( r_value_rule.rule_form() == ENUM_VALUE_RULE_FORM );
+    TTEST( r_value_rule.rule_kind() == RuleKind::ENUM_VALUE );
 
 #ifdef NDEBUG
     // Exceptions are thrown if wrong type is chosen after selection
@@ -398,7 +398,7 @@ TFEATURE( "Creating various types of ValueRule, e.g. SimpleType, EnumType etc." 
     TTEST( ! r_value_rule.is_simple_type() );
     TTEST( ! r_value_rule.is_enum_type() );
     TTEST( r_value_rule.is_union_type() );
-    TTEST( r_value_rule.rule_form() == UNION_VALUE_RULE_FORM );
+    TTEST( r_value_rule.rule_kind() == RuleKind::UNION_VALUE );
 
 #ifdef NDEBUG
     // Exceptions are thrown if wrong type is chosen after selection

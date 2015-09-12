@@ -43,10 +43,14 @@ struct uniq_ptr
 
 class BadSelectorRequest : public std::exception {};
 
-enum RuleForm {
-            UNDEFINED_RULE_FORM, UNDEFINED_VALUE_RULE_FORM,
-            SIMPLE_VALUE_RULE_FORM, ENUM_VALUE_RULE_FORM, UNION_VALUE_RULE_FORM,
-            OBJECT_RULE_FORM, ARRAY_RULE_FORM, GROUP_RULE_FORM, REF_RULE_FORM };
+struct RuleKind
+{
+    enum Enum {
+            UNDEFINED,
+            UNDEFINED_VALUE, SIMPLE_VALUE, ENUM_VALUE, UNION_VALUE,
+            OBJECT, ARRAY, GROUP,
+            REF };
+};
 
 class Rule;
 class SimpleType;
@@ -63,7 +67,7 @@ class ValueType : private detail::NonCopyable
 public:
     virtual ~ValueType() {}
 
-    virtual RuleForm rule_form() const { return UNDEFINED_VALUE_RULE_FORM; }
+    virtual RuleKind::Enum rule_kind() const { return RuleKind::UNDEFINED_VALUE; }
 
     virtual bool is_simple_type() const { return false; }
     virtual const SimpleType & simple_type() const { assert(0); throw BadSimpleTypeRequest(); }
@@ -100,7 +104,7 @@ public:
     static bool is_present( const Rule & );
     static const SimpleType * from_rule( const Rule & );
 
-    virtual RuleForm rule_form() const { return SIMPLE_VALUE_RULE_FORM; }
+    virtual RuleKind::Enum rule_kind() const { return RuleKind::SIMPLE_VALUE; }
 
     virtual bool is_simple_type() const { return true; }
     virtual const SimpleType & simple_type() const { return *this; }
@@ -125,7 +129,7 @@ public:
     static bool is_present( const Rule & );
     static const EnumType * from_rule( const Rule & );
 
-    virtual RuleForm rule_form() const { return ENUM_VALUE_RULE_FORM; }
+    virtual RuleKind::Enum rule_kind() const { return RuleKind::ENUM_VALUE; }
 
     virtual bool is_enum_type() const { return true; }
     virtual const EnumType & enum_type() const { return *this; }
@@ -147,7 +151,7 @@ public:
     static bool is_present( const Rule & );
     static const UnionType * from_rule( const Rule & );
 
-    virtual RuleForm rule_form() const { return UNION_VALUE_RULE_FORM; }
+    virtual RuleKind::Enum rule_kind() const { return RuleKind::UNION_VALUE; }
 
     virtual bool is_union_type() const { return true; }
     virtual const UnionType & union_type() const { return *this; }
@@ -256,7 +260,7 @@ public:
     std::string & member_name() { return m.member_name; }
     bool is_any_member_name() const;
 
-    virtual RuleForm rule_form() const { return UNDEFINED_RULE_FORM; }
+    virtual RuleKind::Enum rule_kind() const { return RuleKind::UNDEFINED; }
 
     virtual bool is_ref_rule() const { return false; }
     virtual const RefRule & ref_rule() const { assert(0); throw BadRefRuleRequest(); }
@@ -293,7 +297,7 @@ public:
 
     ~ValueRule() { delete m.p_value_type; }
 
-    virtual RuleForm rule_form() const { if( m.p_value_type ) return m.p_value_type->rule_form(); else return UNDEFINED_VALUE_RULE_FORM; }
+    virtual RuleKind::Enum rule_kind() const { if( m.p_value_type ) return m.p_value_type->rule_kind(); else return RuleKind::UNDEFINED_VALUE; }
 
     virtual bool is_value_rule() const { return true; }
     virtual const ValueRule & value_rule() const { return *this; }
@@ -376,7 +380,7 @@ private:
 public:
     static ObjectRule & make_and_append( Grammar & );
 
-    virtual RuleForm rule_form() const { return OBJECT_RULE_FORM; }
+    virtual RuleKind::Enum rule_kind() const { return RuleKind::OBJECT; }
 
     virtual bool is_object_rule() const { return true; }
     virtual const ObjectRule & object_rule() const { return *this; }
@@ -394,7 +398,7 @@ private:
 public:
     static ArrayRule & make_and_append( Grammar & );
 
-    virtual RuleForm rule_form() const { return ARRAY_RULE_FORM; }
+    virtual RuleKind::Enum rule_kind() const { return RuleKind::ARRAY; }
 
     virtual bool is_array_rule() const { return true; }
     virtual const ArrayRule & array_rule() const { return *this; }
@@ -410,7 +414,7 @@ private:
 public:
     static GroupRule & make_and_append( Grammar & );
 
-    virtual RuleForm rule_form() const { return GROUP_RULE_FORM; }
+    virtual RuleKind::Enum rule_kind() const { return RuleKind::GROUP; }
 
     virtual bool is_group_rule() const { return true; }
     virtual const GroupRule & group_rule() const { return *this; }
@@ -428,7 +432,7 @@ private:
 public:
     static RefRule & make_and_append( Grammar & );
 
-    virtual RuleForm rule_form() const { return REF_RULE_FORM; }
+    virtual RuleKind::Enum rule_kind() const { return RuleKind::REF; }
 
     virtual bool is_ref_rule() const { return true; }
     virtual const RefRule & ref_rule() const { return *this; }
