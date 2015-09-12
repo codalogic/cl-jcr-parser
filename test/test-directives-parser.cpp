@@ -63,27 +63,27 @@ void test_c_wsp_2_directives( const char * p_jcr )
 
 TFEATURE( "GrammarParser - parsing c-wsp with directives" )
 {
-    TCALL( test_c_wsp_1_directive( 
-						"#pedantic" ) );
     TCALL( test_c_wsp_1_directive(
-						"    #pedantic" ) );
-    TCALL( test_c_wsp_1_directive(
-						";My first jcr\n"
                         "#pedantic" ) );
     TCALL( test_c_wsp_1_directive(
-						"   ;My first jcr\n"
+                        "    #pedantic" ) );
+    TCALL( test_c_wsp_1_directive(
+                        ";My first jcr\n"
                         "#pedantic" ) );
     TCALL( test_c_wsp_1_directive(
-						"   ;My first jcr\n"
-                        ";More grammars\r\n"
+                        "   ;My first jcr\n"
                         "#pedantic" ) );
     TCALL( test_c_wsp_1_directive(
-						"   \n"
                         "   ;My first jcr\n"
                         ";More grammars\r\n"
                         "#pedantic" ) );
     TCALL( test_c_wsp_1_directive(
-						"   ;My first jcr\n"
+                        "   \n"
+                        "   ;My first jcr\n"
+                        ";More grammars\r\n"
+                        "#pedantic" ) );
+    TCALL( test_c_wsp_1_directive(
+                        "   ;My first jcr\n"
                         ";More grammars\r\n"
                         "#pedantic\n"
                         "  ; Stuff at end" ) );

@@ -26,7 +26,7 @@ namespace cljcr {
 
 namespace { // Anonymous namespace for detail
 
-const std::string any_member_name = "\x30";	// ASCII Cancel char - unlikely to appear in a real name
+const std::string any_member_name = "\x30"; // ASCII Cancel char - unlikely to appear in a real name
 
 //----------------------------------------------------------------------------
 //                           class GrammarParser
@@ -41,9 +41,10 @@ private:
         Grammar * p_grammar;
         cl::reader & r_reader;
         JCRParser::Status status;
-        
+
         std::string rule_name;
         std::string member_name;
+        Rule::uniq_ptr pu_rule;
 
         Members(
             JCRParser * p_parent_in,
@@ -67,23 +68,31 @@ private:
     bool directive();
     bool rule();
 
-	bool rulename();
-	bool definition();
-	bool member_rule();
-	bool member_name();
-	bool definition_rule();
-	bool value_rule();
-	bool object_rule();
-	bool array_rule();
-	bool group_rule();
-	bool rule_ref();
+    bool rulename();
+    bool definition();
+    bool member_rule();
+    bool member_name();
+    bool definition_rule();
+    bool value_rule();
+    bool type_rule();
+    bool trivial_type();
+    bool trivial_type( const char * keyword, SimpleType::Type  );
+    bool parameterised_type();
+    bool compound_type();
+    bool error_type_rule();
+    bool object_rule();
+    bool array_rule();
+    bool group_rule();
+    bool rule_ref();
+    bool error_definition_rule();
 
     bool one_star_c_wsp();
     bool comment();
     bool star_c_wsp();
 
-	bool q_string( std::string * );
+    bool q_string( std::string * );
 
+    bool error( JCRParser::Status code, const std::string & r_message );
     bool error( JCRParser::Status code, const char * p_message );
     bool recover_bad_rule_or_directive();
     bool recover_definition();
@@ -105,41 +114,41 @@ class TopLevelRetreat : public UnspecifiedRetreat {};
 
 bool GrammarParser::parse()
 {
-	try
-	{
-		//  grammar         = 1*( *c-wsp (rule / directive) ) *c-wsp
-		
-		bool is_parsing_to_contine = true;
-		while( is_parsing_to_contine )
-		{
-			try
-			{
-				is_parsing_to_contine = star_c_wsp() && rule_or_directive();
-			}
-			catch( TopLevelRetreat & )
-			{
-				// Recovery to resume top-level parsing should be complete before retreat invoked
-				is_parsing_to_contine = true;
-			}
-		}
+    try
+    {
+        //  grammar         = 1*( *c-wsp (rule / directive) ) *c-wsp
 
-		star_c_wsp();
+        bool is_parsing_to_contine = true;
+        while( is_parsing_to_contine )
+        {
+            try
+            {
+                is_parsing_to_contine = star_c_wsp() && rule_or_directive();
+            }
+            catch( TopLevelRetreat & )
+            {
+                // Recovery to resume top-level parsing should be complete before retreat invoked
+                is_parsing_to_contine = true;
+            }
+        }
 
-		if( ! is_current_at_end() )
-			error( JCRParser::S_EXPECTED_END_OF_RULES, "Unexpected input at end of rules" );
-	}
-	
-	catch( SurrenderRetreat & )
-	{
-		// error() should already be reported when error detected
-	}
-	
-	catch( UnspecifiedRetreat & )
-	{
-		error( JCRParser::S_INTERNAL_ERROR, "Internal: Faulty recovery from errored input" );
-	}
+        star_c_wsp();
 
-	return m.status == JCRParser::S_OK;
+        if( ! is_current_at_end() )
+            error( JCRParser::S_EXPECTED_END_OF_RULES, "Unexpected input at end of rules" );
+    }
+
+    catch( SurrenderRetreat & )
+    {
+        // error() should already be reported when error detected
+    }
+
+    catch( UnspecifiedRetreat & )
+    {
+        error( JCRParser::S_INTERNAL_ERROR, "Internal: Faulty recovery from errored input" );
+    }
+
+    return m.status == JCRParser::S_OK;
 }
 
 bool GrammarParser::rule_or_directive()
@@ -178,7 +187,7 @@ bool GrammarParser::directive()
     get_until( &directive_line, cl::alphabet_eol() );
     r_directive.set( directive_line );
     skip( cl::alphabet_eol() );
-    
+
     return true;
 }
 
@@ -188,9 +197,14 @@ bool GrammarParser::rule()
 
     //  rule            = rulename *c-wsp definition
 
-    return rulename() &&
-			star_c_wsp() &&
-			definition();
+    if( rulename() && star_c_wsp() && definition() )
+    {
+        m.p_grammar->append( m.pu_rule );
+        return true;
+    }
+
+    m.pu_rule.reset();
+    return false;
 }
 
 bool GrammarParser::rulename()
@@ -203,9 +217,9 @@ bool GrammarParser::rulename()
     //  ; rulenames are case sensitive
     //
     //  name            = ALPHA *(ALPHA / DIGIT / "-" / "_")
-    
+
     m.rule_name += current();
-    
+
     return read( &m.rule_name, cl::alphabet_name_char() ) >= 0;
 }
 
@@ -217,11 +231,11 @@ bool GrammarParser::definition()
     //
     try
     {
-		return member_rule() || definition_rule();
+        return member_rule() || definition_rule();
     }
     catch( DefinitionRetreat & )
     {
-		return true;
+        return true;    // Recovery already done
     }
 }
 
@@ -229,7 +243,7 @@ bool GrammarParser::member_rule()
 {
     //  member-rule     = member-name *c-wsp definition-rule
 
-	return member_name() && ( star_c_wsp() && definition_rule() || recover_definition() && retreat< DefinitionRetreat >() );
+    return member_name() && star_c_wsp() && definition_rule();
 }
 
 bool GrammarParser::member_name()
@@ -237,8 +251,8 @@ bool GrammarParser::member_name()
     //  member-name     = ( "^" %x22.22 ) /
     //                     ( %x22 *q-string %x22 )
 
-	return fixed( "^\"\"" ) && set( m.member_name, any_member_name )
-			|| q_string( &m.member_name );
+    return fixed( "^\"\"" ) && set( m.member_name, any_member_name )
+            || q_string( &m.member_name );
 }
 
 bool GrammarParser::definition_rule()
@@ -249,50 +263,105 @@ bool GrammarParser::definition_rule()
     //                            group-rule /
     //                            rule-ref )
 
-	return value_rule() || object_rule() || array_rule() ||
-			group_rule() || rule_ref();
+    return value_rule() || object_rule() || array_rule() ||
+            group_rule() || rule_ref() || error_definition_rule();
 }
 
 bool GrammarParser::value_rule()
 {
     //  value-rule      = ":" *c-wsp type-rule
-    //
-    //  type-rule       = boolean-type /
+
+    return fixed( ":" ) && star_c_wsp() && type_rule();
+}
+
+bool GrammarParser::type_rule()
+{
+    //  type-rule       = trivial-type / parameterised-type / compound-type
+
+    return trivial_type() || parameterised_type() || compound_type() || error_type_rule();
+}
+
+bool GrammarParser::trivial_type()
+{
+    // trivial-type     = boolean-type /
     //                   null-type /
-    //                   integer-type /
-    //                   float-type /
-    //                   string-type /
-    //                   uri-type /
     //                   ip-type /
     //                   dns-type /
     //                   date-type /
     //                   email-type /
     //                   phone-type /
     //                   base64-type /
-    //                   enum-type /
     //                   any-type
     //
-    //  boolean-type    = "boolean"
-    //  null-type       = "null"
+    //  boolean-type    = ""
+    //  null-type       = ""
+    //  ip-type         = "" / ""
+    //  dns-type        = "" / ""
+    //  date-type       = "" / "" / ""
+    //  email-type      = ""
+    //  phone-type      = ""
+    //  base64-type     = ""
+    //  any-type        = ""
+
+    return trivial_type( "boolean", SimpleType::BOOLEAN ) || trivial_type( "null", SimpleType::TNULL ) ||
+            trivial_type( "ip4", SimpleType::IP4 ) || trivial_type( "ip6", SimpleType::IP6 ) ||
+            trivial_type( "fqdn", SimpleType::FQDN ) || trivial_type( "idn", SimpleType::IDN ) ||
+            trivial_type( "date-time", SimpleType::DATETIME ) || trivial_type( "full-date", SimpleType::DATE ) || trivial_type( "full-time", SimpleType::TIME ) ||
+            trivial_type( "email", SimpleType::EMAIL ) || trivial_type( "phone", SimpleType::PHONE ) ||
+            trivial_type( "base64", SimpleType::BASE64 ) ||
+            trivial_type( "any", SimpleType::ANY );
+}
+
+bool GrammarParser::trivial_type( const char * keyword, SimpleType::Type type )
+{
+    if( fixed( keyword ) )
+    {
+        m.pu_rule = Rule::uniq_ptr( SimpleType::make_rule() );
+        SimpleType & r_simple_type = *SimpleType::from_rule( m.pu_rule.get() );
+        r_simple_type.type( type );
+        return true;
+    }
+
+    return false;
+}
+
+bool GrammarParser::parameterised_type()
+{
+    // parameterised-type = integer-type /
+    //                   float-type /
+    //                   string-type /
+    //                   uri-type
+    //
     //  integer-type    = "integer" [ 1*c-wsp integer ".." integer ]
     //  float-type      = "float"   [ 1*c-wsp float   ".." float   ]
     //  string-type     = "string"  [ *c-wsp "/" *regex-char "/" ]
     //  uri-type        = "uri"     [ 1*c-wsp URI ] ; URI defined in RFC 3986
-    //  ip-type         = "ip4" / "ip6"
-    //  dns-type        = "fqdn" / "idn"
-    //  date-type       = "date-time" / "full-date" / "full-time"
-    //  email-type      = "email"
-    //  phone-type      = "phone"
-    //  base64-type     = "base64"
+
+    return false;   // TODO
+}
+
+bool GrammarParser::compound_type()
+{
+    // compound-type    = enum-type /
+    //                   union-type
+    //
     //  enum-type       = "<" *c-wsp enum-item *(1*c-wsp enum-item) *c-wsp ">"
-    //  any-type        = "any"
     //
     //  enum-item       = float / integer /
     //                   "1" / "0" / "true" / "false" /
     //                   "null" /
     //                   q-string
 
-	return false;	// TODO
+    return false;   // TODO
+}
+
+bool GrammarParser::error_type_rule()
+{
+    std::string unknown_keyword;
+    get( &unknown_keyword, cl::alphabet_name_char() );
+    error( JCRParser::S_UNKNOWN_VALUE_TYPE, std::string("Unknown value type '") + unknown_keyword + "'" );
+
+    return recover_definition() && retreat< DefinitionRetreat >();
 }
 
 bool GrammarParser::object_rule()
@@ -308,7 +377,7 @@ bool GrammarParser::object_rule()
     //  object-item     = ( rule-ref / member-rule / group-rule )
     //  and-or          = ( "," / "|" )
 
-	return false;	// TODO
+    return false;   // TODO
 }
 
 bool GrammarParser::array_rule()
@@ -324,7 +393,7 @@ bool GrammarParser::array_rule()
     //
     //  array-count     = [int] *c-wsp "*" *c-wsp [int]
 
-	return false;	// TODO
+    return false;   // TODO
 }
 
 bool GrammarParser::group_rule()
@@ -338,7 +407,7 @@ bool GrammarParser::group_rule()
     //
     //  group-member    = [ ("?" / array-count ) ] *c-wsp definition
 
-	return false;	// TODO
+    return false;   // TODO
 }
 
 bool GrammarParser::rule_ref()
@@ -347,7 +416,14 @@ bool GrammarParser::rule_ref()
     //
     //  module-name     = name
 
-	return false;	// TODO
+    return false;   // TODO
+}
+
+bool GrammarParser::error_definition_rule()
+{
+    error( JCRParser::S_UNKNOWN_RULE_FORMAT, "Expected value rule, object rule, array_rule, group_rule or rule reference" );
+
+    return recover_definition() && retreat< DefinitionRetreat >();
 }
 
     //
@@ -429,55 +505,60 @@ class QStringParser
     //                     ( %x75 4HEXDIG ) ) ; uXXXX u+XXXX
 
 private:
-	struct Members
-	{
-		cl::dsl_pa * p_dsl_pa;
-		std::string * p_v;
-		
-		Members( cl::dsl_pa * p_dsl_pa_in, std::string * p_v_in )
-			: p_dsl_pa( p_dsl_pa_in ), p_v( p_v_in )
-		{}
-	} m;
-	
-	QStringParser( cl::dsl_pa * p_dsl_pa, std::string * p_v )
-		: m( p_dsl_pa, p_v )
-	{}
+    struct Members
+    {
+        cl::dsl_pa * p_dsl_pa;
+        std::string * p_v;
 
-	bool read()
-	{
-		if( ! m.p_dsl_pa->is_get_char( '"' ) )
-			return false;
+        Members( cl::dsl_pa * p_dsl_pa_in, std::string * p_v_in )
+            : p_dsl_pa( p_dsl_pa_in ), p_v( p_v_in )
+        {}
+    } m;
 
-		return read_post_quote();
-	}
+    QStringParser( cl::dsl_pa * p_dsl_pa, std::string * p_v )
+        : m( p_dsl_pa, p_v )
+    {}
 
-	bool read_post_quote()
-	{
-		int c;
-		while( (c = m.p_dsl_pa->get()) != '"' )
-		{
-			if( m.p_dsl_pa->is_current_at_end() )
-				return false;
-			*m.p_v += c;
-		}
-		return true;
-	}
+    bool read()
+    {
+        if( ! m.p_dsl_pa->is_get_char( '"' ) )
+            return false;
+
+        return read_post_quote();
+    }
+
+    bool read_post_quote()
+    {
+        int c;
+        while( (c = m.p_dsl_pa->get()) != '"' )
+        {
+            if( m.p_dsl_pa->is_current_at_end() )
+                return false;
+            *m.p_v += c;
+        }
+        return true;
+    }
 
 public:
-	static bool read( cl::dsl_pa * p_dsl_pa, std::string * p_v )
-	{
-		return QStringParser( p_dsl_pa, p_v ).read();
-	}
+    static bool read( cl::dsl_pa * p_dsl_pa, std::string * p_v )
+    {
+        return QStringParser( p_dsl_pa, p_v ).read();
+    }
 
-	static bool read_post_quote( cl::dsl_pa * p_dsl_pa, std::string * p_v )
-	{
-		return QStringParser( p_dsl_pa, p_v ).read_post_quote();
-	}
+    static bool read_post_quote( cl::dsl_pa * p_dsl_pa, std::string * p_v )
+    {
+        return QStringParser( p_dsl_pa, p_v ).read_post_quote();
+    }
 };
 
 bool GrammarParser::q_string( std::string * p_v )
 {
-	return QStringParser::read( this, p_v );
+    return QStringParser::read( this, p_v );
+}
+
+bool GrammarParser::error( JCRParser::Status code, const std::string & r_message )
+{
+    return error( code, r_message.c_str() );
 }
 
 bool GrammarParser::error( JCRParser::Status code, const char * p_message )
@@ -501,10 +582,100 @@ bool GrammarParser::recover_definition()
 bool GrammarParser::recover_badly()
 {
     retreat< SurrenderRetreat >();
-    return true;	// We want to continue parsing after recovery
+    return true;    // We want to continue parsing after recovery
 }
 
 } // End of Anonymous namespace
+
+//----------------------------------------------------------------------------
+//                           class SimpleType
+//----------------------------------------------------------------------------
+
+Rule * SimpleType::make_rule()
+{
+    Rule::uniq_ptr pu_rule( new ValueRule );
+    pu_rule->value_rule().select_simple_type();
+    return pu_rule.release();
+}
+
+bool SimpleType::is_present( const Rule & r_rule )
+{
+    return r_rule.is_value_rule() && r_rule.value_rule().is_simple_type();
+}
+
+SimpleType * SimpleType::from_rule( Rule * p_rule )
+{
+    if( is_present( *p_rule ) )
+        return &p_rule->value_rule().simple_type();
+    return 0;
+}
+
+const SimpleType * SimpleType::from_rule( const Rule & r_rule )
+{
+    if( is_present( r_rule ) )
+        return &r_rule.value_rule().simple_type();
+    return 0;
+}
+
+//----------------------------------------------------------------------------
+//                           class EnumType
+//----------------------------------------------------------------------------
+
+Rule * EnumType::make_rule()
+{
+    Rule::uniq_ptr pu_rule( new ValueRule );
+    pu_rule->value_rule().select_enum_type();
+    return pu_rule.release();
+}
+
+bool EnumType::is_present( const Rule & r_rule )
+{
+    return r_rule.is_value_rule() && r_rule.value_rule().is_enum_type();
+}
+
+EnumType * EnumType::from_rule( Rule * p_rule )
+{
+    if( is_present( *p_rule ) )
+        return &p_rule->value_rule().enum_type();
+    return 0;
+}
+
+const EnumType * EnumType::from_rule( const Rule & r_rule )
+{
+    if( is_present( r_rule ) )
+        return &r_rule.value_rule().enum_type();
+    return 0;
+}
+
+//----------------------------------------------------------------------------
+//                           class UnionType
+//----------------------------------------------------------------------------
+
+Rule * UnionType::make_rule()
+{
+    Rule::uniq_ptr pu_rule( new ValueRule );
+    pu_rule->value_rule().select_union_type();
+    return pu_rule.release();
+}
+
+bool UnionType::is_present( const Rule & r_rule )
+{
+    return r_rule.is_value_rule() && r_rule.value_rule().is_union_type();
+}
+
+UnionType * UnionType::from_rule( Rule * p_rule )
+{
+    if( is_present( *p_rule ) )
+        return &p_rule->value_rule().union_type();
+    return 0;
+}
+
+const UnionType * UnionType::from_rule( const Rule & r_rule )
+{
+    if( is_present( r_rule ) )
+        return &r_rule.value_rule().union_type();
+    return 0;
+}
 
 //----------------------------------------------------------------------------
 //                           class Rule
@@ -512,7 +683,7 @@ bool GrammarParser::recover_badly()
 
 bool Rule::is_any_member_name() const
 {
-	return m.member_name == any_member_name;
+    return m.member_name == any_member_name;
 }
 
 //----------------------------------------------------------------------------

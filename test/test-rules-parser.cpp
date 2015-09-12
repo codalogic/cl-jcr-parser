@@ -37,6 +37,25 @@
 
 using namespace cljcr;
 
-TFEATURE( "GrammarParser - parsing basic rules" )
+#include "test-parser-harness.h"
+
+void test_simple_anonymous_value_rule( const char * p_jcr, SimpleType::Type expected_type )
 {
+    ParserHarness h( p_jcr );
+
+    TCRITICALTEST( h.status() == JCRParser::S_OK );
+    TCRITICALTEST( h.grammar().size() == 1 );
+    TCRITICALTEST( h.grammar()[0].is_rule() );
+
+    TCRITICALTEST( SimpleType::is_present( h.grammar()[0].rule() ) );
+
+    const SimpleType * p_simple_type = SimpleType::from_rule( h.grammar()[0].rule() );
+    TCRITICALTEST( p_simple_type != 0 );    // Actually redundant when we've already done SimpleType::is_present() check
+    TTEST( p_simple_type->type() == expected_type );
+}
+
+TFEATURE( "GrammarParser - parsing trivial simple value rules" )
+{
+    TCALL( test_simple_anonymous_value_rule( "rule1 : boolean", SimpleType::BOOLEAN ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1 : null", SimpleType::TNULL ) );
 }

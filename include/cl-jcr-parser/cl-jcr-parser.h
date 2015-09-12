@@ -43,6 +43,7 @@ struct uniq_ptr
 
 class BadSelectorRequest : public std::exception {};
 
+class Rule;
 class SimpleType;
 class UnionType;
 class EnumType;
@@ -86,6 +87,12 @@ private:
     } m;
 
 public:
+    static Rule * make_rule();      // Call from_rule() afterwards to get SimpleType
+    static SimpleType * from_rule( Rule * );
+
+    static bool is_present( const Rule & );
+    static const SimpleType * from_rule( const Rule & );
+
     virtual bool is_simple_type() const { return true; }
     virtual const SimpleType & simple_type() const { return *this; }
     virtual SimpleType & simple_type() { return *this; }
@@ -94,6 +101,24 @@ public:
     Type type() const { return m.type; }
 
     // TODO: Add parameter accessors
+};
+
+class EnumType : public ValueType
+{
+private:
+    struct Members {
+    } m;
+
+public:
+    static Rule * make_rule();      // Call from_rule() afterwards to get EnumType
+    static EnumType * from_rule( Rule * );
+
+    static bool is_present( const Rule & );
+    static const EnumType * from_rule( const Rule & );
+
+    virtual bool is_enum_type() const { return true; }
+    virtual const EnumType & enum_type() const { return *this; }
+    virtual EnumType & enum_type() { return *this; }
 };
 
 class UnionType : public ValueType
@@ -105,21 +130,15 @@ private:
     } m;
 
 public:
+    static Rule * make_rule();      // Call from_rule() afterwards to get UnionType
+    static UnionType * from_rule( Rule * );
+
+    static bool is_present( const Rule & );
+    static const UnionType * from_rule( const Rule & );
+
     virtual bool is_union_type() const { return true; }
     virtual const UnionType & union_type() const { return *this; }
     virtual UnionType & union_type() { return *this; }
-};
-
-class EnumType : public ValueType
-{
-private:
-    struct Members {
-    } m;
-
-public:
-    virtual bool is_enum_type() const { return true; }
-    virtual const EnumType & enum_type() const { return *this; }
-    virtual EnumType & enum_type() { return *this; }
 };
 
 class BadSimpleTypeAdapter : public BadSelectorRequest {};
@@ -254,10 +273,11 @@ public:
     virtual const RefRule & ref_rule() const { return *this; }
     virtual RefRule & ref_rule() { return *this; }
 
-    void ref( const std::string & ref ) { m.local = ref; }
-
     const std::string & module() const { return m.module; }
+    void module( const std::string & module_in ) { m.local = module_in; }
+
     const std::string & local() const { return m.local; }
+    void local( const std::string & local_in ) { m.local = local_in; }
 };
 
 class ValueRule : public Rule
@@ -599,7 +619,7 @@ public:
 class JCRParser : private detail::NonCopyable
 {
 public:
-    enum Status { S_OK, S_INTERNAL_ERROR, S_UNABLE_TO_OPEN_FILE, S_EXPECTED_END_OF_RULES };
+    enum Status { S_OK, S_INTERNAL_ERROR, S_UNABLE_TO_OPEN_FILE, S_EXPECTED_END_OF_RULES, S_UNKNOWN_RULE_FORMAT, S_UNKNOWN_VALUE_TYPE };
 
 private:
     struct Members {
