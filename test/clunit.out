@@ -1,4 +1,4 @@
-Tests run on Sat Sep 12 13:55:29 2015
+Tests run on Sat Sep 12 15:49:35 2015
 
     GrammarParser - parsing c-wsp with directives [test-directives-parser.cpp:64]
     =============================================================================
@@ -228,43 +228,61 @@ Tests run on Sat Sep 12 13:55:29 2015
 
     Creating various types of Rules in Grammars [test-object-creation.cpp:187]
     ==========================================================================
+    ok: r_rule.is_value_rule()
+    ok: ! r_rule.is_array_rule()
+    ok: ! r_rule.is_object_rule()
+    ok: ! r_rule.is_group_rule()
+    ok: ! r_rule.is_ref_rule()
+    ok: r_rule.rule_form() == UNDEFINED_VALUE_RULE_FORM
+    ok: ! r_rule.is_value_rule()
     ok: r_rule.is_array_rule()
     ok: ! r_rule.is_object_rule()
+    ok: ! r_rule.is_group_rule()
     ok: ! r_rule.is_ref_rule()
+    ok: r_rule.rule_form() == ARRAY_RULE_FORM
     ok: ! r_rule.is_value_rule()
     ok: ! r_rule.is_array_rule()
     ok: r_rule.is_object_rule()
+    ok: ! r_rule.is_group_rule()
     ok: ! r_rule.is_ref_rule()
+    ok: r_rule.rule_form() == OBJECT_RULE_FORM
     ok: ! r_rule.is_value_rule()
     ok: ! r_rule.is_array_rule()
     ok: ! r_rule.is_object_rule()
+    ok: r_rule.is_group_rule()
+    ok: ! r_rule.is_ref_rule()
+    ok: r_rule.rule_form() == GROUP_RULE_FORM
+    ok: ! r_rule.is_value_rule()
+    ok: ! r_rule.is_array_rule()
+    ok: ! r_rule.is_object_rule()
+    ok: ! r_rule.is_group_rule()
     ok: r_rule.is_ref_rule()
-    ok: ! r_rule.is_value_rule()
-    ok: ! r_rule.is_array_rule()
-    ok: ! r_rule.is_object_rule()
-    ok: ! r_rule.is_ref_rule()
-    ok: r_rule.is_value_rule()
+    ok: r_rule.rule_form() == REF_RULE_FORM
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Creating various types of ValueRule, e.g. SimpleType, EnumType etc. [test-object-creation.cpp:226]
+    Creating various types of ValueRule, e.g. SimpleType, EnumType etc. [test-object-creation.cpp:245]
     ==================================================================================================
     ok: r_value_rule.is_value_rule()
     ok: ! r_value_rule.is_simple_type()
     ok: ! r_value_rule.is_enum_type()
     ok: ! r_value_rule.is_union_type()
+    ok: r_value_rule.rule_form() == UNDEFINED_VALUE_RULE_FORM
     ok: r_value_rule.is_simple_type()
     ok: ! r_value_rule.is_enum_type()
     ok: ! r_value_rule.is_union_type()
+    ok: r_value_rule.rule_form() == SIMPLE_VALUE_RULE_FORM
     ok: ! r_value_rule.is_simple_type()
     ok: r_value_rule.is_enum_type()
     ok: ! r_value_rule.is_union_type()
+    ok: r_value_rule.rule_form() == ENUM_VALUE_RULE_FORM
     ok: ! r_value_rule.is_simple_type()
     ok: ! r_value_rule.is_enum_type()
     ok: r_value_rule.is_union_type()
+    ok: r_value_rule.rule_form() == UNION_VALUE_RULE_FORM
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - parsing trivial value rules [test-rules-parser.cpp:57]
-    ======================================================================
+    GrammarParser - parsing trivial simple value rules [test-rules-parser.cpp:57]
+    =============================================================================
       Calling: test_simple_anonymous_value_rule( "rule1 : boolean", SimpleType::BOOLEAN ) (59)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
@@ -293,4 +311,4 @@ TODOs (8):
 - Enhance GrammarParser::q_string() and QStringParsert o full spec [test-main.cpp:47]
 - Verify if we really need Grammar::append_rule() [test-object-creation.cpp:185]
 
-0 error(s), 8 todo(s), 230 test(s)
+0 error(s), 8 todo(s), 248 test(s)

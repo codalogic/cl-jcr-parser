@@ -687,15 +687,6 @@ bool Rule::is_any_member_name() const
 }
 
 //----------------------------------------------------------------------------
-//                           class RefRule
-//----------------------------------------------------------------------------
-
-RefRule & RefRule::make_and_append( Grammar & r_grammar )
-{
-    return r_grammar.append( new RefRule ).ref_rule();
-}
-
-//----------------------------------------------------------------------------
 //                           class ValueRule
 //----------------------------------------------------------------------------
 
@@ -720,6 +711,24 @@ ObjectRule & ObjectRule::make_and_append( Grammar & r_grammar )
 ArrayRule & ArrayRule::make_and_append( Grammar & r_grammar )
 {
     return r_grammar.append( new ArrayRule ).array_rule();
+}
+
+//----------------------------------------------------------------------------
+//                           class GroupRule
+//----------------------------------------------------------------------------
+
+GroupRule & GroupRule::make_and_append( Grammar & r_grammar )
+{
+    return r_grammar.append( new GroupRule ).group_rule();
+}
+
+//----------------------------------------------------------------------------
+//                           class RefRule
+//----------------------------------------------------------------------------
+
+RefRule & RefRule::make_and_append( Grammar & r_grammar )
+{
+    return r_grammar.append( new RefRule ).ref_rule();
 }
 
 //----------------------------------------------------------------------------

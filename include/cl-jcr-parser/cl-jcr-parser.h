@@ -43,6 +43,11 @@ struct uniq_ptr
 
 class BadSelectorRequest : public std::exception {};
 
+enum RuleForm {
+            UNDEFINED_RULE_FORM, UNDEFINED_VALUE_RULE_FORM,
+            SIMPLE_VALUE_RULE_FORM, ENUM_VALUE_RULE_FORM, UNION_VALUE_RULE_FORM,
+            OBJECT_RULE_FORM, ARRAY_RULE_FORM, GROUP_RULE_FORM, REF_RULE_FORM };
+
 class Rule;
 class SimpleType;
 class UnionType;
@@ -57,6 +62,8 @@ class ValueType : private detail::NonCopyable
 {
 public:
     virtual ~ValueType() {}
+
+    virtual RuleForm rule_form() const { return UNDEFINED_VALUE_RULE_FORM; }
 
     virtual bool is_simple_type() const { return false; }
     virtual const SimpleType & simple_type() const { assert(0); throw BadSimpleTypeRequest(); }
@@ -93,6 +100,8 @@ public:
     static bool is_present( const Rule & );
     static const SimpleType * from_rule( const Rule & );
 
+    virtual RuleForm rule_form() const { return SIMPLE_VALUE_RULE_FORM; }
+
     virtual bool is_simple_type() const { return true; }
     virtual const SimpleType & simple_type() const { return *this; }
     virtual SimpleType & simple_type() { return *this; }
@@ -116,6 +125,8 @@ public:
     static bool is_present( const Rule & );
     static const EnumType * from_rule( const Rule & );
 
+    virtual RuleForm rule_form() const { return ENUM_VALUE_RULE_FORM; }
+
     virtual bool is_enum_type() const { return true; }
     virtual const EnumType & enum_type() const { return *this; }
     virtual EnumType & enum_type() { return *this; }
@@ -135,6 +146,8 @@ public:
 
     static bool is_present( const Rule & );
     static const UnionType * from_rule( const Rule & );
+
+    virtual RuleForm rule_form() const { return UNION_VALUE_RULE_FORM; }
 
     virtual bool is_union_type() const { return true; }
     virtual const UnionType & union_type() const { return *this; }
@@ -213,12 +226,14 @@ class RefRule;
 class ValueRule;
 class ObjectRule;
 class ArrayRule;
+class GroupRule;
 
 class BadRuleSelectorRequest : public BadSelectorRequest {};
 class BadRefRuleRequest : public BadRuleSelectorRequest {};
 class BadValueRuleRequest : public BadRuleSelectorRequest {};
 class BadObjectRequest : public BadRuleSelectorRequest {};
 class BadArrayRequest : public BadRuleSelectorRequest {};
+class BadGroupRequest : public BadRuleSelectorRequest {};
 
 class Rule : private detail::NonCopyable
 {
@@ -241,6 +256,8 @@ public:
     std::string & member_name() { return m.member_name; }
     bool is_any_member_name() const;
 
+    virtual RuleForm rule_form() const { return UNDEFINED_RULE_FORM; }
+
     virtual bool is_ref_rule() const { return false; }
     virtual const RefRule & ref_rule() const { assert(0); throw BadRefRuleRequest(); }
     virtual RefRule & ref_rule() { assert(0); throw BadRefRuleRequest(); }
@@ -256,28 +273,10 @@ public:
     virtual bool is_array_rule() const { return false; }
     virtual const ArrayRule & array_rule() const { assert(0); throw BadArrayRequest(); }
     virtual ArrayRule & array_rule() { assert(0); throw BadArrayRequest(); }
-};
 
-class RefRule : public Rule
-{
-private:
-    struct Members {
-        std::string module;
-        std::string local;
-    } m;
-
-public:
-    static RefRule & make_and_append( Grammar & );
-
-    virtual bool is_ref_rule() const { return true; }
-    virtual const RefRule & ref_rule() const { return *this; }
-    virtual RefRule & ref_rule() { return *this; }
-
-    const std::string & module() const { return m.module; }
-    void module( const std::string & module_in ) { m.local = module_in; }
-
-    const std::string & local() const { return m.local; }
-    void local( const std::string & local_in ) { m.local = local_in; }
+    virtual bool is_group_rule() const { return false; }
+    virtual const GroupRule & group_rule() const { assert(0); throw BadGroupRequest(); }
+    virtual GroupRule & group_rule() { assert(0); throw BadGroupRequest(); }
 };
 
 class ValueRule : public Rule
@@ -293,6 +292,8 @@ public:
     static ValueRule & make_and_append( Grammar & );
 
     ~ValueRule() { delete m.p_value_type; }
+
+    virtual RuleForm rule_form() const { if( m.p_value_type ) return m.p_value_type->rule_form(); else return UNDEFINED_VALUE_RULE_FORM; }
 
     virtual bool is_value_rule() const { return true; }
     virtual const ValueRule & value_rule() const { return *this; }
@@ -375,6 +376,8 @@ private:
 public:
     static ObjectRule & make_and_append( Grammar & );
 
+    virtual RuleForm rule_form() const { return OBJECT_RULE_FORM; }
+
     virtual bool is_object_rule() const { return true; }
     virtual const ObjectRule & object_rule() const { return *this; }
     virtual ObjectRule & object_rule() { return *this; }
@@ -391,9 +394,51 @@ private:
 public:
     static ArrayRule & make_and_append( Grammar & );
 
+    virtual RuleForm rule_form() const { return ARRAY_RULE_FORM; }
+
     virtual bool is_array_rule() const { return true; }
     virtual const ArrayRule & array_rule() const { return *this; }
     virtual ArrayRule & array_rule() { return *this; }
+};
+
+class GroupRule : public Rule
+{
+private:
+    struct Members {
+    } m;
+
+public:
+    static GroupRule & make_and_append( Grammar & );
+
+    virtual RuleForm rule_form() const { return GROUP_RULE_FORM; }
+
+    virtual bool is_group_rule() const { return true; }
+    virtual const GroupRule & group_rule() const { return *this; }
+    virtual GroupRule & group_rule() { return *this; }
+};
+
+class RefRule : public Rule
+{
+private:
+    struct Members {
+        std::string module;
+        std::string local;
+    } m;
+
+public:
+    static RefRule & make_and_append( Grammar & );
+
+    virtual RuleForm rule_form() const { return REF_RULE_FORM; }
+
+    virtual bool is_ref_rule() const { return true; }
+    virtual const RefRule & ref_rule() const { return *this; }
+    virtual RefRule & ref_rule() { return *this; }
+
+    const std::string & module() const { return m.module; }
+    void module( const std::string & module_in ) { m.local = module_in; }
+
+    const std::string & local() const { return m.local; }
+    void local( const std::string & local_in ) { m.local = local_in; }
 };
 
 class Directive : private detail::NonCopyable

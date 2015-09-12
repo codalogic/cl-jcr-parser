@@ -188,38 +188,57 @@ TFEATURE( "Creating various types of Rules in Grammars" )
 {
     {
     Grammar grammar;
+    ValueRule & r_rule = ValueRule::make_and_append( grammar );
+    TTEST( r_rule.is_value_rule() );
+    TTEST( ! r_rule.is_array_rule() );
+    TTEST( ! r_rule.is_object_rule() );
+    TTEST( ! r_rule.is_group_rule() );
+    TTEST( ! r_rule.is_ref_rule() );
+    TTEST( r_rule.rule_form() == UNDEFINED_VALUE_RULE_FORM );
+    }
+
+    {
+    Grammar grammar;
     ArrayRule & r_rule = ArrayRule::make_and_append( grammar );
+    TTEST( ! r_rule.is_value_rule() );
     TTEST( r_rule.is_array_rule() );
     TTEST( ! r_rule.is_object_rule() );
+    TTEST( ! r_rule.is_group_rule() );
     TTEST( ! r_rule.is_ref_rule() );
-    TTEST( ! r_rule.is_value_rule() );
+    TTEST( r_rule.rule_form() == ARRAY_RULE_FORM );
     }
 
     {
     Grammar grammar;
     ObjectRule & r_rule = ObjectRule::make_and_append( grammar );
+    TTEST( ! r_rule.is_value_rule() );
     TTEST( ! r_rule.is_array_rule() );
     TTEST( r_rule.is_object_rule() );
+    TTEST( ! r_rule.is_group_rule() );
     TTEST( ! r_rule.is_ref_rule() );
+    TTEST( r_rule.rule_form() == OBJECT_RULE_FORM );
+    }
+
+    {
+    Grammar grammar;
+    GroupRule & r_rule = GroupRule::make_and_append( grammar );
     TTEST( ! r_rule.is_value_rule() );
+    TTEST( ! r_rule.is_array_rule() );
+    TTEST( ! r_rule.is_object_rule() );
+    TTEST( r_rule.is_group_rule() );
+    TTEST( ! r_rule.is_ref_rule() );
+    TTEST( r_rule.rule_form() == GROUP_RULE_FORM );
     }
 
     {
     Grammar grammar;
     RefRule & r_rule = RefRule::make_and_append( grammar );
-    TTEST( ! r_rule.is_array_rule() );
-    TTEST( ! r_rule.is_object_rule() );
-    TTEST( r_rule.is_ref_rule() );
     TTEST( ! r_rule.is_value_rule() );
-    }
-
-    {
-    Grammar grammar;
-    ValueRule & r_rule = ValueRule::make_and_append( grammar );
     TTEST( ! r_rule.is_array_rule() );
     TTEST( ! r_rule.is_object_rule() );
-    TTEST( ! r_rule.is_ref_rule() );
-    TTEST( r_rule.is_value_rule() );
+    TTEST( ! r_rule.is_group_rule() );
+    TTEST( r_rule.is_ref_rule() );
+    TTEST( r_rule.rule_form() == REF_RULE_FORM );
     }
 }
 
@@ -232,6 +251,7 @@ TFEATURE( "Creating various types of ValueRule, e.g. SimpleType, EnumType etc." 
     TTEST( ! r_value_rule.is_simple_type() );
     TTEST( ! r_value_rule.is_enum_type() );
     TTEST( ! r_value_rule.is_union_type() );
+    TTEST( r_value_rule.rule_form() == UNDEFINED_VALUE_RULE_FORM );
 #ifdef NDEBUG
     // Exceptions are thrown if wrong type is chosen after selection
 
@@ -280,6 +300,7 @@ TFEATURE( "Creating various types of ValueRule, e.g. SimpleType, EnumType etc." 
     TTEST( r_value_rule.is_simple_type() );
     TTEST( ! r_value_rule.is_enum_type() );
     TTEST( ! r_value_rule.is_union_type() );
+    TTEST( r_value_rule.rule_form() == SIMPLE_VALUE_RULE_FORM );
 
 #ifdef NDEBUG
     // Exceptions are thrown if wrong type is chosen after selection
@@ -328,6 +349,7 @@ TFEATURE( "Creating various types of ValueRule, e.g. SimpleType, EnumType etc." 
     TTEST( ! r_value_rule.is_simple_type() );
     TTEST( r_value_rule.is_enum_type() );
     TTEST( ! r_value_rule.is_union_type() );
+    TTEST( r_value_rule.rule_form() == ENUM_VALUE_RULE_FORM );
 
 #ifdef NDEBUG
     // Exceptions are thrown if wrong type is chosen after selection
@@ -376,6 +398,7 @@ TFEATURE( "Creating various types of ValueRule, e.g. SimpleType, EnumType etc." 
     TTEST( ! r_value_rule.is_simple_type() );
     TTEST( ! r_value_rule.is_enum_type() );
     TTEST( r_value_rule.is_union_type() );
+    TTEST( r_value_rule.rule_form() == UNION_VALUE_RULE_FORM );
 
 #ifdef NDEBUG
     // Exceptions are thrown if wrong type is chosen after selection
