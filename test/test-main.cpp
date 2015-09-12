@@ -40,9 +40,5 @@ TFEATURE( "Miscellaneous TODOs" )
 
     TTODO( "Make RefRule set method split input into module and local parts" );
 
-    TTODO( "Test ValueType class" );
-
-    TTODO( "Test ValueRule class and derivatives" );
-
     TTODO( "Enhance GrammarParser::q_string() and QStringParsert o full spec" );
 }

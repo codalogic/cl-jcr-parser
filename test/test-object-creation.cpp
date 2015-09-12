@@ -40,7 +40,7 @@ using namespace cljcr;
 TFEATURE( "RuleOrDirective creation" )
 {
     {
-    RuleOrDirective::uniq_ptr pu_rule_or_directive( RuleOrDirective::make_rule() );
+    RuleOrDirective::uniq_ptr pu_rule_or_directive( RuleOrDirective::make( new Rule ) );
 
     TTEST( pu_rule_or_directive->is_rule() == true );
     TTEST( pu_rule_or_directive->is_directive() == false );
@@ -56,7 +56,7 @@ TFEATURE( "RuleOrDirective creation" )
     }
 
     {
-    RuleOrDirective::uniq_ptr pu_rule_or_directive( RuleOrDirective::make_directive() );
+    RuleOrDirective::uniq_ptr pu_rule_or_directive( RuleOrDirective::make( new Directive ) );
 
     TTEST( pu_rule_or_directive->is_directive() == true );
     TTEST( pu_rule_or_directive->is_rule() == false );
@@ -181,8 +181,6 @@ TFEATURE( "Grammar exception throwing on bad selection" )
     }
     }
 }
-
-TFEATURETODO( "Verify if we really need Grammar::append_rule()" )
 
 TFEATURE( "Creating various types of Rules in Grammars" )
 {

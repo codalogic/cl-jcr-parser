@@ -480,10 +480,8 @@ private:
 public:
     typedef uniq_ptr<RuleOrDirective>::type uniq_ptr;
 
-    static RuleOrDirective * make( Directive * p_directive ) { return new RuleOrDirective( Directive::uniq_ptr( p_directive ) ); }
-    static RuleOrDirective * make( Rule * p_rule ) { return new RuleOrDirective( Rule::uniq_ptr( p_rule ) ); }
-    static RuleOrDirective * make_directive() { return make( new Directive ); }
-    static RuleOrDirective * make_rule() { return make( new Rule ); }
+    static uniq_ptr make( Directive * p_directive ) { return uniq_ptr( new RuleOrDirective( Directive::uniq_ptr( p_directive ) ) ); }
+    static uniq_ptr make( Rule * p_rule ) { return uniq_ptr( new RuleOrDirective( Rule::uniq_ptr( p_rule ) ) ); }
 
     RuleOrDirective( Directive::uniq_ptr pu_directive_in )
     {
@@ -549,6 +547,7 @@ public:
         m.rules_and_directives.push_back( pu_rule_or_directive.get() );
         pu_rule_or_directive.release();
     }
+
     Directive & append( Directive::uniq_ptr pu_directive )
     {
         Directive * p_directive = pu_directive.get();
@@ -563,8 +562,9 @@ public:
     }
     Directive & append_directive()
     {
-        return append( RuleOrDirective::make_directive() ).directive();
+        return append( new Directive );
     }
+
     Rule & append( Rule::uniq_ptr pu_rule )
     {
         Rule * p_rule = pu_rule.get();
@@ -576,10 +576,6 @@ public:
     {
         append( RuleOrDirective::make( p_rule ) );
         return *p_rule;
-    }
-    Rule & append_rule( Rule * p_rule )
-    {
-        return append( p_rule );
     }
 
     const RuleOrDirective & back() const

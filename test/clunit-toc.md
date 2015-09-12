@@ -1,4 +1,4 @@
-Tests table of contents generated on Sat Sep 12 16:16:15 2015
+Tests table of contents generated on Sat Sep 12 17:12:32 2015
 
 # test-directives-parser.cpp
 | Description | Line |
@@ -22,8 +22,8 @@ Tests table of contents generated on Sat Sep 12 16:16:15 2015
 | RuleOrDirective creation | 40 |
 | Grammar creation / deletion | 75 |
 | Grammar exception throwing on bad selection | 126 |
-| Creating various types of Rules in Grammars | 187 |
-| Creating various types of ValueRule, e.g. SimpleType, EnumType etc. | 245 |
+| Creating various types of Rules in Grammars | 185 |
+| Creating various types of ValueRule, e.g. SimpleType, EnumType etc. | 243 |
 
 # test-rules-parser.cpp
 | Description | Line |

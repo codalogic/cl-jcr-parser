@@ -1,4 +1,4 @@
-Tests run on Sat Sep 12 16:16:15 2015
+Tests run on Sat Sep 12 17:12:32 2015
 
     GrammarParser - parsing c-wsp with directives [test-directives-parser.cpp:64]
     =============================================================================
@@ -224,9 +224,7 @@ Tests run on Sat Sep 12 16:16:15 2015
     ok: true
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
-
-    Creating various types of Rules in Grammars [test-object-creation.cpp:187]
+    Creating various types of Rules in Grammars [test-object-creation.cpp:185]
     ==========================================================================
     ok: r_rule.is_value_rule()
     ok: ! r_rule.is_array_rule()
@@ -260,7 +258,7 @@ Tests run on Sat Sep 12 16:16:15 2015
     ok: r_rule.rule_kind() == RuleKind::REF
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Creating various types of ValueRule, e.g. SimpleType, EnumType etc. [test-object-creation.cpp:245]
+    Creating various types of ValueRule, e.g. SimpleType, EnumType etc. [test-object-creation.cpp:243]
     ==================================================================================================
     ok: r_value_rule.is_value_rule()
     ok: ! r_value_rule.is_simple_type()
@@ -300,7 +298,7 @@ Tests run on Sat Sep 12 16:16:15 2015
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
 
-TODOs (8):
+TODOs (7):
 ------------------------
 - Test GrammarSet class [test-grammar-set.cpp:42]
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:44]
@@ -309,6 +307,5 @@ TODOs (8):
 - Test ValueType class [test-main.cpp:43]
 - Test ValueRule class and derivatives [test-main.cpp:45]
 - Enhance GrammarParser::q_string() and QStringParsert o full spec [test-main.cpp:47]
-- Verify if we really need Grammar::append_rule() [test-object-creation.cpp:185]
 
-0 error(s), 8 todo(s), 248 test(s)
+0 error(s), 7 todo(s), 247 test(s)
