@@ -1,4 +1,4 @@
-Tests table of contents generated on Sat Sep 12 17:12:32 2015
+Tests table of contents generated on Sun Sep 13 16:06:58 2015
 
 # test-directives-parser.cpp
 | Description | Line |
@@ -28,4 +28,5 @@ Tests table of contents generated on Sat Sep 12 17:12:32 2015
 # test-rules-parser.cpp
 | Description | Line |
 |-------------|------|
-| GrammarParser - parsing trivial simple value rules | 57 |
+| GrammarParser - parsing trivial simple value rules | 58 |
+| GrammarParser - spacing around parsing trivial simple value rules | 73 |

@@ -255,6 +255,7 @@ public:
     void rule_name( const std::string & name ) { m.rule_name = name; }
     const std::string & rule_name() const { return m.rule_name; }
     std::string & rule_name() { return m.rule_name; }
+
     void member_name( const std::string & name ) { m.member_name = name; }
     const std::string & member_name() const { return m.member_name; }
     std::string & member_name() { return m.member_name; }

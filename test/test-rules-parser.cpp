@@ -52,10 +52,33 @@ void test_simple_anonymous_value_rule( const char * p_jcr, SimpleType::Type expe
     const SimpleType * p_simple_type = SimpleType::from_rule( h.grammar()[0].rule() );
     TCRITICALTEST( p_simple_type != 0 );    // Actually redundant when we've already done SimpleType::is_present() check
     TTEST( p_simple_type->type() == expected_type );
+    TTEST( h.grammar()[0].rule().rule_name() == "rule1" );
 }
 
 TFEATURE( "GrammarParser - parsing trivial simple value rules" )
 {
     TCALL( test_simple_anonymous_value_rule( "rule1 : boolean", SimpleType::BOOLEAN ) );
     TCALL( test_simple_anonymous_value_rule( "rule1 : null", SimpleType::TNULL ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1 : ip4", SimpleType::IP4 ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1 : ip6", SimpleType::IP6 ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1 : fqdn ", SimpleType::FQDN ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1 : idn", SimpleType::IDN ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1 : date-time", SimpleType::DATETIME ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1 : email", SimpleType::EMAIL ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1 : phone", SimpleType::PHONE ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1 : base64", SimpleType::BASE64 ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1 : any", SimpleType::ANY ) );
+}
+
+TFEATURE( "GrammarParser - spacing around parsing trivial simple value rules" )
+{
+    TCALL( test_simple_anonymous_value_rule( "rule1 : boolean", SimpleType::BOOLEAN ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1: boolean", SimpleType::BOOLEAN ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1 :boolean", SimpleType::BOOLEAN ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1:boolean", SimpleType::BOOLEAN ) );
+
+    TCALL( test_simple_anonymous_value_rule( "rule1 : boolean", SimpleType::BOOLEAN ) );
+    TCALL( test_simple_anonymous_value_rule( " rule1 : boolean", SimpleType::BOOLEAN ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1 : boolean ", SimpleType::BOOLEAN ) );
+    TCALL( test_simple_anonymous_value_rule( " rule1 : boolean ", SimpleType::BOOLEAN ) );
 }

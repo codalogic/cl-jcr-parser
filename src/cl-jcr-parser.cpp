@@ -317,8 +317,12 @@ bool GrammarParser::trivial_type( const char * keyword, SimpleType::Type type )
     if( fixed( keyword ) )
     {
         m.pu_rule = Rule::uniq_ptr( SimpleType::make_rule() );
+        m.pu_rule->rule_name( m.rule_name );
+        m.pu_rule->member_name( m.member_name );
+
         SimpleType & r_simple_type = *SimpleType::from_rule( m.pu_rule.get() );
         r_simple_type.type( type );
+
         return true;
     }
 
