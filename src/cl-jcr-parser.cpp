@@ -314,7 +314,7 @@ bool GrammarParser::trivial_type()
 
 bool GrammarParser::trivial_type( const char * keyword, SimpleType::Type type )
 {
-    if( fixed( keyword ) )
+    if( ifixed( keyword ) )
     {
         m.pu_rule = Rule::uniq_ptr( SimpleType::make_rule() );
         m.pu_rule->rule_name( m.rule_name );

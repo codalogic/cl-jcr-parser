@@ -64,10 +64,26 @@ TFEATURE( "GrammarParser - parsing trivial simple value rules" )
     TCALL( test_simple_anonymous_value_rule( "rule1 : fqdn ", SimpleType::FQDN ) );
     TCALL( test_simple_anonymous_value_rule( "rule1 : idn", SimpleType::IDN ) );
     TCALL( test_simple_anonymous_value_rule( "rule1 : date-time", SimpleType::DATETIME ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1 : full-date", SimpleType::DATE ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1 : full-time", SimpleType::TIME ) );
     TCALL( test_simple_anonymous_value_rule( "rule1 : email", SimpleType::EMAIL ) );
     TCALL( test_simple_anonymous_value_rule( "rule1 : phone", SimpleType::PHONE ) );
     TCALL( test_simple_anonymous_value_rule( "rule1 : base64", SimpleType::BASE64 ) );
     TCALL( test_simple_anonymous_value_rule( "rule1 : any", SimpleType::ANY ) );
+
+    TCALL( test_simple_anonymous_value_rule( "rule1 : BOOLEAN", SimpleType::BOOLEAN ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1 : NULL", SimpleType::TNULL ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1 : IP4", SimpleType::IP4 ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1 : IP6", SimpleType::IP6 ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1 : FQDN ", SimpleType::FQDN ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1 : IDN", SimpleType::IDN ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1 : DATE-TIME", SimpleType::DATETIME ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1 : FULL-DATE", SimpleType::DATE ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1 : FULL-TIME", SimpleType::TIME ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1 : EMAIL", SimpleType::EMAIL ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1 : PHONE", SimpleType::PHONE ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1 : BASE64", SimpleType::BASE64 ) );
+    TCALL( test_simple_anonymous_value_rule( "rule1 : ANY", SimpleType::ANY ) );
 }
 
 TFEATURE( "GrammarParser - spacing around parsing trivial simple value rules" )

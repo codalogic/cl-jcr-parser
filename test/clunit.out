@@ -1,4 +1,4 @@
-Tests run on Sun Sep 13 16:06:58 2015
+Tests run on Mon Sep 14 18:56:07 2015
 
     GrammarParser - parsing c-wsp with directives [test-directives-parser.cpp:64]
     =============================================================================
@@ -337,7 +337,7 @@ Tests run on Sun Sep 13 16:06:58 2015
     ok: p_simple_type != 0
     ok: p_simple_type->type() == expected_type
     ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : email", SimpleType::EMAIL ) (67)
+      Calling: test_simple_anonymous_value_rule( "rule1 : full-date", SimpleType::DATE ) (67)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
     ok: h.grammar()[0].is_rule()
@@ -345,7 +345,7 @@ Tests run on Sun Sep 13 16:06:58 2015
     ok: p_simple_type != 0
     ok: p_simple_type->type() == expected_type
     ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : phone", SimpleType::PHONE ) (68)
+      Calling: test_simple_anonymous_value_rule( "rule1 : full-time", SimpleType::TIME ) (68)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
     ok: h.grammar()[0].is_rule()
@@ -353,7 +353,7 @@ Tests run on Sun Sep 13 16:06:58 2015
     ok: p_simple_type != 0
     ok: p_simple_type->type() == expected_type
     ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : base64", SimpleType::BASE64 ) (69)
+      Calling: test_simple_anonymous_value_rule( "rule1 : email", SimpleType::EMAIL ) (69)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
     ok: h.grammar()[0].is_rule()
@@ -361,7 +361,127 @@ Tests run on Sun Sep 13 16:06:58 2015
     ok: p_simple_type != 0
     ok: p_simple_type->type() == expected_type
     ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : any", SimpleType::ANY ) (70)
+      Calling: test_simple_anonymous_value_rule( "rule1 : phone", SimpleType::PHONE ) (70)
+    ok: h.status() == JCRParser::S_OK
+    ok: h.grammar().size() == 1
+    ok: h.grammar()[0].is_rule()
+    ok: SimpleType::is_present( h.grammar()[0].rule() )
+    ok: p_simple_type != 0
+    ok: p_simple_type->type() == expected_type
+    ok: h.grammar()[0].rule().rule_name() == "rule1"
+      Calling: test_simple_anonymous_value_rule( "rule1 : base64", SimpleType::BASE64 ) (71)
+    ok: h.status() == JCRParser::S_OK
+    ok: h.grammar().size() == 1
+    ok: h.grammar()[0].is_rule()
+    ok: SimpleType::is_present( h.grammar()[0].rule() )
+    ok: p_simple_type != 0
+    ok: p_simple_type->type() == expected_type
+    ok: h.grammar()[0].rule().rule_name() == "rule1"
+      Calling: test_simple_anonymous_value_rule( "rule1 : any", SimpleType::ANY ) (72)
+    ok: h.status() == JCRParser::S_OK
+    ok: h.grammar().size() == 1
+    ok: h.grammar()[0].is_rule()
+    ok: SimpleType::is_present( h.grammar()[0].rule() )
+    ok: p_simple_type != 0
+    ok: p_simple_type->type() == expected_type
+    ok: h.grammar()[0].rule().rule_name() == "rule1"
+      Calling: test_simple_anonymous_value_rule( "rule1 : BOOLEAN", SimpleType::BOOLEAN ) (74)
+    ok: h.status() == JCRParser::S_OK
+    ok: h.grammar().size() == 1
+    ok: h.grammar()[0].is_rule()
+    ok: SimpleType::is_present( h.grammar()[0].rule() )
+    ok: p_simple_type != 0
+    ok: p_simple_type->type() == expected_type
+    ok: h.grammar()[0].rule().rule_name() == "rule1"
+      Calling: test_simple_anonymous_value_rule( "rule1 : NULL", SimpleType::TNULL ) (75)
+    ok: h.status() == JCRParser::S_OK
+    ok: h.grammar().size() == 1
+    ok: h.grammar()[0].is_rule()
+    ok: SimpleType::is_present( h.grammar()[0].rule() )
+    ok: p_simple_type != 0
+    ok: p_simple_type->type() == expected_type
+    ok: h.grammar()[0].rule().rule_name() == "rule1"
+      Calling: test_simple_anonymous_value_rule( "rule1 : IP4", SimpleType::IP4 ) (76)
+    ok: h.status() == JCRParser::S_OK
+    ok: h.grammar().size() == 1
+    ok: h.grammar()[0].is_rule()
+    ok: SimpleType::is_present( h.grammar()[0].rule() )
+    ok: p_simple_type != 0
+    ok: p_simple_type->type() == expected_type
+    ok: h.grammar()[0].rule().rule_name() == "rule1"
+      Calling: test_simple_anonymous_value_rule( "rule1 : IP6", SimpleType::IP6 ) (77)
+    ok: h.status() == JCRParser::S_OK
+    ok: h.grammar().size() == 1
+    ok: h.grammar()[0].is_rule()
+    ok: SimpleType::is_present( h.grammar()[0].rule() )
+    ok: p_simple_type != 0
+    ok: p_simple_type->type() == expected_type
+    ok: h.grammar()[0].rule().rule_name() == "rule1"
+      Calling: test_simple_anonymous_value_rule( "rule1 : FQDN ", SimpleType::FQDN ) (78)
+    ok: h.status() == JCRParser::S_OK
+    ok: h.grammar().size() == 1
+    ok: h.grammar()[0].is_rule()
+    ok: SimpleType::is_present( h.grammar()[0].rule() )
+    ok: p_simple_type != 0
+    ok: p_simple_type->type() == expected_type
+    ok: h.grammar()[0].rule().rule_name() == "rule1"
+      Calling: test_simple_anonymous_value_rule( "rule1 : IDN", SimpleType::IDN ) (79)
+    ok: h.status() == JCRParser::S_OK
+    ok: h.grammar().size() == 1
+    ok: h.grammar()[0].is_rule()
+    ok: SimpleType::is_present( h.grammar()[0].rule() )
+    ok: p_simple_type != 0
+    ok: p_simple_type->type() == expected_type
+    ok: h.grammar()[0].rule().rule_name() == "rule1"
+      Calling: test_simple_anonymous_value_rule( "rule1 : DATE-TIME", SimpleType::DATETIME ) (80)
+    ok: h.status() == JCRParser::S_OK
+    ok: h.grammar().size() == 1
+    ok: h.grammar()[0].is_rule()
+    ok: SimpleType::is_present( h.grammar()[0].rule() )
+    ok: p_simple_type != 0
+    ok: p_simple_type->type() == expected_type
+    ok: h.grammar()[0].rule().rule_name() == "rule1"
+      Calling: test_simple_anonymous_value_rule( "rule1 : FULL-DATE", SimpleType::DATE ) (81)
+    ok: h.status() == JCRParser::S_OK
+    ok: h.grammar().size() == 1
+    ok: h.grammar()[0].is_rule()
+    ok: SimpleType::is_present( h.grammar()[0].rule() )
+    ok: p_simple_type != 0
+    ok: p_simple_type->type() == expected_type
+    ok: h.grammar()[0].rule().rule_name() == "rule1"
+      Calling: test_simple_anonymous_value_rule( "rule1 : FULL-TIME", SimpleType::TIME ) (82)
+    ok: h.status() == JCRParser::S_OK
+    ok: h.grammar().size() == 1
+    ok: h.grammar()[0].is_rule()
+    ok: SimpleType::is_present( h.grammar()[0].rule() )
+    ok: p_simple_type != 0
+    ok: p_simple_type->type() == expected_type
+    ok: h.grammar()[0].rule().rule_name() == "rule1"
+      Calling: test_simple_anonymous_value_rule( "rule1 : EMAIL", SimpleType::EMAIL ) (83)
+    ok: h.status() == JCRParser::S_OK
+    ok: h.grammar().size() == 1
+    ok: h.grammar()[0].is_rule()
+    ok: SimpleType::is_present( h.grammar()[0].rule() )
+    ok: p_simple_type != 0
+    ok: p_simple_type->type() == expected_type
+    ok: h.grammar()[0].rule().rule_name() == "rule1"
+      Calling: test_simple_anonymous_value_rule( "rule1 : PHONE", SimpleType::PHONE ) (84)
+    ok: h.status() == JCRParser::S_OK
+    ok: h.grammar().size() == 1
+    ok: h.grammar()[0].is_rule()
+    ok: SimpleType::is_present( h.grammar()[0].rule() )
+    ok: p_simple_type != 0
+    ok: p_simple_type->type() == expected_type
+    ok: h.grammar()[0].rule().rule_name() == "rule1"
+      Calling: test_simple_anonymous_value_rule( "rule1 : BASE64", SimpleType::BASE64 ) (85)
+    ok: h.status() == JCRParser::S_OK
+    ok: h.grammar().size() == 1
+    ok: h.grammar()[0].is_rule()
+    ok: SimpleType::is_present( h.grammar()[0].rule() )
+    ok: p_simple_type != 0
+    ok: p_simple_type->type() == expected_type
+    ok: h.grammar()[0].rule().rule_name() == "rule1"
+      Calling: test_simple_anonymous_value_rule( "rule1 : ANY", SimpleType::ANY ) (86)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
     ok: h.grammar()[0].is_rule()
@@ -371,9 +491,9 @@ Tests run on Sun Sep 13 16:06:58 2015
     ok: h.grammar()[0].rule().rule_name() == "rule1"
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - spacing around parsing trivial simple value rules [test-rules-parser.cpp:73]
+    GrammarParser - spacing around parsing trivial simple value rules [test-rules-parser.cpp:89]
     ============================================================================================
-      Calling: test_simple_anonymous_value_rule( "rule1 : boolean", SimpleType::BOOLEAN ) (75)
+      Calling: test_simple_anonymous_value_rule( "rule1 : boolean", SimpleType::BOOLEAN ) (91)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
     ok: h.grammar()[0].is_rule()
@@ -381,7 +501,7 @@ Tests run on Sun Sep 13 16:06:58 2015
     ok: p_simple_type != 0
     ok: p_simple_type->type() == expected_type
     ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1: boolean", SimpleType::BOOLEAN ) (76)
+      Calling: test_simple_anonymous_value_rule( "rule1: boolean", SimpleType::BOOLEAN ) (92)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
     ok: h.grammar()[0].is_rule()
@@ -389,7 +509,7 @@ Tests run on Sun Sep 13 16:06:58 2015
     ok: p_simple_type != 0
     ok: p_simple_type->type() == expected_type
     ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 :boolean", SimpleType::BOOLEAN ) (77)
+      Calling: test_simple_anonymous_value_rule( "rule1 :boolean", SimpleType::BOOLEAN ) (93)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
     ok: h.grammar()[0].is_rule()
@@ -397,7 +517,7 @@ Tests run on Sun Sep 13 16:06:58 2015
     ok: p_simple_type != 0
     ok: p_simple_type->type() == expected_type
     ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1:boolean", SimpleType::BOOLEAN ) (78)
+      Calling: test_simple_anonymous_value_rule( "rule1:boolean", SimpleType::BOOLEAN ) (94)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
     ok: h.grammar()[0].is_rule()
@@ -405,7 +525,7 @@ Tests run on Sun Sep 13 16:06:58 2015
     ok: p_simple_type != 0
     ok: p_simple_type->type() == expected_type
     ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : boolean", SimpleType::BOOLEAN ) (80)
+      Calling: test_simple_anonymous_value_rule( "rule1 : boolean", SimpleType::BOOLEAN ) (96)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
     ok: h.grammar()[0].is_rule()
@@ -413,7 +533,7 @@ Tests run on Sun Sep 13 16:06:58 2015
     ok: p_simple_type != 0
     ok: p_simple_type->type() == expected_type
     ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( " rule1 : boolean", SimpleType::BOOLEAN ) (81)
+      Calling: test_simple_anonymous_value_rule( " rule1 : boolean", SimpleType::BOOLEAN ) (97)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
     ok: h.grammar()[0].is_rule()
@@ -421,7 +541,7 @@ Tests run on Sun Sep 13 16:06:58 2015
     ok: p_simple_type != 0
     ok: p_simple_type->type() == expected_type
     ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : boolean ", SimpleType::BOOLEAN ) (82)
+      Calling: test_simple_anonymous_value_rule( "rule1 : boolean ", SimpleType::BOOLEAN ) (98)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
     ok: h.grammar()[0].is_rule()
@@ -429,7 +549,7 @@ Tests run on Sun Sep 13 16:06:58 2015
     ok: p_simple_type != 0
     ok: p_simple_type->type() == expected_type
     ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( " rule1 : boolean ", SimpleType::BOOLEAN ) (83)
+      Calling: test_simple_anonymous_value_rule( " rule1 : boolean ", SimpleType::BOOLEAN ) (99)
     ok: h.status() == JCRParser::S_OK
     ok: h.grammar().size() == 1
     ok: h.grammar()[0].is_rule()
@@ -448,4 +568,4 @@ TODOs (5):
 - Make RefRule set method split input into module and local parts [test-main.cpp:41]
 - Enhance GrammarParser::q_string() and QStringParsert o full spec [test-main.cpp:43]
 
-0 error(s), 5 todo(s), 369 test(s)
+0 error(s), 5 todo(s), 474 test(s)
