@@ -76,10 +76,6 @@ public:
     virtual bool is_union_type() const { return false; }
     virtual const UnionType & union_type() const { assert(0); throw BadUnionTypeRequest(); }
     virtual UnionType & union_type() { assert(0); throw BadUnionTypeRequest(); }
-
-    virtual bool is_enum_type() const { return false; }
-    virtual const EnumType & enum_type() const { assert(0); throw BadEnumTypeRequest(); }
-    virtual EnumType & enum_type() { assert(0); throw BadEnumTypeRequest(); }
 };
 
 class SimpleType : public ValueType
@@ -114,26 +110,6 @@ public:
     Type type() const { return m.type; }
 
     // TODO: Add parameter accessors
-};
-
-class EnumType : public ValueType
-{
-private:
-    struct Members {
-    } m;
-
-public:
-    static Rule * make_rule();      // Call from_rule() afterwards to get EnumType
-    static EnumType * from_rule( Rule * );
-
-    static bool is_present( const Rule & );
-    static const EnumType * from_rule( const Rule & );
-
-    virtual RuleKind::Enum rule_kind() const { return RuleKind::ENUM_VALUE; }
-
-    virtual bool is_enum_type() const { return true; }
-    virtual const EnumType & enum_type() const { return *this; }
-    virtual EnumType & enum_type() { return *this; }
 };
 
 class UnionType : public ValueType
@@ -340,23 +316,6 @@ public:
         if( ! m.p_value_type )
             throw BadUnionTypeRequest();
         return m.p_value_type->union_type();
-    }
-
-    EnumType & select_enum_type() { return select< EnumType >(); }
-    virtual bool is_enum_type() const { return m.p_value_type && m.p_value_type->is_enum_type(); }
-    virtual const EnumType & enum_type() const
-    {
-        assert( m.p_value_type );
-        if( ! m.p_value_type )
-            throw BadEnumTypeRequest();
-        return m.p_value_type->enum_type();
-    }
-    virtual EnumType & enum_type()
-    {
-        assert( m.p_value_type );
-        if( ! m.p_value_type )
-            throw BadEnumTypeRequest();
-        return m.p_value_type->enum_type();
     }
 
 private:

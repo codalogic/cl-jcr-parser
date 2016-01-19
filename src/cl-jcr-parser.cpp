@@ -622,36 +622,6 @@ const SimpleType * SimpleType::from_rule( const Rule & r_rule )
 }
 
 //----------------------------------------------------------------------------
-//                           class EnumType
-//----------------------------------------------------------------------------
-
-Rule * EnumType::make_rule()
-{
-    Rule::uniq_ptr pu_rule( new ValueRule );
-    pu_rule->value_rule().select_enum_type();
-    return pu_rule.release();
-}
-
-bool EnumType::is_present( const Rule & r_rule )
-{
-    return r_rule.is_value_rule() && r_rule.value_rule().is_enum_type();
-}
-
-EnumType * EnumType::from_rule( Rule * p_rule )
-{
-    if( is_present( *p_rule ) )
-        return &p_rule->value_rule().enum_type();
-    return 0;
-}
-
-const EnumType * EnumType::from_rule( const Rule & r_rule )
-{
-    if( is_present( r_rule ) )
-        return &r_rule.value_rule().enum_type();
-    return 0;
-}
-
-//----------------------------------------------------------------------------
 //                           class UnionType
 //----------------------------------------------------------------------------
 

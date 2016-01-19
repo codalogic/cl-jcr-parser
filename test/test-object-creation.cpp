@@ -247,7 +247,6 @@ TFEATURE( "Creating various types of ValueRule, e.g. SimpleType, EnumType etc." 
     ValueRule & r_value_rule = ValueRule::make_and_append( grammar );
     TTEST( r_value_rule.is_value_rule() );
     TTEST( ! r_value_rule.is_simple_type() );
-    TTEST( ! r_value_rule.is_enum_type() );
     TTEST( ! r_value_rule.is_union_type() );
     TTEST( r_value_rule.rule_kind() == RuleKind::UNDEFINED_VALUE );
 #ifdef NDEBUG
@@ -262,17 +261,6 @@ TFEATURE( "Creating various types of ValueRule, e.g. SimpleType, EnumType etc." 
         TTEST( false );
     }
     catch( BadSimpleTypeRequest & )
-    {
-        is_thrown = true;
-    }
-    TTEST( is_thrown );
-    try
-    {
-        is_thrown = false;
-        r_value_rule.enum_type();
-        TTEST( false );
-    }
-    catch( BadEnumTypeRequest & )
     {
         is_thrown = true;
     }
@@ -296,7 +284,6 @@ TFEATURE( "Creating various types of ValueRule, e.g. SimpleType, EnumType etc." 
     ValueRule & r_value_rule = ValueRule::make_and_append( grammar );
     r_value_rule.select_simple_type();
     TTEST( r_value_rule.is_simple_type() );
-    TTEST( ! r_value_rule.is_enum_type() );
     TTEST( ! r_value_rule.is_union_type() );
     TTEST( r_value_rule.rule_kind() == RuleKind::SIMPLE_VALUE );
 
@@ -311,66 +298,6 @@ TFEATURE( "Creating various types of ValueRule, e.g. SimpleType, EnumType etc." 
         r_value_rule.simple_type();
     }
     catch( BadSimpleTypeRequest & )
-    {
-        is_thrown = true;
-    }
-    TTEST( ! is_thrown );
-    try
-    {
-        is_thrown = false;
-        r_value_rule.enum_type();
-        TTEST( false );
-    }
-    catch( BadEnumTypeRequest & )
-    {
-        is_thrown = true;
-    }
-    TTEST( is_thrown );
-    try
-    {
-        is_thrown = false;
-        r_value_rule.union_type();
-        TTEST( false );
-    }
-    catch( BadUnionTypeRequest & )
-    {
-        is_thrown = true;
-    }
-    TTEST( is_thrown );
-#endif
-    }
-
-    {
-    Grammar grammar;
-    ValueRule & r_value_rule = ValueRule::make_and_append( grammar );
-    r_value_rule.select_enum_type();
-    TTEST( ! r_value_rule.is_simple_type() );
-    TTEST( r_value_rule.is_enum_type() );
-    TTEST( ! r_value_rule.is_union_type() );
-    TTEST( r_value_rule.rule_kind() == RuleKind::ENUM_VALUE );
-
-#ifdef NDEBUG
-    // Exceptions are thrown if wrong type is chosen after selection
-
-    // These tests don't in Debug mode because there are also asserts in place.
-    bool is_thrown = false;
-    try
-    {
-        is_thrown = false;
-        r_value_rule.simple_type();
-        TTEST( false );
-    }
-    catch( BadSimpleTypeRequest & )
-    {
-        is_thrown = true;
-    }
-    TTEST( is_thrown );
-    try
-    {
-        is_thrown = false;
-        r_value_rule.enum_type();
-    }
-    catch( BadEnumTypeRequest & )
     {
         is_thrown = true;
     }
@@ -394,7 +321,6 @@ TFEATURE( "Creating various types of ValueRule, e.g. SimpleType, EnumType etc." 
     ValueRule & r_value_rule = ValueRule::make_and_append( grammar );
     r_value_rule.select_union_type();
     TTEST( ! r_value_rule.is_simple_type() );
-    TTEST( ! r_value_rule.is_enum_type() );
     TTEST( r_value_rule.is_union_type() );
     TTEST( r_value_rule.rule_kind() == RuleKind::UNION_VALUE );
 
@@ -410,17 +336,6 @@ TFEATURE( "Creating various types of ValueRule, e.g. SimpleType, EnumType etc." 
         TTEST( false );
     }
     catch( BadSimpleTypeRequest & )
-    {
-        is_thrown = true;
-    }
-    TTEST( is_thrown );
-    try
-    {
-        is_thrown = false;
-        r_value_rule.enum_type();
-        TTEST( false );
-    }
-    catch( BadEnumTypeRequest & )
     {
         is_thrown = true;
     }

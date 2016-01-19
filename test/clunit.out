@@ -1,4 +1,4 @@
-Tests run on Mon Sep 14 18:56:07 2015
+Tests run on Tue Jan 19 18:24:39 2016
 
     GrammarParser - parsing c-wsp with directives [test-directives-parser.cpp:64]
     =============================================================================
@@ -262,19 +262,12 @@ Tests run on Mon Sep 14 18:56:07 2015
     ==================================================================================================
     ok: r_value_rule.is_value_rule()
     ok: ! r_value_rule.is_simple_type()
-    ok: ! r_value_rule.is_enum_type()
     ok: ! r_value_rule.is_union_type()
     ok: r_value_rule.rule_kind() == RuleKind::UNDEFINED_VALUE
     ok: r_value_rule.is_simple_type()
-    ok: ! r_value_rule.is_enum_type()
     ok: ! r_value_rule.is_union_type()
     ok: r_value_rule.rule_kind() == RuleKind::SIMPLE_VALUE
     ok: ! r_value_rule.is_simple_type()
-    ok: r_value_rule.is_enum_type()
-    ok: ! r_value_rule.is_union_type()
-    ok: r_value_rule.rule_kind() == RuleKind::ENUM_VALUE
-    ok: ! r_value_rule.is_simple_type()
-    ok: ! r_value_rule.is_enum_type()
     ok: r_value_rule.is_union_type()
     ok: r_value_rule.rule_kind() == RuleKind::UNION_VALUE
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
@@ -568,4 +561,4 @@ TODOs (5):
 - Make RefRule set method split input into module and local parts [test-main.cpp:41]
 - Enhance GrammarParser::q_string() and QStringParsert o full spec [test-main.cpp:43]
 
-0 error(s), 5 todo(s), 474 test(s)
+0 error(s), 5 todo(s), 467 test(s)
