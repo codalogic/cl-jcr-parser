@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 // dsl-pa is a Domain Specific Language Parsing Assistant library designed to
-// take advantage of the C++ logic shortcut operators such as && and ||.
+// take advantage of the C++ logic shortcircuit operators such as && and ||.
 // See the brief overview in dsl-pa.h or, for more information, README.html
 // at https://github.com/codalogic/dsl-pa
 //----------------------------------------------------------------------------
@@ -69,22 +69,44 @@ public:
     {}
 };
 
+class mutator
+{
+private:
+    char basic_return[2];
+
+public:
+    mutator() { basic_return[1] = '\0'; }
+
+    virtual const char * operator() ( char c ) = 0;
+    virtual bool got_eof() { return true; } // Optional to override
+
+    // Convenience method for immediately returning single character
+    const char * from_char( char c )
+    {
+        basic_return[0] = c;
+        return basic_return;
+    }
+};
+
 class dsl_pa
 {
 private:
     const static size_t unbounded = ~0;
 
     reader & r_reader;
+    std::string * p_accumulator;
 
     template< typename Twriter >
     size_t read_or_skip_handler( std::string * p_output, const alphabet & r_alphabet, size_t max_chars );
     template< typename Twriter >
     size_t read_or_skip_until_handler( std::string * p_output, const alphabet & r_alphabet, char escape_char, size_t max_chars );
+    template< typename Twriter >
+    size_t read_or_skip_handler( std::string * p_output, mutator & r_mutator );
     template< class Tcomparer >
     bool read_fixed_or_ifixed( std::string * p_output, const char * p_seeking );
 
 public:
-    dsl_pa( reader & r_reader_in ) : r_reader( r_reader_in ) {}
+    dsl_pa( reader & r_reader_in ) : r_reader( r_reader_in ), p_accumulator( 0 ) {}
     virtual ~dsl_pa() {}
 
     // parse() provides a hook to allow use with factories that return
@@ -142,6 +164,7 @@ public:
     size_t get_bounded_until( std::string * p_output, const alphabet & r_alphabet, size_t max_chars );
     size_t get_escaped_until( std::string * p_output, const alphabet & r_alphabet, char escape_char );
     size_t get_until( std::string * p_output, const alphabet & r_alphabet, char escape_char, size_t max_chars );
+    size_t get( std::string * p_output, mutator & r_mutator );
 
     // These read...() functions DO NOT clear the output string before reading the input
     size_t /*num chars read*/ read( std::string * p_output, const alphabet & r_alphabet );
@@ -150,6 +173,7 @@ public:
     size_t read_bounded_until( std::string * p_output, const alphabet & r_alphabet, size_t max_chars );
     size_t read_escaped_until( std::string * p_output, const alphabet & r_alphabet, char escape_char );
     size_t read_until( std::string * p_output, const alphabet & r_alphabet, char escape_char, size_t max_chars );
+    size_t read( std::string * p_output, mutator & r_mutator );
 
     size_t /*num chars skipped*/ skip( const alphabet & r_alphabet );
     size_t skip( const alphabet & r_alphabet, size_t max_chars );
@@ -157,6 +181,27 @@ public:
     size_t skip_bounded_until( const alphabet & r_alphabet, size_t max_chars );
     size_t skip_escaped_until( const alphabet & r_alphabet, char escape_char );
     size_t skip_until( const alphabet & r_alphabet, char escape_char, size_t max_chars );
+    size_t skip( mutator & r_mutator );
+
+    // If the next input character is in the alphabet then add it to the string pointed to by p_accumulator
+    bool accumulate( const alphabet & r_alphabet );
+    class accumulator_setter        // Control access to dsl_pa::p_accumulator so it has to be used in a RAII fashion
+    {                               // Do: dsl_pa::accumulator_setter my_value_accumulator( this, my_value );
+    private:
+        dsl_pa * p_dsl_pa;
+        std::string * p_previous_accumulator;
+    public:
+        accumulator_setter( dsl_pa * p_dsl_pa_in, std::string & r_new_accumulator_in )
+            : p_dsl_pa( p_dsl_pa_in ), p_previous_accumulator( p_dsl_pa_in->p_accumulator )
+        {
+            p_dsl_pa->p_accumulator = &r_new_accumulator_in;
+        }
+        ~accumulator_setter()
+        {
+            p_dsl_pa->p_accumulator = p_previous_accumulator;
+        }
+    };
+    friend class accumulator_setter;
 
     // fixed() ensures that the specified text is read from the input, or leave input location unchanged.
     // ifixed() ignores ASCII case.
@@ -180,9 +225,9 @@ public:
     void location_push() { r_reader.location_push(); }
     bool location_top() { r_reader.location_top(); return true; }
     bool location_top( bool ret ) { r_reader.location_top(); return ret; }
-    void location_pop() { r_reader.location_pop(); }    // pop should always be called, so discourage it's use in a shortcut sequence
+    void location_pop() { r_reader.location_pop(); }    // pop should always be called, so discourage it's use in a shortcircuit sequence
 
-    // optional_rewind() will call location_top() if the shortcut arguments
+    // optional_rewind() will call location_top() if the shortcircuit arguments
     // it is called with yield false.  Used when the specified path is determined
     // not to be the one encountered.
     // Do location_push(); optional_rewind( XYZ() && ABC() ) && DEF(); location_pop()
@@ -202,7 +247,7 @@ public:
     static bool on_fail( int ) { return false; }
 
     // set() allows setting of state information within a set of
-    // shortcut operators
+    // shortcircuit operators
     template< typename T >
     static bool set( T & r_variable, const T & r_value )
     {
@@ -210,7 +255,7 @@ public:
         return true;
     }
     // record() allows recording the return values of parsing functions in the
-    // middle of a sequence of shortcut operators
+    // middle of a sequence of shortcircuit operators
     template< typename T, typename U >
     static const U & record( T & r_variable, const U & r_value )
     {
@@ -233,6 +278,12 @@ public:
     bool append_current( Tvar & r_variable )
     {
         r_variable += current();
+        return true;
+    }
+    template< typename Tcontainer, typename Tval >
+    static bool push_back( Tcontainer & r_container, const Tval & r_value )
+    {
+        r_container.push_back( r_value );
         return true;
     }
 
