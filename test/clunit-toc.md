@@ -1,10 +1,4 @@
-Tests table of contents generated on Tue Jan 19 18:24:39 2016
-
-# test-directives-parser.cpp
-| Description | Line |
-|-------------|------|
-| GrammarParser - parsing c-wsp with directives | 64 |
-| GrammarParser - parsing directives | 149 |
+Tests table of contents generated on Fri Jan 22 21:07:41 2016
 
 # test-grammar-set.cpp
 | Description | Line |
@@ -25,8 +19,11 @@ Tests table of contents generated on Tue Jan 19 18:24:39 2016
 | Creating various types of Rules in Grammars | 185 |
 | Creating various types of ValueRule, e.g. SimpleType, EnumType etc. | 243 |
 
-# test-rules-parser.cpp
+# test-parsing-only.cpp
 | Description | Line |
 |-------------|------|
-| GrammarParser - parsing trivial simple value rules | 58 |
-| GrammarParser - spacing around parsing trivial simple value rules | 89 |
+| GrammarParser - Syntax parsing with no semantic interpretation - comments | 62 |
+| GrammarParser - Syntax parsing - JCR directive | 87 |
+| GrammarParser - Syntax parsing - ruleset-id directive | 123 |
+| GrammarParser - Syntax parsing - import directive | 143 |
+| GrammarParser - Syntax parsing - TBD directive | 179 |

@@ -1,171 +1,4 @@
-Tests run on Tue Jan 19 18:24:39 2016
-
-    GrammarParser - parsing c-wsp with directives [test-directives-parser.cpp:64]
-    =============================================================================
-      Calling: test_c_wsp_1_directive( "#pedantic" ) (67)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive().get() == "pedantic"
-      Calling: test_c_wsp_1_directive( "    #pedantic" ) (69)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive().get() == "pedantic"
-      Calling: test_c_wsp_1_directive( ";My first jcr\n" "#pedantic" ) (72)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive().get() == "pedantic"
-      Calling: test_c_wsp_1_directive( "   ;My first jcr\n" "#pedantic" ) (75)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive().get() == "pedantic"
-      Calling: test_c_wsp_1_directive( "   ;My first jcr\n" ";More grammars\r\n" "#pedantic" ) (79)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive().get() == "pedantic"
-      Calling: test_c_wsp_1_directive( "   \n" "   ;My first jcr\n" ";More grammars\r\n" "#pedantic" ) (84)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive().get() == "pedantic"
-      Calling: test_c_wsp_1_directive( "   ;My first jcr\n" ";More grammars\r\n" "#pedantic\n" "  ; Stuff at end" ) (89)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive().get() == "pedantic"
-      Calling: test_c_wsp_2_directives( "#pedantic\n" "#language-compatible-members" ) (93)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 2
-    ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive().get() == "pedantic"
-    ok: h.grammar()[1].is_directive()
-    ok: h.grammar()[1].directive().get() == "language-compatible-members"
-      Calling: test_c_wsp_2_directives( "    #pedantic\n" "    #language-compatible-members" ) (96)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 2
-    ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive().get() == "pedantic"
-    ok: h.grammar()[1].is_directive()
-    ok: h.grammar()[1].directive().get() == "language-compatible-members"
-      Calling: test_c_wsp_2_directives( "; A comment\n" "#pedantic\n" "; Another comment\n" "#language-compatible-members" ) (101)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 2
-    ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive().get() == "pedantic"
-    ok: h.grammar()[1].is_directive()
-    ok: h.grammar()[1].directive().get() == "language-compatible-members"
-      Calling: test_c_wsp_2_directives( "   ; A comment\n" "#pedantic\n" "   ; Another comment\n" "#language-compatible-members" ) (106)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 2
-    ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive().get() == "pedantic"
-    ok: h.grammar()[1].is_directive()
-    ok: h.grammar()[1].directive().get() == "language-compatible-members"
-      Calling: test_c_wsp_2_directives( "   ; A comment\n" "#pedantic\n" "   ; Another comment\n" "#language-compatible-members\r\n" ";More comments\n" ) (112)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 2
-    ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive().get() == "pedantic"
-    ok: h.grammar()[1].is_directive()
-    ok: h.grammar()[1].directive().get() == "language-compatible-members"
-      Calling: test_c_wsp_2_directives( "   ; A comment\n" "#pedantic\n" "   ; Another comment\n" "#language-compatible-members\r\n" "    ;More comments\n" ) (118)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 2
-    ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive().get() == "pedantic"
-    ok: h.grammar()[1].is_directive()
-    ok: h.grammar()[1].directive().get() == "language-compatible-members"
-      Calling: test_c_wsp_2_directives( "   ; A comment\n" "#pedantic\n" "   ; Another comment\n" "   ; Also a comment\n" "#language-compatible-members\r\n" "    ;More comments\n" ) (125)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 2
-    ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive().get() == "pedantic"
-    ok: h.grammar()[1].is_directive()
-    ok: h.grammar()[1].directive().get() == "language-compatible-members"
-    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
-
-    GrammarParser - parsing directives [test-directives-parser.cpp:149]
-    ===================================================================
-      Calling: test_2_directives( "#name http://example.com/myjcr.jcr\n" "#import http://example.com/otherjcr.jcr as other" ) (153)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 2
-    ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive().get() == "name http://example.com/myjcr.jcr"
-    ok: h.grammar()[0].directive().size() == 2
-    ok: h.grammar()[0].directive()[0] == "name"
-    ok: h.grammar()[0].directive().get(1) == "http://example.com/myjcr.jcr"
-    ok: h.grammar()[1].is_directive()
-    ok: h.grammar()[1].directive().size() == 4
-    ok: h.grammar()[1].directive().get() == "import http://example.com/otherjcr.jcr as other"
-    ok: h.grammar()[1].directive()[0] == "import"
-    ok: h.grammar()[1].directive().get(1) == "http://example.com/otherjcr.jcr"
-    ok: h.grammar()[1].directive().get(2) == "as"
-    ok: h.grammar()[1].directive().get(3) == "other"
-      Calling: test_2_directives( "#name http://example.com/myjcr.jcr\n" "#import http://example.com/otherjcr.jcr as other\n" ) (156)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 2
-    ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive().get() == "name http://example.com/myjcr.jcr"
-    ok: h.grammar()[0].directive().size() == 2
-    ok: h.grammar()[0].directive()[0] == "name"
-    ok: h.grammar()[0].directive().get(1) == "http://example.com/myjcr.jcr"
-    ok: h.grammar()[1].is_directive()
-    ok: h.grammar()[1].directive().size() == 4
-    ok: h.grammar()[1].directive().get() == "import http://example.com/otherjcr.jcr as other"
-    ok: h.grammar()[1].directive()[0] == "import"
-    ok: h.grammar()[1].directive().get(1) == "http://example.com/otherjcr.jcr"
-    ok: h.grammar()[1].directive().get(2) == "as"
-    ok: h.grammar()[1].directive().get(3) == "other"
-      Calling: test_2_directives( "\n" "#name http://example.com/myjcr.jcr\n" "\n" "#import http://example.com/otherjcr.jcr as other\n" "\n" ) (162)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 2
-    ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive().get() == "name http://example.com/myjcr.jcr"
-    ok: h.grammar()[0].directive().size() == 2
-    ok: h.grammar()[0].directive()[0] == "name"
-    ok: h.grammar()[0].directive().get(1) == "http://example.com/myjcr.jcr"
-    ok: h.grammar()[1].is_directive()
-    ok: h.grammar()[1].directive().size() == 4
-    ok: h.grammar()[1].directive().get() == "import http://example.com/otherjcr.jcr as other"
-    ok: h.grammar()[1].directive()[0] == "import"
-    ok: h.grammar()[1].directive().get(1) == "http://example.com/otherjcr.jcr"
-    ok: h.grammar()[1].directive().get(2) == "as"
-    ok: h.grammar()[1].directive().get(3) == "other"
-      Calling: test_2_directives( "; with comments\n" "#name http://example.com/myjcr.jcr\n" "; Another comment\n" "#import http://example.com/otherjcr.jcr as other\n" "\n" ) (168)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 2
-    ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive().get() == "name http://example.com/myjcr.jcr"
-    ok: h.grammar()[0].directive().size() == 2
-    ok: h.grammar()[0].directive()[0] == "name"
-    ok: h.grammar()[0].directive().get(1) == "http://example.com/myjcr.jcr"
-    ok: h.grammar()[1].is_directive()
-    ok: h.grammar()[1].directive().size() == 4
-    ok: h.grammar()[1].directive().get() == "import http://example.com/otherjcr.jcr as other"
-    ok: h.grammar()[1].directive()[0] == "import"
-    ok: h.grammar()[1].directive().get(1) == "http://example.com/otherjcr.jcr"
-    ok: h.grammar()[1].directive().get(2) == "as"
-    ok: h.grammar()[1].directive().get(3) == "other"
-      Calling: test_2_directives( "; with comments\n" "   \n" "#name http://example.com/myjcr.jcr\n" "\n" "; Another comment\n" "\n" "#import http://example.com/otherjcr.jcr as other\n" "; Yet another comment\n" "\n" ) (178)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 2
-    ok: h.grammar()[0].is_directive()
-    ok: h.grammar()[0].directive().get() == "name http://example.com/myjcr.jcr"
-    ok: h.grammar()[0].directive().size() == 2
-    ok: h.grammar()[0].directive()[0] == "name"
-    ok: h.grammar()[0].directive().get(1) == "http://example.com/myjcr.jcr"
-    ok: h.grammar()[1].is_directive()
-    ok: h.grammar()[1].directive().size() == 4
-    ok: h.grammar()[1].directive().get() == "import http://example.com/otherjcr.jcr as other"
-    ok: h.grammar()[1].directive()[0] == "import"
-    ok: h.grammar()[1].directive().get(1) == "http://example.com/otherjcr.jcr"
-    ok: h.grammar()[1].directive().get(2) == "as"
-    ok: h.grammar()[1].directive().get(3) == "other"
-    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+Tests run on Fri Jan 22 21:07:41 2016
 
     GrammarSet TODOS [test-grammar-set.cpp:40]
     ==========================================
@@ -272,293 +105,202 @@ Tests run on Tue Jan 19 18:24:39 2016
     ok: r_value_rule.rule_kind() == RuleKind::UNION_VALUE
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - parsing trivial simple value rules [test-rules-parser.cpp:58]
-    =============================================================================
-      Calling: test_simple_anonymous_value_rule( "rule1 : boolean", SimpleType::BOOLEAN ) (60)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : null", SimpleType::TNULL ) (61)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : ip4", SimpleType::IP4 ) (62)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : ip6", SimpleType::IP6 ) (63)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : fqdn ", SimpleType::FQDN ) (64)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : idn", SimpleType::IDN ) (65)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : date-time", SimpleType::DATETIME ) (66)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : full-date", SimpleType::DATE ) (67)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : full-time", SimpleType::TIME ) (68)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : email", SimpleType::EMAIL ) (69)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : phone", SimpleType::PHONE ) (70)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : base64", SimpleType::BASE64 ) (71)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : any", SimpleType::ANY ) (72)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : BOOLEAN", SimpleType::BOOLEAN ) (74)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : NULL", SimpleType::TNULL ) (75)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : IP4", SimpleType::IP4 ) (76)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : IP6", SimpleType::IP6 ) (77)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : FQDN ", SimpleType::FQDN ) (78)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : IDN", SimpleType::IDN ) (79)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : DATE-TIME", SimpleType::DATETIME ) (80)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : FULL-DATE", SimpleType::DATE ) (81)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : FULL-TIME", SimpleType::TIME ) (82)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : EMAIL", SimpleType::EMAIL ) (83)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : PHONE", SimpleType::PHONE ) (84)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : BASE64", SimpleType::BASE64 ) (85)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : ANY", SimpleType::ANY ) (86)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
+    GrammarParser - Syntax parsing with no semantic interpretation - comments [test-parsing-only.cpp:62]
+    ====================================================================================================
+      Calling: test_parsing_only( "" ) (65)
+      
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only( "   " ) (67)
+         
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only( "; Hello World" ) (69)
+      ; Hello World
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only( "; Hello World" ) (71)
+      ; Hello World
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only( "; Hello World\n" "     " ) (74)
+      ; Hello World
+     
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only( "; Hello World\n" "     \n" "  ; Let's go..." ) (78)
+      ; Hello World
+     
+  ; Let's go...
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only_bad_input( "; Hello World ; Let's go...\n" ) (80)
+      ; Hello World ; Let's go...
+
+    ok: status != JCRParser::S_OK
+      Calling: test_parsing_only( "; Hello World ;; Let's go...\n" ) (82)
+      ; Hello World ;; Let's go...
+
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only( "" ) (84)
+      
+    ok: status == JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - spacing around parsing trivial simple value rules [test-rules-parser.cpp:89]
-    ============================================================================================
-      Calling: test_simple_anonymous_value_rule( "rule1 : boolean", SimpleType::BOOLEAN ) (91)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1: boolean", SimpleType::BOOLEAN ) (92)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 :boolean", SimpleType::BOOLEAN ) (93)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1:boolean", SimpleType::BOOLEAN ) (94)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : boolean", SimpleType::BOOLEAN ) (96)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( " rule1 : boolean", SimpleType::BOOLEAN ) (97)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( "rule1 : boolean ", SimpleType::BOOLEAN ) (98)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
-      Calling: test_simple_anonymous_value_rule( " rule1 : boolean ", SimpleType::BOOLEAN ) (99)
-    ok: h.status() == JCRParser::S_OK
-    ok: h.grammar().size() == 1
-    ok: h.grammar()[0].is_rule()
-    ok: SimpleType::is_present( h.grammar()[0].rule() )
-    ok: p_simple_type != 0
-    ok: p_simple_type->type() == expected_type
-    ok: h.grammar()[0].rule().rule_name() == "rule1"
+    GrammarParser - Syntax parsing - JCR directive [test-parsing-only.cpp:87]
+    =========================================================================
+      Calling: test_parsing_only( "#jcr-version 0.5" ) (90)
+      #jcr-version 0.5
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only_bad_input( "#\n" "jcr-version\n" " 0.5" ) (94)
+      #
+jcr-version
+ 0.5
+    ok: status != JCRParser::S_OK
+      Calling: test_parsing_only( "#jcr-version 0.12" ) (96)
+      #jcr-version 0.12
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only( "#jcr-version 10.5" ) (98)
+      #jcr-version 10.5
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only_bad_input( "#jcr-version 0.5 too long" ) (100)
+      #jcr-version 0.5 too long
+    ok: status != JCRParser::S_OK
+      Calling: test_parsing_only( "; Start\n" "#jcr-version 0.5" ) (103)
+      ; Start
+#jcr-version 0.5
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only( "; Start\n" "#jcr-version 0.5\n" "; End" ) (107)
+      ; Start
+#jcr-version 0.5
+; End
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only( "  #jcr-version 0.5\n" "; End" ) (110)
+        #jcr-version 0.5
+; End
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only( "; Start ; #jcr-version 0.5" ) (112)
+      ; Start ; #jcr-version 0.5
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only_bad_input( "#jcr-version0.5" ) (114)
+      #jcr-version0.5
+    ok: status != JCRParser::S_OK
+      Calling: test_parsing_only_bad_input( "#jcr-version a.5" ) (116)
+      #jcr-version a.5
+    ok: status != JCRParser::S_OK
+      Calling: test_parsing_only_bad_input( "#jcr-version 0:5" ) (118)
+      #jcr-version 0:5
+    ok: status != JCRParser::S_OK
+      Calling: test_parsing_only_bad_input( "#jcr-version 0.b" ) (120)
+      #jcr-version 0.b
+    ok: status != JCRParser::S_OK
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    GrammarParser - Syntax parsing - ruleset-id directive [test-parsing-only.cpp:123]
+    =================================================================================
+      Calling: test_parsing_only( "#ruleset-id http://www.example.com/jcr\n" ) (126)
+      #ruleset-id http://www.example.com/jcr
+
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only_bad_input( "#ruleset-id \n" ) (128)
+      #ruleset-id 
+
+    ok: status != JCRParser::S_OK
+      Calling: test_parsing_only_bad_input( "#ruleset-id\n" ) (130)
+      #ruleset-id
+
+    ok: status != JCRParser::S_OK
+      Calling: test_parsing_only( "; A comment ; #ruleset-id http://www.example.com/jcr\n" ) (132)
+      ; A comment ; #ruleset-id http://www.example.com/jcr
+
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only( "#ruleset-id http://www.example.com/jcr\n" "; A comment" ) (135)
+      #ruleset-id http://www.example.com/jcr
+; A comment
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only( "#ruleset-id http://www.example.com/jcr\n" "; A comment\n" "; Another comment\n" "#jcr-version 0.5\n" ) (140)
+      #ruleset-id http://www.example.com/jcr
+; A comment
+; Another comment
+#jcr-version 0.5
+
+    ok: status == JCRParser::S_OK
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    GrammarParser - Syntax parsing - import directive [test-parsing-only.cpp:143]
+    =============================================================================
+      Calling: test_parsing_only( "#import http://www.example.com/jcr\n" ) (146)
+      #import http://www.example.com/jcr
+
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only_bad_input( "#import http://www.example.com/jcr as\n" ) (148)
+      #import http://www.example.com/jcr as
+
+    ok: status != JCRParser::S_OK
+      Calling: test_parsing_only_bad_input( "#import http://www.example.com/jcr as \n" ) (150)
+      #import http://www.example.com/jcr as 
+
+    ok: status != JCRParser::S_OK
+      Calling: test_parsing_only( "#import http://www.example.com/jcr as my_1st-alias\n" ) (152)
+      #import http://www.example.com/jcr as my_1st-alias
+
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only( " ; Hello\n" "#import http://www.example.com/jcr as  my_1st-alias\n" ) (155)
+       ; Hello
+#import http://www.example.com/jcr as  my_1st-alias
+
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only( " ; Hello\n" "#jcr-version 0.5\n" "#ruleset-id http://www.example.com/jcr\n" "#import http://www.example.com/jcr as  my_1st-alias\n" "#import http://www.example.com/jcr2 as  my_2nd-alias\n" "\n" ) (162)
+       ; Hello
+#jcr-version 0.5
+#ruleset-id http://www.example.com/jcr
+#import http://www.example.com/jcr as  my_1st-alias
+#import http://www.example.com/jcr2 as  my_2nd-alias
+
+
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only( " ; Hello\n" "#jcr-version 0.5\n" "  ; A comment\n" "#ruleset-id http://www.example.com/jcr\n" "  ; A comment\n" "  ; A comment\n" "#import http://www.example.com/jcr as  my_1st-alias\n" "  ; A comment\n" "  ; A comment\n" "  ; A comment\n" "  ; A comment\n" "#import http://www.example.com/jcr2 as  my_2nd-alias\n" "\n" ) (176)
+       ; Hello
+#jcr-version 0.5
+  ; A comment
+#ruleset-id http://www.example.com/jcr
+  ; A comment
+  ; A comment
+#import http://www.example.com/jcr as  my_1st-alias
+  ; A comment
+  ; A comment
+  ; A comment
+  ; A comment
+#import http://www.example.com/jcr2 as  my_2nd-alias
+
+
+    ok: status == JCRParser::S_OK
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    GrammarParser - Syntax parsing - TBD directive [test-parsing-only.cpp:179]
+    ==========================================================================
+      Calling: test_parsing_only_bad_input( "#TBD\n" ) (182)
+      #TBD
+
+    ok: status != JCRParser::S_OK
+      Calling: test_parsing_only_bad_input( "#TBD  we\n" ) (184)
+      #TBD  we
+
+    ok: status != JCRParser::S_OK
+      Calling: test_parsing_only_bad_input( "#TBD  we don't know\n" ) (186)
+      #TBD  we don't know
+
+    ok: status != JCRParser::S_OK
+      Calling: test_parsing_only_bad_input( "; Hello\n" "#TBD\n" "#jcr-version 0.5\n" ) (190)
+      ; Hello
+#TBD
+#jcr-version 0.5
+
+    ok: status != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
 
-TODOs (5):
+TODOs (6):
 ------------------------
 - Test GrammarSet class [test-grammar-set.cpp:42]
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:44]
 - Implement ValueRuleAdapters [test-main.cpp:39]
 - Make RefRule set method split input into module and local parts [test-main.cpp:41]
-- Enhance GrammarParser::q_string() and QStringParsert o full spec [test-main.cpp:43]
+- Enhance GrammarParser::q_string() and QStringParsert to full spec [test-main.cpp:43]
+- Add test-rules-parser.cpp back into project for testing [test-main.cpp:45]
 
-0 error(s), 5 todo(s), 467 test(s)
+0 error(s), 6 todo(s), 129 test(s)

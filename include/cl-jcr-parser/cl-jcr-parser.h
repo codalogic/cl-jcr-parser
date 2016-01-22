@@ -624,7 +624,7 @@ public:
 class JCRParser : private detail::NonCopyable
 {
 public:
-    enum Status { S_OK, S_INTERNAL_ERROR, S_UNABLE_TO_OPEN_FILE, S_EXPECTED_END_OF_RULES, S_UNKNOWN_RULE_FORMAT, S_UNKNOWN_VALUE_TYPE };
+    enum Status { S_OK, S_UNABLE_TO_OPEN_FILE, S_INTERNAL_ERROR };
 
 private:
     struct Members {
