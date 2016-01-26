@@ -1,4 +1,4 @@
-Tests run on Fri Jan 22 21:07:41 2016
+Tests run on Tue Jan 26 14:06:14 2016
 
     GrammarSet TODOS [test-grammar-set.cpp:40]
     ==========================================
@@ -292,9 +292,11 @@ jcr-version
 
     ok: status != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
 
-TODOs (6):
+TODOs (7):
 ------------------------
 - Test GrammarSet class [test-grammar-set.cpp:42]
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:44]
@@ -302,5 +304,6 @@ TODOs (6):
 - Make RefRule set method split input into module and local parts [test-main.cpp:41]
 - Enhance GrammarParser::q_string() and QStringParsert to full spec [test-main.cpp:43]
 - Add test-rules-parser.cpp back into project for testing [test-main.cpp:45]
+- Correctly populate and place annotations into Grammar [test-parsing-only.cpp:193]
 
-0 error(s), 6 todo(s), 129 test(s)
+0 error(s), 7 todo(s), 130 test(s)

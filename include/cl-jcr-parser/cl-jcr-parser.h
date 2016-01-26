@@ -43,6 +43,45 @@ struct uniq_ptr
 
 class BadSelectorRequest : public std::exception {};
 
+struct Annotations
+{
+    bool reject;
+    bool is_unordered;
+    bool is_root;
+
+    Annotations() : reject( false ), is_unordered( false ), is_root( false ) {}
+};
+
+struct Repetition
+{
+    int min;
+    int max;
+
+    Repetition() : min( 1 ), max( 1 ) {}
+};
+
+class MemberName
+{
+private:
+    enum Form { Absent, Literal, Regex };
+    struct Members {
+        std::string name;
+        Form form;
+
+        Members() : form( Absent ) {}
+    } m;
+
+public:
+    void set_absent( const std::string & name ) { m.form = Absent; m.name.clear(); }
+    void set_literal( const std::string & name ) { m.form = Literal; m.name = name; }
+    void set_regex( const std::string & name ) { m.form = Regex; m.name = name; }
+
+    bool is_absent() { return m.form == Absent; }
+    bool is_literal() { return m.form == Literal; }
+    bool is_regex() { return m.form == Regex; }
+    const std::string & name() const { return m.name; }
+};
+
 struct RuleKind
 {
     enum Enum {

@@ -94,6 +94,12 @@ public:
 };
 
 //----------------------------------------------------------------------------
+//                       class GrammarParserFatalError
+//----------------------------------------------------------------------------
+
+class GrammarParserFatalError : public std::exception {};
+
+//----------------------------------------------------------------------------
 //                           class GrammarParser
 //----------------------------------------------------------------------------
 
@@ -138,6 +144,7 @@ private:
     bool star_comment_or_directive();
     bool star_comment_or_directive_or_rule();
     bool sp_cmt();
+    STAR( sp_cmt )
     bool spaces();
     bool comment();
     bool comment_char();
@@ -172,8 +179,8 @@ private:
     bool type_choice_rule();
     bool type_choice();
     bool type_choice_items();
-    bool annotations();
-    bool annotation_set();
+    bool annotations( Annotations & anno );
+    bool annotation_set( Annotations & anno );
     bool reject_annotation();
     bool unordered_annotation();
     bool root_annotation();
@@ -229,7 +236,7 @@ private:
     bool group_group();
     bool sequence_combiner();
     bool choice_combiner();
-    bool repetition();
+    bool repetition( Repetition & reps );
     bool optional_marker();
     bool one_or_more();
     bool zero_or_more();
@@ -296,12 +303,24 @@ private:
     STAR( WSP )
     ONE_STAR( WSP )
     bool WSPs();
-    
+
     // This is a temporary place holder
+    bool warning( const char * p_message )
+    {
+        std::cout << p_message << "\n";
+        return true;
+    }
     bool error( const char * p_message )
     {
         std::cout << p_message << "\n";
         m.is_errored = true;
+        return false;
+    }
+    bool fatal( const char * p_message )
+    {
+        std::cout << p_message << "\n";
+        m.is_errored = true;
+        throw GrammarParserFatalError();
         return false;
     }
     bool recover_to_eol()
@@ -337,13 +356,20 @@ bool GrammarParser::jcr()
 {
     // jcr() = *( sp_cmt() || directive() ) && [ root_rule() ] && *( sp_cmt() || directive() || rule() )
 
-    return star_comment_or_directive() && optional( root_rule() ) && star_comment_or_directive_or_rule() && is_peek_at_end();
+    try
+    {
+        return star_comment_or_directive() && optional( root_rule() ) && star_comment_or_directive_or_rule() && is_peek_at_end();
+    }
+    catch( const GrammarParserFatalError & )
+    {
+        return false;
+    }
 }
 
 bool GrammarParser::star_comment_or_directive()
 {
     // *( sp_cmt() || directive() )
-    
+
     while( sp_cmt() || directive() )
     {}
 
@@ -353,7 +379,7 @@ bool GrammarParser::star_comment_or_directive()
 bool GrammarParser::star_comment_or_directive_or_rule()
 {
     // *( sp_cmt() || directive() || rule() )
-    
+
     while( sp_cmt() || directive() || rule() )
     {}
 
@@ -400,7 +426,7 @@ bool is_jcr_comment_char( char c )
 bool GrammarParser::comment_char()
 {
     // comment_char() = HTAB() / %x20-3A / %x3C-10FFFF
-    
+
     return is_get_char_in( cl::alphabet_function( is_jcr_comment_char ) );
 }
 
@@ -429,7 +455,7 @@ bool GrammarParser::directive_def()
     // directive_def() = jcr_version_d() || ruleset_id_d() || import_d() || tbd_directive_d()
 
     cl::locator loc( this );
-    
+
     return optional_rewind( jcr_version_d() ) ||
             optional_rewind( ruleset_id_d() ) ||
             optional_rewind( import_d() ) ||
@@ -458,7 +484,7 @@ bool GrammarParser::jcr_version_d()
 
         return true;
     }
-    
+
     return false;
 }
 
@@ -472,7 +498,6 @@ bool GrammarParser::major_version()
 bool GrammarParser::minor_version()
 {
     // minor_version() = p_integer()
-
 
     return p_integer();
 }
@@ -494,7 +519,7 @@ bool GrammarParser::ruleset_id_d()
 
         return true;
     }
-    
+
     return false;
 }
 
@@ -551,18 +576,18 @@ bool GrammarParser::ruleset_id_alias()
 bool GrammarParser::tbd_directive_d()
 {
     // tbd_directive_d() = directive_name() [ spaces() && directive_parameters() ]
-    
+
     cl::accumulator tbd_directive_name_accumulator( this );
     cl::accumulator_deferred tbd_directive_parameters_accumulator( this );
 
     if( directive_name() &&
         optional( WSPs() && tbd_directive_parameters_accumulator.select() && directive_parameters() ) )
     {
-        error( (std::string( "Unknown directive: " ) + tbd_directive_name_accumulator.get() + 
+        error( (std::string( "Unknown directive: " ) + tbd_directive_name_accumulator.get() +
                 ", parameters: " + tbd_directive_parameters_accumulator.get()).c_str() );
         return true;
     }
-    
+
     return false;
 }
 
@@ -598,26 +623,69 @@ bool GrammarParser::root_rule()
 {
     // root_rule() = value_rule() || member_rule() || group_rule()
 
-    return false;
+    cl::locator loc( this );
+
+    return optional_rewind( value_rule() ) ||
+            optional_rewind( member_rule() ) ||
+            optional_rewind( group_rule() );
 }
 
 bool GrammarParser::rule()
 {
     // rule() = rule_name() && *sp_cmt() && rule_def()
 
-    return false;
+    cl::locator loc( this );
+
+    cl::accumulator name_accumulator( this );
+
+    if( ! rule_name() )
+        return location_top( false );
+
+    star_sp_cmt() && rule_def() || fatal( "Unable to read rule definition" );
+
+    return true;    // We've 'accepted' this path, even if we end up deciding there's a fatal error
 }
 
 bool GrammarParser::rule_name()
 {
     // rule_name() = name()
 
-    return false;
+    return name();
 }
 
 bool GrammarParser::target_rule_name()
 {
     // target_rule_name() = [ ruleset_id_alias() "." ] && rule_name()
+
+    // Both ruleset_id_alias() and rule_name() ultimately map to name()
+    // so a little juggling of values is required to get parsed values
+    // in the right place
+
+    std::string id_alias, rule;
+
+    cl::accumulator first_accumulator( this );
+    cl::accumulator_deferred second_accumulator( this );
+
+    if( ruleset_id_alias() )
+    {
+        if( is_get_char( '.' ) )
+        {
+            second_accumulator.select();
+            if( rule_name() )
+            {
+                id_alias = first_accumulator.get();
+                rule = second_accumulator.get();
+                return true;
+            }
+            else
+                return error( "Expected 'rule_name' after 'ruleset_id_alias'" );
+        }
+        else
+        {
+            rule = first_accumulator.get();
+            return true;
+        }
+    }
 
     return false;
 }
@@ -632,7 +700,7 @@ bool GrammarParser::name()
         {}
         return true;
     }
-    
+
     return false;
 }
 
@@ -640,21 +708,33 @@ bool GrammarParser::rule_def()
 {
     // rule_def() = type_rule() || member_rule() || group_rule()
 
-    return false;
+    cl::locator loc( this );
+
+    return optional_rewind( type_rule() ) ||
+            optional_rewind( member_rule() ) ||
+            optional_rewind( group_rule() );
 }
 
 bool GrammarParser::type_rule()
 {
     // type_rule() = value_rule() || type_choice_rule() || target_rule_name()
 
-    return false;
+    cl::locator loc( this );
+
+    return optional_rewind( value_rule() ) ||
+            optional_rewind( type_choice_rule() ) ||
+            optional_rewind( target_rule_name() );
 }
 
 bool GrammarParser::value_rule()
 {
     // value_rule() = primitive_rule() || array_rule() || object_rule()
 
-    return false;
+    cl::locator loc( this );
+
+    return optional_rewind( primitive_rule() ) ||
+            optional_rewind( array_rule() ) ||
+            optional_rewind( object_rule() );
 }
 
 bool GrammarParser::member_rule()
@@ -692,60 +772,79 @@ bool GrammarParser::type_choice_items()
     return false;
 }
 
-bool GrammarParser::annotations()
+bool GrammarParser::annotations( Annotations & anno )
 {
-    // annotations() = *( "@(" && *sp_cmt() && annotation_set() && *sp_cmt() ")" && *sp_cmt() )
+    // annotations() = *( "@(" && *sp_cmt() && annotation_set() && *sp_cmt() && ")" && *sp_cmt() )
 
-    return false;
+    while( fixed( "@(" ) )
+    {
+        star_sp_cmt() && annotation_set( anno ) && star_sp_cmt() &&
+            (fixed( ")" ) || fatal( "Expected ')' at end of annotation" )) &&
+            star_sp_cmt();
+    }
+
+    return true;    // Annotations are optional, so we always return 'true' unless we've errored
 }
 
-bool GrammarParser::annotation_set()
+bool GrammarParser::annotation_set( Annotations & anno )
 {
     // annotation_set() = reject_annotation() || unordered_annotation() || root_annotation() || tbd_annotation()
 
-    return false;
+    cl::locator loc( this );    // Current annotations don't benefit from optional_rewind(), but maintain the pattern for consistency and possible future proofing
+
+    return optional_rewind( reject_annotation() && set( anno.reject, true ) ) ||
+            optional_rewind( unordered_annotation() && set( anno.is_unordered, true ) ) ||
+            optional_rewind( root_annotation() && set( anno.is_root, true ) ) ||
+            optional_rewind( tbd_annotation() ) ||
+            fatal( "Unrecognised annotation format" );     // Getting to fatal() will throw an exception
 }
 
 bool GrammarParser::reject_annotation()
 {
     // reject_annotation() = reject_kw()
 
-    return false;
+    return reject_kw();
 }
 
 bool GrammarParser::unordered_annotation()
 {
     // unordered_annotation() = unordered_kw()
 
-    return false;
+    return unordered_kw();
 }
 
 bool GrammarParser::root_annotation()
 {
     // root_annotation() = root_kw()
 
-    return false;
+    return root_kw();
 }
 
 bool GrammarParser::tbd_annotation()
 {
     // tbd_annotation() = annotation_name() [ spaces() && annotation_parameters() ]
 
-    return false;
+    cl::accumulator name_accumulator( this );
+
+    annotation_name() && optional( spaces() && name_accumulator.none() && annotation_parameters() );
+
+    fatal( (std::string( "Annotation: '" ) + name_accumulator.get() + "' not supported").c_str() );
+
+    return true;    // We've 'accepted' this path despite having decided to error
 }
 
 bool GrammarParser::annotation_name()
 {
     // annotation_name() = name()
 
-    return false;
+    return name();
 }
 
 bool GrammarParser::annotation_parameters()
 {
     // annotation_parameters() = *( spaces() / %x21-28 / %x2A-10FFFF )
 
-    return false;
+    return skip( cl::alphabet_not( cl::alphabet_char( ')' ) ) ) >= 0;
 }
 
 bool GrammarParser::primitive_rule()
@@ -976,6 +1075,9 @@ bool GrammarParser::object_rule()
 {
     // object_rule() = annotations() [ ":" && *sp_cmt() ] "{" && *sp_cmt() [ object_items() && *sp_cmt() ] "}"
 
+    Annotations annos;
+    annotations( annos );
+
     return false;
 }
 
@@ -1091,7 +1193,7 @@ bool GrammarParser::choice_combiner()
     return false;
 }
 
-bool GrammarParser::repetition()
+bool GrammarParser::repetition( Repetition & reps )
 {
     // repetition() = optional_marker() || one_or_more() || min_max_repetition() || min_repetition() || max_repetition() || zero_or_more() || specific_repetition()
 
@@ -1247,7 +1349,7 @@ bool GrammarParser::zero()
 
 bool GrammarParser::q_string()
 {
-    // q_string() = quotation_mark() && *char() && quotation_mark() 
+    // q_string() = quotation_mark() && *char() && quotation_mark()
 
     return false;
 }
@@ -1513,7 +1615,7 @@ bool GrammarParser::LF()
 bool GrammarParser::SP()
 {
     // SP() = %x20         ; space
-    
+
     return is_get_char( ' ' );
 }
 
