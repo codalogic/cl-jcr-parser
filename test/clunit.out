@@ -1,4 +1,4 @@
-Tests run on Tue Jan 26 14:06:14 2016
+Tests run on Thu Jan 28 10:03:54 2016
 
     GrammarSet TODOS [test-grammar-set.cpp:40]
     ==========================================
@@ -6,103 +6,6 @@ Tests run on Tue Jan 26 14:06:14 2016
 
     Miscellaneous TODOs [test-main.cpp:37]
     ======================================
-    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
-
-    RuleOrDirective creation [test-object-creation.cpp:40]
-    ======================================================
-    ok: pu_rule_or_directive->is_rule() == true
-    ok: pu_rule_or_directive->is_directive() == false
-    ok: true
-    ok: pu_rule_or_directive->is_directive() == true
-    ok: pu_rule_or_directive->is_rule() == false
-    ok: true
-    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
-
-    Grammar creation / deletion [test-object-creation.cpp:75]
-    =========================================================
-    ok: i != end
-    ok: i->is_directive()
-    ok: ! (*i).is_rule()
-    ok: i != end
-    ok: ! i->is_directive()
-    ok: i->is_rule()
-    ok: i == end
-    ok: grammar[0].is_directive()
-    ok: ! grammar[0].is_rule()
-    ok: ! grammar[1].is_directive()
-    ok: grammar[1].is_rule()
-    ok: grammar.back_is_directive()
-    ok: ! grammar.back_is_rule()
-    ok: grammar.back_is_rule()
-    ok: ! grammar.back_is_directive()
-    ok: i != end
-    ok: i->is_directive()
-    ok: ! i->is_rule()
-    ok: i != end
-    ok: ! i->is_directive()
-    ok: i->is_rule()
-    ok: i == end
-    ok: grammar[0].is_directive()
-    ok: ! grammar[0].is_rule()
-    ok: ! grammar[1].is_directive()
-    ok: grammar[1].is_rule()
-    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
-
-    Grammar exception throwing on bad selection [test-object-creation.cpp:126]
-    ==========================================================================
-    ok: true
-    ok: true
-    ok: true
-    ok: true
-    ok: true
-    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
-
-    Creating various types of Rules in Grammars [test-object-creation.cpp:185]
-    ==========================================================================
-    ok: r_rule.is_value_rule()
-    ok: ! r_rule.is_array_rule()
-    ok: ! r_rule.is_object_rule()
-    ok: ! r_rule.is_group_rule()
-    ok: ! r_rule.is_ref_rule()
-    ok: r_rule.rule_kind() == RuleKind::UNDEFINED_VALUE
-    ok: ! r_rule.is_value_rule()
-    ok: r_rule.is_array_rule()
-    ok: ! r_rule.is_object_rule()
-    ok: ! r_rule.is_group_rule()
-    ok: ! r_rule.is_ref_rule()
-    ok: r_rule.rule_kind() == RuleKind::ARRAY
-    ok: ! r_rule.is_value_rule()
-    ok: ! r_rule.is_array_rule()
-    ok: r_rule.is_object_rule()
-    ok: ! r_rule.is_group_rule()
-    ok: ! r_rule.is_ref_rule()
-    ok: r_rule.rule_kind() == RuleKind::OBJECT
-    ok: ! r_rule.is_value_rule()
-    ok: ! r_rule.is_array_rule()
-    ok: ! r_rule.is_object_rule()
-    ok: r_rule.is_group_rule()
-    ok: ! r_rule.is_ref_rule()
-    ok: r_rule.rule_kind() == RuleKind::GROUP
-    ok: ! r_rule.is_value_rule()
-    ok: ! r_rule.is_array_rule()
-    ok: ! r_rule.is_object_rule()
-    ok: ! r_rule.is_group_rule()
-    ok: r_rule.is_ref_rule()
-    ok: r_rule.rule_kind() == RuleKind::REF
-    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
-
-    Creating various types of ValueRule, e.g. SimpleType, EnumType etc. [test-object-creation.cpp:243]
-    ==================================================================================================
-    ok: r_value_rule.is_value_rule()
-    ok: ! r_value_rule.is_simple_type()
-    ok: ! r_value_rule.is_union_type()
-    ok: r_value_rule.rule_kind() == RuleKind::UNDEFINED_VALUE
-    ok: r_value_rule.is_simple_type()
-    ok: ! r_value_rule.is_union_type()
-    ok: r_value_rule.rule_kind() == RuleKind::SIMPLE_VALUE
-    ok: ! r_value_rule.is_simple_type()
-    ok: r_value_rule.is_union_type()
-    ok: r_value_rule.rule_kind() == RuleKind::UNION_VALUE
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
     GrammarParser - Syntax parsing with no semantic interpretation - comments [test-parsing-only.cpp:62]
@@ -306,4 +209,4 @@ TODOs (7):
 - Add test-rules-parser.cpp back into project for testing [test-main.cpp:45]
 - Correctly populate and place annotations into Grammar [test-parsing-only.cpp:193]
 
-0 error(s), 7 todo(s), 130 test(s)
+0 error(s), 7 todo(s), 48 test(s)

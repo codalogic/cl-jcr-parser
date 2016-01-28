@@ -183,10 +183,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\test-object-creation.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\test-parser-harness.h"
 				>
 			</File>

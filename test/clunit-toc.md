@@ -1,4 +1,4 @@
-Tests table of contents generated on Tue Jan 26 14:06:14 2016
+Tests table of contents generated on Thu Jan 28 10:03:54 2016
 
 # test-grammar-set.cpp
 | Description | Line |
@@ -9,15 +9,6 @@ Tests table of contents generated on Tue Jan 26 14:06:14 2016
 | Description | Line |
 |-------------|------|
 | Miscellaneous TODOs | 37 |
-
-# test-object-creation.cpp
-| Description | Line |
-|-------------|------|
-| RuleOrDirective creation | 40 |
-| Grammar creation / deletion | 75 |
-| Grammar exception throwing on bad selection | 126 |
-| Creating various types of Rules in Grammars | 185 |
-| Creating various types of ValueRule, e.g. SimpleType, EnumType etc. | 243 |
 
 # test-parsing-only.cpp
 | Description | Line |

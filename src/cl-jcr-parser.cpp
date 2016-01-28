@@ -114,9 +114,7 @@ private:
         bool is_errored;
         JCRParser::Status status;
 
-        std::string rule_name;
-        std::string member_name;
-        Rule::uniq_ptr pu_rule;
+        Rule * p_rule;
 
         Members(
             JCRParser * p_parent_in,
@@ -127,7 +125,8 @@ private:
             p_grammar( p_grammar_in ),
             r_reader( r_reader_in ),
             is_errored( false ),
-            status( JCRParser::S_OK )
+            status( JCRParser::S_OK ),
+            p_rule( 0 )
         {}
     } m;
 
@@ -1634,135 +1633,6 @@ bool GrammarParser::WSPs()
 }
 
 } // End of Anonymous namespace
-
-//----------------------------------------------------------------------------
-//                           class SimpleType
-//----------------------------------------------------------------------------
-
-Rule * SimpleType::make_rule()
-{
-    Rule::uniq_ptr pu_rule( new ValueRule );
-    pu_rule->value_rule().select_simple_type();
-    return pu_rule.release();
-}
-
-bool SimpleType::is_present( const Rule & r_rule )
-{
-    return r_rule.is_value_rule() && r_rule.value_rule().is_simple_type();
-}
-
-SimpleType * SimpleType::from_rule( Rule * p_rule )
-{
-    if( is_present( *p_rule ) )
-        return &p_rule->value_rule().simple_type();
-    return 0;
-}
-
-const SimpleType * SimpleType::from_rule( const Rule & r_rule )
-{
-    if( is_present( r_rule ) )
-        return &r_rule.value_rule().simple_type();
-    return 0;
-}
-
-//----------------------------------------------------------------------------
-//                           class UnionType
-//----------------------------------------------------------------------------
-
-Rule * UnionType::make_rule()
-{
-    Rule::uniq_ptr pu_rule( new ValueRule );
-    pu_rule->value_rule().select_union_type();
-    return pu_rule.release();
-}
-
-bool UnionType::is_present( const Rule & r_rule )
-{
-    return r_rule.is_value_rule() && r_rule.value_rule().is_union_type();
-}
-
-UnionType * UnionType::from_rule( Rule * p_rule )
-{
-    if( is_present( *p_rule ) )
-        return &p_rule->value_rule().union_type();
-    return 0;
-}
-
-const UnionType * UnionType::from_rule( const Rule & r_rule )
-{
-    if( is_present( r_rule ) )
-        return &r_rule.value_rule().union_type();
-    return 0;
-}
-
-//----------------------------------------------------------------------------
-//                           class ValueRule
-//----------------------------------------------------------------------------
-
-ValueRule & ValueRule::make_and_append( Grammar & r_grammar )
-{
-    return r_grammar.append( new ValueRule ).value_rule();
-}
-
-//----------------------------------------------------------------------------
-//                           class ObjectRule
-//----------------------------------------------------------------------------
-
-ObjectRule & ObjectRule::make_and_append( Grammar & r_grammar )
-{
-    return r_grammar.append( new ObjectRule ).object_rule();
-}
-
-//----------------------------------------------------------------------------
-//                           class ArrayRule
-//----------------------------------------------------------------------------
-
-ArrayRule & ArrayRule::make_and_append( Grammar & r_grammar )
-{
-    return r_grammar.append( new ArrayRule ).array_rule();
-}
-
-//----------------------------------------------------------------------------
-//                           class GroupRule
-//----------------------------------------------------------------------------
-
-GroupRule & GroupRule::make_and_append( Grammar & r_grammar )
-{
-    return r_grammar.append( new GroupRule ).group_rule();
-}
-
-//----------------------------------------------------------------------------
-//                           class RefRule
-//----------------------------------------------------------------------------
-
-RefRule & RefRule::make_and_append( Grammar & r_grammar )
-{
-    return r_grammar.append( new RefRule ).ref_rule();
-}
-
-//----------------------------------------------------------------------------
-//                           class Directive
-//----------------------------------------------------------------------------
-
-void Directive::set( const std::string & r_directive )
-{
-    using namespace cl::short_alphabets;
-
-    m.directive = r_directive;
-    cl::reader_string reader( r_directive );
-    cl::dsl_pa line_parser( reader );
-    for(;;)
-    {
-        line_parser.space();
-        std::string part;
-        line_parser.get( &part, and( not( space() ), not( semicolon() ) ) );
-        if( part.empty() )
-            break;
-        m.parts.push_back( part );
-        if( line_parser.current_is( ';' ) )
-            break;
-    }
-}
 
 //----------------------------------------------------------------------------
 //                           class JCRParser
