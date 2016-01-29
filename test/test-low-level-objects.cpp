@@ -149,6 +149,7 @@ TFEATURE( "Grammar" )
 {
     Grammar g;
 
+    TDOC( "Adding and accessing unaliased imports" );
     TSETUP( g.add_unaliased_import( "foo" ) );
     TTEST( g.unaliased_imports.size() == 1 );
     TSETUP( g.add_unaliased_import( "bar" ) );
@@ -156,6 +157,7 @@ TFEATURE( "Grammar" )
     TTEST( g.unaliased_imports[0] == "foo" );
     TTEST( g.unaliased_imports[1] == "bar" );
 
+    TDOC( "Adding aliased imports" );
     TTEST( g.has_aliased_import( "foo" ) == false );
     TTEST( g.add_aliased_import( "foo", "http://foo" ) == true );
     TTEST( g.has_aliased_import( "foo" ) == true );
@@ -166,13 +168,20 @@ TFEATURE( "Grammar" )
     TTEST( g.aliased_imports["foo"] == "http://foo" );
     TTEST( g.aliased_imports["bar"] == "http://bar" );
 
+    TDOC( "Adding duplicate aliased imports fails" );
+    TTEST( g.add_aliased_import( "foo", "http://foo" ) == false );
+
+    TDOC( "Accessing aliased imports for const instances" );
     TSETUP( const Grammar & r_g( g ) );
-    TTEST( *r_g.get_aliased_import( "foo" ) == "http://foo" ); // get_aliased_imports() returns a null-able pointer
-    TTEST( *r_g.get_aliased_import( "bar" ) == "http://bar" );
+    TTEST( r_g.get_aliased_import( "foo" ).value() == "http://foo" );
+    TSETUP( std::string foo = r_g.get_aliased_import( "foo" ) );        // Can use AliasLookupResult cast to string & to assign directly to string
+    TTEST( foo == "http://foo" );
+    TTEST( r_g.get_aliased_import( "bar" ).value() == "http://bar" );
 
     TTEST( r_g.has_aliased_import( "blah" ) == false );
-    TTEST( ! r_g.get_aliased_import( "blah" ) );
+    TTEST( r_g.get_aliased_import( "blah" ).is_found() == false );
     
+    TDOC( "Adding rules" );
     TTEST( g.rules.size() == 0 );
     TSETUP( Rule::uniq_ptr pu_r( new Rule ) );
     TSETUP( pu_r->p_parent = pu_r.get() );  // Set p_parent to non-zero value so we can test it's set to 0 later

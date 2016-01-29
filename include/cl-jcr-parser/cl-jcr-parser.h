@@ -114,7 +114,7 @@ struct Rule;
 
 struct TargetRule
 {
-    std::string rulesetid_alias;
+    std::string rulesetid;
     std::string local_name;
     Rule * p_rule;      // Filled in when 'compiled'
 
@@ -144,6 +144,7 @@ struct Rule : private detail::NonCopyable
     ValueConstraint max;
     typedef clutils::ptr_vector< Rule > children_container_t;
     children_container_t children;
+    TargetRule target_rule;
 
     Rule() : p_parent( 0 ), type( NONE ) {}
 
@@ -153,6 +154,19 @@ struct Rule : private detail::NonCopyable
         children.push_back( pu_child_rule.get() );
         return pu_child_rule.release();
     }
+};
+
+class AliasLookupResult
+{
+private:
+    const std::string * p_s;
+
+public:
+    AliasLookupResult() : p_s( 0 ) {}
+    AliasLookupResult( const std::string & r_s ) : p_s( &r_s ) {}
+    bool is_found() const { return p_s != 0; }
+    const std::string & value() const { return *p_s; }
+    operator const std::string & () const { return value(); }
 };
 
 struct Grammar : private detail::NonCopyable
@@ -181,12 +195,12 @@ struct Grammar : private detail::NonCopyable
     {
         return aliased_imports.find( r_alias ) != aliased_imports.end();
     }
-    const std::string * get_aliased_import( const std::string & r_alias ) const
+    AliasLookupResult get_aliased_import( const std::string & r_alias ) const
     {
         aliased_imports_t::const_iterator i_alias = aliased_imports.find( r_alias );
         if( i_alias != aliased_imports.end() )
-            return &(i_alias->second);
-        return 0;
+            return AliasLookupResult( i_alias->second );
+        return AliasLookupResult();
     }
     Rule * append_rule( Rule::uniq_ptr pu_rule )
     {

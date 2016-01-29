@@ -1,9 +1,18 @@
-Tests table of contents generated on Fri Jan 29 13:26:43 2016
+Tests table of contents generated on Fri Jan 29 18:14:59 2016
 
 # test-grammar-set.cpp
 | Description | Line |
 |-------------|------|
 | GrammarSet TODOS | 40 |
+
+# test-low-level-objects.cpp
+| Description | Line |
+|-------------|------|
+| ValueConstraint | 40 |
+| MemberName | 95 |
+| TargetRule | 123 |
+| Rule | 130 |
+| Grammar | 148 |
 
 # test-main.cpp
 | Description | Line |
@@ -15,16 +24,8 @@ Tests table of contents generated on Fri Jan 29 13:26:43 2016
 |-------------|------|
 | GrammarParser - Syntax parsing with no semantic interpretation - comments | 62 |
 | GrammarParser - Syntax parsing - JCR directive | 87 |
-| GrammarParser - Syntax parsing - ruleset-id directive | 123 |
-| GrammarParser - Syntax parsing - import directive | 143 |
-| GrammarParser - Syntax parsing - TBD directive | 179 |
-| GrammarParser - Syntax parsing - Primitive rules | 193 |
-
-# test-low-level-objects.cpp
-| Description | Line |
-|-------------|------|
-| ValueConstraint | 40 |
-| MemberName | 95 |
-| TargetRule | 123 |
-| Rule | 130 |
-| Grammar | 148 |
+| GrammarParser - Syntax parsing - ruleset-id directive | 127 |
+| GrammarParser - Syntax parsing - import directive | 154 |
+| GrammarParser - Syntax parsing - TBD directive | 205 |
+| GrammarParser - Syntax parsing - target_rule_name | 219 |
+| GrammarParser - Syntax parsing - Primitive rules | 240 |
