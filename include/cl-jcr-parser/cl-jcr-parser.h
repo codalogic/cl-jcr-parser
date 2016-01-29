@@ -162,25 +162,37 @@ struct Grammar : private detail::NonCopyable
 
     std::string ruleset_id;
     std::vector< std::string > unaliased_imports;
-    std::map< std::string, std::string > aliased_imports;   // Alias -> Ruleset_id
+    typedef std::map< std::string, std::string > aliased_imports_t;   // Alias -> Ruleset_id
+    aliased_imports_t aliased_imports;
     rule_container_t rules;
 
     void add_unaliased_import( const std::string & r_import )
     {
         unaliased_imports.push_back( r_import );
     }
-    void add_aliased_import( const std::string & r_alias, const std::string & r_import )
+    bool add_aliased_import( const std::string & r_alias, const std::string & r_import )
     {
+        if( has_aliased_import( r_alias ) )
+            return false;
         aliased_imports[r_alias] = r_import;
+        return true;
     }
-    bool has_import_alias( const std::string & r_alias )
+    bool has_aliased_import( const std::string & r_alias ) const
     {
         return aliased_imports.find( r_alias ) != aliased_imports.end();
     }
-    void append_rule( Rule::uniq_ptr pu_rule )
+    const std::string * get_aliased_import( const std::string & r_alias ) const
     {
+        aliased_imports_t::const_iterator i_alias = aliased_imports.find( r_alias );
+        if( i_alias != aliased_imports.end() )
+            return &(i_alias->second);
+        return 0;
+    }
+    Rule * append_rule( Rule::uniq_ptr pu_rule )
+    {
+        pu_rule->p_parent = 0;
         rules.push_back( pu_rule.get() );
-        pu_rule.release();
+        return pu_rule.release();
     }
 };
 

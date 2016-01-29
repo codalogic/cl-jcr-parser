@@ -1,4 +1,4 @@
-Tests run on Fri Jan 29 12:33:22 2016
+Tests run on Fri Jan 29 13:26:43 2016
 
     GrammarSet TODOS [test-grammar-set.cpp:40]
     ==========================================
@@ -324,6 +324,38 @@ jcr-version
     ok: p_appended_rule == p_new_rule
     ok: p_appended_rule->p_parent == &r
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    Grammar [test-low-level-objects.cpp:148]
+    ========================================
+      : g.add_unaliased_import( "foo" )
+    ok: g.unaliased_imports.size() == 1
+      : g.add_unaliased_import( "bar" )
+    ok: g.unaliased_imports.size() == 2
+    ok: g.unaliased_imports[0] == "foo"
+    ok: g.unaliased_imports[1] == "bar"
+    ok: g.has_aliased_import( "foo" ) == false
+    ok: g.add_aliased_import( "foo", "http://foo" ) == true
+    ok: g.has_aliased_import( "foo" ) == true
+    ok: g.has_aliased_import( "bar" ) == false
+    ok: g.add_aliased_import( "bar", "http://bar" ) == true
+    ok: g.has_aliased_import( "bar" ) == true
+    ok: g.aliased_imports["foo"] == "http://foo"
+    ok: g.aliased_imports["bar"] == "http://bar"
+      : const Grammar & r_g( g )
+    ok: *r_g.get_aliased_import( "foo" ) == "http://foo"
+    ok: *r_g.get_aliased_import( "bar" ) == "http://bar"
+    ok: r_g.has_aliased_import( "blah" ) == false
+    ok: ! r_g.get_aliased_import( "blah" )
+    ok: g.rules.size() == 0
+      : Rule::uniq_ptr pu_r( new Rule )
+      : pu_r->p_parent = pu_r.get()
+    ok: pu_r->p_parent != 0
+      : Rule * p_unmanaged_rule = pu_r.get()
+      : Rule * p_r = g.append_rule( pu_r )
+    ok: p_r == p_unmanaged_rule
+    ok: ! p_r->p_parent
+    ok: g.rules.size() == 1
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
 
 TODOs (7):
@@ -336,4 +368,4 @@ TODOs (7):
 - Add test-rules-parser.cpp back into project for testing [test-main.cpp:45]
 - Correctly populate and place annotations into Grammar [test-parsing-only.cpp:243]
 
-0 error(s), 7 todo(s), 140 test(s)
+0 error(s), 7 todo(s), 162 test(s)

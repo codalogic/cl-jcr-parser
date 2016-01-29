@@ -144,3 +144,42 @@ TFEATURE( "Rule" )
     TTEST( p_appended_rule == p_new_rule );
     TTEST( p_appended_rule->p_parent == &r );
 }
+
+TFEATURE( "Grammar" )
+{
+    Grammar g;
+
+    TSETUP( g.add_unaliased_import( "foo" ) );
+    TTEST( g.unaliased_imports.size() == 1 );
+    TSETUP( g.add_unaliased_import( "bar" ) );
+    TTEST( g.unaliased_imports.size() == 2 );
+    TTEST( g.unaliased_imports[0] == "foo" );
+    TTEST( g.unaliased_imports[1] == "bar" );
+
+    TTEST( g.has_aliased_import( "foo" ) == false );
+    TTEST( g.add_aliased_import( "foo", "http://foo" ) == true );
+    TTEST( g.has_aliased_import( "foo" ) == true );
+    TTEST( g.has_aliased_import( "bar" ) == false );
+
+    TTEST( g.add_aliased_import( "bar", "http://bar" ) == true );
+    TTEST( g.has_aliased_import( "bar" ) == true );
+    TTEST( g.aliased_imports["foo"] == "http://foo" );
+    TTEST( g.aliased_imports["bar"] == "http://bar" );
+
+    TSETUP( const Grammar & r_g( g ) );
+    TTEST( *r_g.get_aliased_import( "foo" ) == "http://foo" ); // get_aliased_imports() returns a null-able pointer
+    TTEST( *r_g.get_aliased_import( "bar" ) == "http://bar" );
+
+    TTEST( r_g.has_aliased_import( "blah" ) == false );
+    TTEST( ! r_g.get_aliased_import( "blah" ) );
+    
+    TTEST( g.rules.size() == 0 );
+    TSETUP( Rule::uniq_ptr pu_r( new Rule ) );
+    TSETUP( pu_r->p_parent = pu_r.get() );  // Set p_parent to non-zero value so we can test it's set to 0 later
+    TTEST( pu_r->p_parent != 0 );
+    TSETUP( Rule * p_unmanaged_rule = pu_r.get() );
+    TSETUP( Rule * p_r = g.append_rule( pu_r ) );
+    TTEST( p_r == p_unmanaged_rule );   // Using append_rule() returns released pointer to rule
+    TTEST( ! p_r->p_parent );           // Using append_rule() sets p-parent pointer to null
+    TTEST( g.rules.size() == 1 );
+}

@@ -1,4 +1,4 @@
-Tests table of contents generated on Fri Jan 29 12:33:22 2016
+Tests table of contents generated on Fri Jan 29 13:26:43 2016
 
 # test-grammar-set.cpp
 | Description | Line |
@@ -27,3 +27,4 @@ Tests table of contents generated on Fri Jan 29 12:33:22 2016
 | MemberName | 95 |
 | TargetRule | 123 |
 | Rule | 130 |
+| Grammar | 148 |
