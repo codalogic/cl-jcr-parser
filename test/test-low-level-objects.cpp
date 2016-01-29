@@ -119,3 +119,10 @@ TFEATURE( "MemberName" )
     TTEST( mn.is_regex() == false );
     TTEST( mn.name() == "" );
 }
+
+TFEATURE( "TargetRule" )
+{
+    TargetRule tr;
+
+    TTEST( ! tr.p_rule );
+}

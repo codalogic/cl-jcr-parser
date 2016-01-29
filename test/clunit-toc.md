@@ -1,4 +1,4 @@
-Tests table of contents generated on Thu Jan 28 10:03:54 2016
+Tests table of contents generated on Fri Jan 29 11:44:10 2016
 
 # test-grammar-set.cpp
 | Description | Line |
@@ -18,3 +18,11 @@ Tests table of contents generated on Thu Jan 28 10:03:54 2016
 | GrammarParser - Syntax parsing - ruleset-id directive | 123 |
 | GrammarParser - Syntax parsing - import directive | 143 |
 | GrammarParser - Syntax parsing - TBD directive | 179 |
+| GrammarParser - Syntax parsing - Primitive rules | 193 |
+
+# test-low-level-objects.cpp
+| Description | Line |
+|-------------|------|
+| ValueConstraint | 40 |
+| MemberName | 95 |
+| TargetRule | 123 |

@@ -179,6 +179,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\test-low-level-objects.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\test-main.cpp"
 				>
 			</File>

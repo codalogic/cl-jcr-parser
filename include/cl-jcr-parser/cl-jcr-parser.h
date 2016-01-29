@@ -14,6 +14,7 @@
 #include <cassert>
 #include <memory>
 #include <map>
+#include <string>
 
 namespace cl { class reader; }
 
@@ -70,7 +71,7 @@ private:
     } m;
 
 public:
-    void set_absent( const std::string & name ) { m.form = Absent; m.name.clear(); }
+    void set_absent() { m.form = Absent; m.name.clear(); }
     void set_literal( const std::string & name ) { m.form = Literal; m.name = name; }
     void set_regex( const std::string & name ) { m.form = Regex; m.name = name; }
 
@@ -80,7 +81,45 @@ public:
     const std::string & name() const { return m.name; }
 };
 
-typedef std::string ConvertibleString; // DEBUG TODO
+class ValueConstraint
+{
+private:
+    struct Members {
+        bool is_set;
+        std::string value;
+
+        Members() : is_set( false ) {}
+    } m;
+
+public:
+    ValueConstraint & operator = ( const std::string & r_constraint )
+    {
+        m.is_set = true;
+        m.value = r_constraint;
+        return *this;
+    }
+    bool is_set() const { return m.is_set; }
+    bool operator == ( const std::string & r_rhs ) const { return m.value == r_rhs; }
+    bool operator == ( const char * p_rhs ) const { return m.value == p_rhs; }
+    bool operator != ( const std::string & r_rhs ) const { return m.value == r_rhs; }
+    bool operator != ( const char * p_rhs ) const { return m.value == p_rhs; }
+    const std::string & to_string() const { return m.value; }
+    bool to_bool() const { return m.value == "true"; }
+    int to_int() const { return atoi( m.value.c_str() ); }
+    double to_float() const { return atof( m.value.c_str() ); }
+    void clear() { m.is_set = false; m.value.clear(); }
+};
+
+struct Rule;
+
+struct TargetRule
+{
+    std::string rulesetid_alias;
+    std::string local_name;
+    Rule * p_rule;      // Filled in when 'compiled'
+
+    TargetRule() : p_rule( 0 ) {}
+};
 
 struct Rule : private detail::NonCopyable
 {
@@ -92,7 +131,8 @@ struct Rule : private detail::NonCopyable
             URI_TYPE, URI_RANGE, IP4, IP6, FQDN, IDN,
             DATETIME, DATE, TIME,
             EMAIL, PHONE, BASE64, ANY,
-            VALUE_CHOICE, OBJECT, ARRAY, GROUP };
+            VALUE_CHOICE, OBJECT, ARRAY, GROUP,
+            TARGET_RULE };
 
     Rule * p_parent;
     std::string rule_name;
@@ -100,14 +140,12 @@ struct Rule : private detail::NonCopyable
     Annotations annotations;
     MemberName member_name;
     Type type;
-    bool has_min_value;
-    ConvertibleString min_value;
-    bool has_max_value;
-    ConvertibleString max_value;
+    ValueConstraint min;
+    ValueConstraint max;
     typedef clutils::ptr_vector< Rule > children_container_t;
     children_container_t children;
 
-    Rule() : p_parent( 0 ), type( NONE ), has_min_value( false ), has_max_value( false ) {}
+    Rule() : p_parent( 0 ), type( NONE ) {}
 };
 
 struct Grammar : private detail::NonCopyable
@@ -119,6 +157,24 @@ struct Grammar : private detail::NonCopyable
     std::vector< std::string > unaliased_imports;
     std::map< std::string, std::string > aliased_imports;   // Alias -> Ruleset_id
     rule_container_t rules;
+
+    void add_unaliased_import( const std::string & r_import )
+    {
+        unaliased_imports.push_back( r_import );
+    }
+    void add_aliased_import( const std::string & r_alias, const std::string & r_import )
+    {
+        aliased_imports[r_alias] = r_import;
+    }
+    bool has_import_alias( const std::string & r_alias )
+    {
+        return aliased_imports.find( r_alias ) != aliased_imports.end();
+    }
+    void append_rule( Rule::uniq_ptr pu_rule )
+    {
+        rules.push_back( pu_rule.get() );
+        pu_rule.release();
+    }
 };
 
 struct GrammarSet : private detail::NonCopyable

@@ -1,4 +1,4 @@
-Tests run on Thu Jan 28 10:03:54 2016
+Tests run on Fri Jan 29 11:44:10 2016
 
     GrammarSet TODOS [test-grammar-set.cpp:40]
     ==========================================
@@ -196,6 +196,120 @@ jcr-version
     ok: status != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
+    GrammarParser - Syntax parsing - Primitive rules [test-parsing-only.cpp:193]
+    ============================================================================
+      Calling: test_parsing_only( "my_rule : null\n" ) (196)
+      my_rule : null
+
+    ok: status == JCRParser::S_OK
+      : ParserHarness ph( "my_rule : null\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "my_rule"
+    ok: ph.grammar().rules[0].type == Rule::TNULL
+    ok: ph.grammar().rules[0].repetition.min == 1
+    ok: ph.grammar().rules[0].repetition.max == 1
+      : ParserHarness ph( "another_rule : boolean\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "another_rule"
+    ok: ph.grammar().rules[0].type == Rule::BOOLEAN
+    ok: ph.grammar().rules[0].min.is_set() == false
+    ok: ph.grammar().rules[0].max.is_set() == false
+      : ParserHarness ph( "another_rule : true\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "another_rule"
+    ok: ph.grammar().rules[0].type == Rule::BOOLEAN
+    ok: ph.grammar().rules[0].min.is_set() == true
+    ok: ph.grammar().rules[0].min == "true"
+    ok: ph.grammar().rules[0].min.to_bool() == true
+    ok: ph.grammar().rules[0].max.is_set() == true
+    ok: ph.grammar().rules[0].max == "true"
+    ok: ph.grammar().rules[0].max.to_bool() == true
+      : ParserHarness ph( "another_rule : boolean\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "another_rule"
+    ok: ph.grammar().rules[0].type == Rule::BOOLEAN
+    ok: ph.grammar().rules[0].min.is_set() == false
+    ok: ph.grammar().rules[0].max.is_set() == false
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    ValueConstraint [test-low-level-objects.cpp:40]
+    ===============================================
+    ok: vc.is_set() == false
+      : vc = "true"
+    ok: vc.is_set() == true
+    ok: vc == "true"
+    ok: vc == std::string( "true" )
+    ok: vc.to_string() == "true"
+    ok: vc.to_bool() == true
+    ok: vc.to_int() == 0
+    ok: vc.to_float() == 0
+      : vc = "false"
+    ok: vc.is_set() == true
+    ok: vc == "false"
+    ok: vc.to_bool() == false
+    ok: vc.to_int() == 0
+    ok: vc.to_float() == 0
+      : vc = "foo"
+    ok: vc.is_set() == true
+    ok: vc == "foo"
+    ok: vc.to_bool() == false
+    ok: vc.to_int() == 0
+    ok: vc.to_float() == 0
+      : vc = "10"
+    ok: vc.is_set() == true
+    ok: vc == "10"
+    ok: vc.to_bool() == false
+    ok: vc.to_int() == 10
+    ok: vc.to_float() == 10.0
+      : vc = "10.5"
+    ok: vc.is_set() == true
+    ok: vc == "10.5"
+    ok: vc.to_bool() == false
+    ok: vc.to_int() == 10
+    ok: vc.to_float() == 10.5
+      : vc = "2.5e+3"
+    ok: vc.is_set() == true
+    ok: vc == "2.5e+3"
+    ok: vc.to_bool() == false
+    ok: vc.to_int() == 2
+    ok: vc.to_float() == 2500.0
+      : vc.clear()
+    ok: vc.is_set() == false
+    ok: vc == ""
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    MemberName [test-low-level-objects.cpp:95]
+    ==========================================
+    ok: mn.is_absent() == true
+    ok: mn.is_literal() == false
+    ok: mn.is_regex() == false
+    ok: mn.name() == ""
+      : mn.set_literal( "foo" )
+    ok: mn.is_absent() == false
+    ok: mn.is_literal() == true
+    ok: mn.is_regex() == false
+    ok: mn.name() == "foo"
+      : mn.set_regex( "/name*/i" )
+    ok: mn.is_absent() == false
+    ok: mn.is_literal() == false
+    ok: mn.is_regex() == true
+    ok: mn.name() == "/name*/i"
+      : mn.set_absent()
+    ok: mn.is_absent() == true
+    ok: mn.is_literal() == false
+    ok: mn.is_regex() == false
+    ok: mn.name() == ""
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    TargetRule [test-low-level-objects.cpp:123]
+    ===========================================
+    ok: ! tr.p_rule
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
 
@@ -207,6 +321,6 @@ TODOs (7):
 - Make RefRule set method split input into module and local parts [test-main.cpp:41]
 - Enhance GrammarParser::q_string() and QStringParsert to full spec [test-main.cpp:43]
 - Add test-rules-parser.cpp back into project for testing [test-main.cpp:45]
-- Correctly populate and place annotations into Grammar [test-parsing-only.cpp:193]
+- Correctly populate and place annotations into Grammar [test-parsing-only.cpp:243]
 
-0 error(s), 7 todo(s), 48 test(s)
+0 error(s), 7 todo(s), 133 test(s)
