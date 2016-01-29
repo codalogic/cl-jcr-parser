@@ -88,13 +88,17 @@ TFEATURE( "GrammarParser - Syntax parsing - JCR directive" )
 {
     TCALL( test_parsing_only(
                         "#jcr-version 0.5" ) );
+    TCALL( test_parsing_only(
+                        "#jcr-version 0.5 " ) );
+    TCALL( test_parsing_only(
+                        "#jcr-version 0.5 \t" ) );
     TCALL( test_parsing_only_bad_input(
                         "#\n"
                         "jcr-version\n"
                         " 0.5" ) );
-    TCALL( test_parsing_only(
+    TCALL( test_parsing_only_bad_input(
                         "#jcr-version 0.12" ) );
-    TCALL( test_parsing_only(
+    TCALL( test_parsing_only_bad_input(
                         "#jcr-version 10.5" ) );
     TCALL( test_parsing_only_bad_input(
                         "#jcr-version 0.5 too long" ) );
@@ -124,6 +128,8 @@ TFEATURE( "GrammarParser - Syntax parsing - ruleset-id directive" )
 {
     TCALL( test_parsing_only(
                         "#ruleset-id http://www.example.com/jcr\n" ) );
+    TCALL( test_parsing_only(
+                        "#ruleset-id http://www.example.com/jcr \n" ) );
     TCALL( test_parsing_only_bad_input(
                         "#ruleset-id \n" ) );
     TCALL( test_parsing_only_bad_input(
@@ -138,18 +144,27 @@ TFEATURE( "GrammarParser - Syntax parsing - ruleset-id directive" )
                         "; A comment\n"
                         "; Another comment\n"
                         "#jcr-version 0.5\n" ) );
+    {
+        TSETUP( ParserHarness ph( "#ruleset-id http://www.example.com/jcr" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().ruleset_id == "http://www.example.com/jcr" );
+    }
 }
 
 TFEATURE( "GrammarParser - Syntax parsing - import directive" )
 {
     TCALL( test_parsing_only(
                         "#import http://www.example.com/jcr\n" ) );
+    TCALL( test_parsing_only(
+                        "#import http://www.example.com/jcr \n" ) );
     TCALL( test_parsing_only_bad_input(
                         "#import http://www.example.com/jcr as\n" ) );
     TCALL( test_parsing_only_bad_input(
                         "#import http://www.example.com/jcr as \n" ) );
     TCALL( test_parsing_only(
                         "#import http://www.example.com/jcr as my_1st-alias\n" ) );
+    TCALL( test_parsing_only(
+                        "#import http://www.example.com/jcr as my_1st-alias \n" ) );
     TCALL( test_parsing_only(
                         " ; Hello\n"
                         "#import http://www.example.com/jcr as  my_1st-alias\n" ) );
@@ -174,6 +189,17 @@ TFEATURE( "GrammarParser - Syntax parsing - import directive" )
                         "  ; A comment\n"
                         "#import http://www.example.com/jcr2 as  my_2nd-alias\n"
                         "\n" ) );
+    {
+        TSETUP( ParserHarness ph( "#import http://www.example.com/jcr" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().unaliased_imports[0] == "http://www.example.com/jcr" );
+    }
+    {
+        TSETUP( ParserHarness ph( "#import http://www.example.com/jcr as jcr" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().has_aliased_import( "jcr" ) );
+        TCRITICALTEST( ph.grammar().get_aliased_import( "jcr" ).value() == "http://www.example.com/jcr" );
+    }
 }
 
 TFEATURE( "GrammarParser - Syntax parsing - TBD directive" )
@@ -188,6 +214,85 @@ TFEATURE( "GrammarParser - Syntax parsing - TBD directive" )
                         "; Hello\n"
                         "#TBD\n"
                         "#jcr-version 0.5\n" ) );
+}
+
+TFEATURE( "GrammarParser - Syntax parsing - target_rule_name" )
+{
+    {
+        TSETUP( ParserHarness ph( "my_rule other_rule\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "my_rule" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::TARGET_RULE );
+        TCRITICALTEST( ph.grammar().rules[0].target_rule.local_name == "other_rule" );
+    }
+    {
+        TSETUP( ParserHarness ph( "#import http://foo.bar as foo\n my_rule foo.other_rule\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "my_rule" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::TARGET_RULE );
+        TCRITICALTEST( ph.grammar().rules[0].target_rule.rulesetid == "http://foo.bar" );
+        TCRITICALTEST( ph.grammar().rules[0].target_rule.local_name == "other_rule" );
+    }
+}
+
+TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
+{
+    TCALL( test_parsing_only(
+                        "my_rule : null\n" ) );
+    {
+        TSETUP( ParserHarness ph( "my_rule : flubber\n" ) );
+        TCRITICALTEST( ph.status() != JCRParser::S_OK );
+    }
+    {
+        TSETUP( ParserHarness ph( "my_rule : null\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "my_rule" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::TNULL );
+
+        TTEST( ph.grammar().rules[0].repetition.min == 1 );
+        TTEST( ph.grammar().rules[0].repetition.max == 1 );
+    }
+    {
+        TSETUP( ParserHarness ph( "another_rule : boolean\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "another_rule" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::BOOLEAN );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
+        TSETUP( ParserHarness ph( "another_rule : true\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "another_rule" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::BOOLEAN );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min == "true" );
+        TTEST( ph.grammar().rules[0].min.to_bool() == true );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max == "true" );
+        TTEST( ph.grammar().rules[0].max.to_bool() == true );
+    }
+    {
+        TSETUP( ParserHarness ph( "another_rule : false\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "another_rule" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::BOOLEAN );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min == "false" );
+        TTEST( ph.grammar().rules[0].min.to_bool() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max == "false" );
+        TTEST( ph.grammar().rules[0].max.to_bool() == false );
+    }
 }
 
 TFEATURETODO( "Correctly populate and place annotations into Grammar" )

@@ -29,6 +29,15 @@ namespace cljcr {
 namespace { // Anonymous namespace for detail
 
 //----------------------------------------------------------------------------
+//                           Standalone utility functions
+//----------------------------------------------------------------------------
+
+bool is_supported_jcr_version( const std::string & major, const std::string & minor )
+{
+    return major == "0" && minor == "5";
+}
+
+//----------------------------------------------------------------------------
 //                           class QStringParser
 //----------------------------------------------------------------------------
 
@@ -130,6 +139,27 @@ private:
         {}
     } m;
 
+    class RuleStackLogger
+    {
+    // Use this class to keep track of which Rule we're logging to in a stack-like manner
+    private:
+        GrammarParser * p_grammar_parser;
+        Rule * p_prev_rule;
+    public:
+        RuleStackLogger( GrammarParser * p_grammar_parser_in, Rule::uniq_ptr & pu_rule )
+            : p_grammar_parser( p_grammar_parser_in )
+        {
+            p_prev_rule = p_grammar_parser->m.p_rule;
+            if( p_prev_rule )
+                pu_rule->p_parent = p_prev_rule;
+            p_grammar_parser->m.p_rule = pu_rule.get();
+        }
+        ~RuleStackLogger()
+        {
+            p_grammar_parser->m.p_rule = p_prev_rule;
+        }
+    };
+
 public:
     GrammarParser( JCRParser * p_parent, cl::reader & r_reader, Grammar * p_grammar );
     bool parse();
@@ -178,8 +208,8 @@ private:
     bool type_choice_rule();
     bool type_choice();
     bool type_choice_items();
-    bool annotations( Annotations & anno );
-    bool annotation_set( Annotations & anno );
+    bool annotations();
+    bool annotation_set();
     bool reject_annotation();
     bool unordered_annotation();
     bool root_annotation();
@@ -258,6 +288,14 @@ private:
     bool e();
     bool zero();
     bool q_string();
+    bool qs_char();
+    STAR( qs_char )
+    bool quotation_mark();
+    bool unescaped();
+    bool escape();
+    bool escaped_code();
+    bool u();
+    bool four_HEXDIG();
     bool regex();
     bool not_slash();
     bool regex_modifiers();
@@ -438,12 +476,14 @@ bool GrammarParser::comment_end_char()
 
 bool GrammarParser::directive()
 {
-    // directive() = "#" && [ spaces() ] && directive_def() && eol()
+    // Old: directive() = "#" && [ spaces() ] && directive_def() && eol()
+    // Fixed: directive() = "#" && *WSP() && directive_def() && *WSP() && eol()
 
     if( is_get_char( '#' ) )
     {
-        return optional( WSPs() ) &&
+        return star_WSP() &&
                 (directive_def() || error( "Invalid #directive format" ) ) &&
+                star_WSP() &&
                 (eol() || error( "Unexpected additional material in directive" ) || recover_to_eol() );
     }
     return false;
@@ -476,9 +516,11 @@ bool GrammarParser::jcr_version_d()
                 minor_version_accumulator.select() && minor_version()
                 || error( "Bad #jcr-version directive format" ) || recover_to_eol() )
         {
-            // TODO...
-            std::string major_version_number = major_version_accumulator.get();
-            std::string minor_version_number = minor_version_accumulator.get();
+            std::string major_number = major_version_accumulator.get();
+            std::string minor_number = minor_version_accumulator.get();
+
+            if( ! is_supported_jcr_version( major_number, minor_number ) )
+                error( (std::string( "Unsupported JCR version: " ) + major_number + "." + minor_number).c_str() );
         }
 
         return true;
@@ -512,8 +554,7 @@ bool GrammarParser::ruleset_id_d()
         if( (WSPs() && ruleset_id())
             || error( "Unable to read ruleset-id value" ) || recover_to_eol() )
         {
-            // TODO...
-            std::string ruleset_id_value = ruleset_id_accumulator.get();
+            m.p_grammar->ruleset_id = ruleset_id_accumulator.get();
         }
 
         return true;
@@ -540,9 +581,12 @@ bool GrammarParser::import_d()
                 (WSPs() || error( "Expected space after 'as' keyword" ) ) &&
                 (ruleset_id_alias_accumulator.select() && ruleset_id_alias() || error( "Unable to read alias for imported ruleset-id" ) ) ) )
         {
-            // TODO...
-            std::string ruleset_id_value = ruleset_id_accumulator.get();
-            std::string ruleset_id_alias_value = ruleset_id_alias_accumulator.get();
+            std::string ruleset_id = ruleset_id_accumulator.get();
+            std::string ruleset_id_alias = ruleset_id_alias_accumulator.get();
+            if( ruleset_id_alias.empty() )
+                m.p_grammar->add_unaliased_import( ruleset_id );
+            else
+                m.p_grammar->add_aliased_import( ruleset_id_alias, ruleset_id );
         }
 
         return true;
@@ -633,16 +677,23 @@ bool GrammarParser::rule()
 {
     // rule() = rule_name() && *sp_cmt() && rule_def()
 
-    cl::locator loc( this );
-
     cl::accumulator name_accumulator( this );
 
-    if( ! rule_name() )
-        return location_top( false );
+    if( rule_name() )
+    {
+        Rule::uniq_ptr pu_rule( new Rule );
+        RuleStackLogger rule_stack_logger( this, pu_rule );
 
-    star_sp_cmt() && rule_def() || fatal( "Unable to read rule definition" );
+        m.p_rule->rule_name = name_accumulator.get();
 
-    return true;    // We've 'accepted' this path, even if we end up deciding there's a fatal error
+        star_sp_cmt() && rule_def() || fatal( "Unable to read rule definition" );
+
+        m.p_grammar->append_rule( pu_rule );
+
+        return true;    // We've 'accepted' this path, even if we end up deciding there's a fatal error
+    }
+
+    return false;
 }
 
 bool GrammarParser::rule_name()
@@ -660,8 +711,6 @@ bool GrammarParser::target_rule_name()
     // so a little juggling of values is required to get parsed values
     // in the right place
 
-    std::string id_alias, rule;
-
     cl::accumulator first_accumulator( this );
     cl::accumulator_deferred second_accumulator( this );
 
@@ -672,18 +721,23 @@ bool GrammarParser::target_rule_name()
             second_accumulator.select();
             if( rule_name() )
             {
-                id_alias = first_accumulator.get();
-                rule = second_accumulator.get();
-                return true;
+                AliasLookupResult alias_lookup_result( m.p_grammar->get_aliased_import( first_accumulator.get() ) );
+                if( ! alias_lookup_result.is_found() )
+                    return fatal( (std::string( "Unknown alias in target rule: " ) + first_accumulator.get() ).c_str() );
+
+                m.p_rule->type = Rule::TARGET_RULE;
+                m.p_rule->target_rule.rulesetid = alias_lookup_result;
+                m.p_rule->target_rule.local_name = second_accumulator.get();
             }
             else
                 return error( "Expected 'rule_name' after 'ruleset_id_alias'" );
         }
         else
         {
-            rule = first_accumulator.get();
-            return true;
+            m.p_rule->type = Rule::TARGET_RULE;
+            m.p_rule->target_rule.local_name = first_accumulator.get();
         }
+        return true;
     }
 
     return false;
@@ -771,13 +825,13 @@ bool GrammarParser::type_choice_items()
     return false;
 }
 
-bool GrammarParser::annotations( Annotations & anno )
+bool GrammarParser::annotations()
 {
     // annotations() = *( "@(" && *sp_cmt() && annotation_set() && *sp_cmt() && ")" && *sp_cmt() )
 
     while( fixed( "@(" ) )
     {
-        star_sp_cmt() && annotation_set( anno ) && star_sp_cmt() &&
+        star_sp_cmt() && annotation_set() && star_sp_cmt() &&
             (fixed( ")" ) || fatal( "Expected ')' at end of annotation" )) &&
             star_sp_cmt();
     }
@@ -785,15 +839,15 @@ bool GrammarParser::annotations( Annotations & anno )
     return true;    // Annotations are optional, so we always return 'true' unless we've errored
 }
 
-bool GrammarParser::annotation_set( Annotations & anno )
+bool GrammarParser::annotation_set()
 {
     // annotation_set() = reject_annotation() || unordered_annotation() || root_annotation() || tbd_annotation()
 
     cl::locator loc( this );    // Current annotations don't benefit from optional_rewind(), but maintain the pattern for consistency and possible future proofing
 
-    return optional_rewind( reject_annotation() && set( anno.reject, true ) ) ||
-            optional_rewind( unordered_annotation() && set( anno.is_unordered, true ) ) ||
-            optional_rewind( root_annotation() && set( anno.is_root, true ) ) ||
+    return optional_rewind( reject_annotation() && set( m.p_rule->annotations.reject, true ) ) ||
+            optional_rewind( unordered_annotation() && set( m.p_rule->annotations.is_unordered, true ) ) ||
+            optional_rewind( root_annotation() && set( m.p_rule->annotations.is_root, true ) ) ||
             optional_rewind( tbd_annotation() ) ||
             fatal( "Unrecognised annotation format" );     // Getting to fatal() will throw an exception
 }
@@ -850,54 +904,112 @@ bool GrammarParser::primitive_rule()
 {
     // primitive_rule() = annotations() ":" && *sp_cmt() && primimitive_def()
 
+    annotations();
+    
+    if( is_get_char( ':' ) )
+    {
+        cl::locator loc( this );    // Taking rollback position after parsing annotations avoid repeated parsing of annotations!
+
+        return sp_cmt() && primimitive_def() || location_top( false );
+    }
+    
     return false;
 }
 
 bool GrammarParser::primimitive_def()
 {
-    // primimitive_def() = null_type() || boolean_type() || true_value() || false_value() || string_type() || string_range() || string_value() || float_type() || float_range() || float_value() || integer_type() || integer_range() || integer_value() || ip4_type() || ip6_type() || fqdn_type() || idn_type() || uri_range() || uri_type() || phone_type() || email_type() || full_date_type() || full_time_type() || date_time_type() || base64_type() || any()
+    // primimitive_def() = null_type() || boolean_type() || true_value() || false_value() ||
+    //                     string_type() || string_range() || string_value() || float_type() ||
+    //                     float_range() || float_value() || integer_type() || integer_range() ||
+    //                     integer_value() || ip4_type() || ip6_type() || fqdn_type() || idn_type() ||
+    //                     uri_range() || uri_type() || phone_type() || email_type() ||
+    //                     full_date_type() || full_time_type() || date_time_type() ||
+    //                     base64_type() || any()
 
-    return false;
+    cl::locator loc( this );
+
+    return optional_rewind( null_type() ) ||
+            optional_rewind( boolean_type() ) ||
+            optional_rewind( true_value() ) ||
+            optional_rewind( false_value() ) ||
+            optional_rewind( string_type() ) ||
+            optional_rewind( string_range() ) ||
+            optional_rewind( string_value() ) ||
+            optional_rewind( float_type() ) ||
+            optional_rewind( float_range() ) ||
+            optional_rewind( float_value() ) ||
+            optional_rewind( integer_type() ) ||
+            optional_rewind( integer_range() ) ||
+            optional_rewind( integer_value() ) ||
+            optional_rewind( ip4_type() ) ||
+            optional_rewind( ip6_type() ) ||
+            optional_rewind( fqdn_type() ) ||
+            optional_rewind( idn_type() ) ||
+            optional_rewind( uri_range() ) ||
+            optional_rewind( uri_type() ) ||
+            optional_rewind( phone_type() ) ||
+            optional_rewind( email_type() ) ||
+            optional_rewind( full_date_type() ) ||
+            optional_rewind( full_time_type() ) ||
+            optional_rewind( date_time_type() ) ||
+            optional_rewind( base64_type() ) ||
+            optional_rewind( any() );
 }
 
 bool GrammarParser::null_type()
 {
     // null_type() = null_kw()
 
-    return false;
+    return null_kw() && set( m.p_rule->type, Rule::TNULL );
 }
 
 bool GrammarParser::boolean_type()
 {
     // boolean_type() = boolean_kw()
 
-    return false;
+    return boolean_kw() && set( m.p_rule->type, Rule::BOOLEAN );
 }
 
 bool GrammarParser::true_value()
 {
     // true_value() = true_kw()
 
-    return false;
+    return true_kw() &&
+            set( m.p_rule->type, Rule::BOOLEAN ) &&
+            set( m.p_rule->min, "true" ) &&
+            set( m.p_rule->max, "true" );
 }
 
 bool GrammarParser::false_value()
 {
     // false_value() = false_kw()
 
-    return false;
+    return false_kw() &&
+            set( m.p_rule->type, Rule::BOOLEAN ) &&
+            set( m.p_rule->min, "false" ) &&
+            set( m.p_rule->max, "false" );
 }
 
 bool GrammarParser::string_type()
 {
     // string_type() = string_kw()
 
-    return false;
+    return string_kw() && set( m.p_rule->type, Rule::STRING_TYPE );
 }
 
 bool GrammarParser::string_value()
 {
     // string_value() = q_string()
+
+    cl::accumulator q_string_accumulator( this );
+
+    if( q_string() )
+    {
+        m.p_rule->type = Rule::STRING_LITERAL;
+        m.p_rule->min = m.p_rule->max = q_string_accumulator.get();
+
+        return true;
+    }
 
     return false;
 }
@@ -905,6 +1017,16 @@ bool GrammarParser::string_value()
 bool GrammarParser::string_range()
 {
     // string_range() = regex()
+
+    cl::accumulator regex_accumulator( this );
+
+    if( regex() )
+    {
+        m.p_rule->type = Rule::STRING_REGEX;
+        m.p_rule->min = m.p_rule->max = regex_accumulator.get();
+
+        return true;
+    }
 
     return false;
 }
@@ -1074,8 +1196,7 @@ bool GrammarParser::object_rule()
 {
     // object_rule() = annotations() [ ":" && *sp_cmt() ] "{" && *sp_cmt() [ object_items() && *sp_cmt() ] "}"
 
-    Annotations annos;
-    annotations( annos );
+    annotations();
 
     return false;
 }
@@ -1348,29 +1469,121 @@ bool GrammarParser::zero()
 
 bool GrammarParser::q_string()
 {
-    // q_string() = quotation_mark() && *char() && quotation_mark()
+    // q_string() = quotation_mark() && *qs_char() && quotation_mark()
+
+    if( quotation_mark() )
+    {
+        star_qs_char() && quotation_mark() || fatal( "Badly formed QString" );
+
+        return true;
+    }
 
     return false;
 }
+
+bool GrammarParser::quotation_mark()
+{
+    // quotation-mark   = %x22      ; "
+
+    return accumulate( cl::alphabet_char( '"' ) );
+}
+
+bool GrammarParser::qs_char()
+{
+    // qs_char     = unescaped /
+    //               escape (
+    //               %x22 /          ; "    quotation mark  U+0022
+    //               %x5C /          ; \    reverse solidus U+005C
+    //               %x2F /          ; /    solidus         U+002F
+    //               %x62 /          ; b    backspace       U+0008
+    //               %x66 /          ; f    form feed       U+000C
+    //               %x6E /          ; n    line feed       U+000A
+    //               %x72 /          ; r    carriage return U+000D
+    //               %x74 /          ; t    tab             U+0009
+    //               %x75 4HEXDIG )  ; uXXXX                U+XXXX
+
+    return unescaped() || escape() && (escaped_code() || u() && four_HEXDIG());
+}
+
+bool is_qstring_unescaped( char c )
+{
+    // unescaped        = %x20-21 / %x23-5B / %x5D-10FFFF
+
+    return c >= 0x20 && c <= 0x21 || c >= 0x23 && c <= 0x5b || c >= 0x5d;
+}
+
+bool GrammarParser::unescaped()
+{
+    // unescaped        = %x20-21 / %x23-5B / %x5D-10FFFF
+
+    return accumulate( cl::alphabet_function( is_qstring_unescaped ) );
+}
+
+bool GrammarParser::escape()
+{
+    // escape           = %x5C              ; \
+
+    return accumulate( cl::alphabet_char( '\\' ) );
+}
+
+cl::alphabet_char_class escaped_code_alphabet( "\"\\/bfnrt" );
+
+bool GrammarParser::escaped_code()
+{
+    return accumulate( escaped_code_alphabet );
+}
+
+bool GrammarParser::u()
+{
+    return accumulate( cl::alphabet_char( 'u' ) );
+}
+
+bool GrammarParser::four_HEXDIG()
+{
+    for( size_t i=0; i<4; ++i )
+        if( ! HEXDIG() )
+            return false;
+    return true;
+}
+
 bool GrammarParser::regex()
 {
     // regex() = "/" && *( escape() "/" || not_slash() ) "/" [ regex_modifiers() ]
 
+    if( accumulate( '/' ) )
+    {
+        while( (escape() && accumulate( '/' )) || not_slash() )
+        {}
+        accumulate( '/' ) && optional( regex_modifiers() ) || fatal( "Error reading regular expression" );
+
+        return true;
+    }
+
     return false;
+}
+
+bool is_not_slash( char c )
+{
+    // not_slash() = HTAB() || CR() || LF() / %x20-2E / %x30-10FFFF
+
+    return c == '\t' || c == '\r' || c == '\n' ||
+            c >= 0x20 && c <= 0x2e || c >= 0x30;
 }
 
 bool GrammarParser::not_slash()
 {
     // not_slash() = HTAB() || CR() || LF() / %x20-2E / %x30-10FFFF
 
-    return false;
+    return accumulate( cl::alphabet_function( is_not_slash ) );
 }
+
+cl::alphabet_char_class regex_modifiers_alphabet( "isx" );
 
 bool GrammarParser::regex_modifiers()
 {
     // regex_modifiers() = *( "i" || "s" || "x" )
 
-    return false;
+    return accumulate( regex_modifiers_alphabet );
 }
 
 bool GrammarParser::uri_template()
