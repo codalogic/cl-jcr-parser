@@ -236,8 +236,8 @@ public:
 
     // set() allows setting of state information within a set of
     // shortcircuit operators
-    template< typename T >
-    static bool set( T & r_variable, const T & r_value )
+    template< typename T, typename U >
+    static bool set( T & r_variable, const U & r_value )
     {
         r_variable = r_value;
         return true;
@@ -346,6 +346,8 @@ public:
     bool select() { p_dsl_pa->p_accumulator = &my_accumulator; return true; }
     bool previous() { p_dsl_pa->p_accumulator = p_previous_accumulator; return true; }
     bool none() { p_dsl_pa->p_accumulator = 0; return true; }
+    bool clear() { my_accumulator.clear(); return true; }
+    bool select_and_clear() { select(); return clear(); }
     const std::string & get() const { return my_accumulator; }
     bool put_in( std::string & r_place_where ) const { r_place_where = get(); return true; }
 };
