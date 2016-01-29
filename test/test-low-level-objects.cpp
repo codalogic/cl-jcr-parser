@@ -126,3 +126,21 @@ TFEATURE( "TargetRule" )
 
     TTEST( ! tr.p_rule );
 }
+
+TFEATURE( "Rule" )
+{
+    Rule r;
+
+    TTEST( ! r.p_parent );
+    TTEST( r.type == Rule::NONE );
+
+    TSETUP( Rule::uniq_ptr pu_rule( new Rule ) );
+
+    TTEST( ! pu_rule->p_parent );
+    TTEST( pu_rule->type == Rule::NONE );
+
+    TSETUP( Rule * p_new_rule = pu_rule.get() );
+    TSETUP( Rule * p_appended_rule = r.append_child_rule( pu_rule ) );
+    TTEST( p_appended_rule == p_new_rule );
+    TTEST( p_appended_rule->p_parent == &r );
+}

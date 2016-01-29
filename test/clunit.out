@@ -1,4 +1,4 @@
-Tests run on Fri Jan 29 11:44:10 2016
+Tests run on Fri Jan 29 12:33:22 2016
 
     GrammarSet TODOS [test-grammar-set.cpp:40]
     ==========================================
@@ -311,6 +311,19 @@ jcr-version
     ===========================================
     ok: ! tr.p_rule
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    Rule [test-low-level-objects.cpp:130]
+    =====================================
+    ok: ! r.p_parent
+    ok: r.type == Rule::NONE
+      : Rule::uniq_ptr pu_rule( new Rule )
+    ok: ! pu_rule->p_parent
+    ok: pu_rule->type == Rule::NONE
+      : Rule * p_new_rule = pu_rule.get()
+      : Rule * p_appended_rule = r.append_child_rule( pu_rule )
+    ok: p_appended_rule == p_new_rule
+    ok: p_appended_rule->p_parent == &r
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
 
 TODOs (7):
@@ -323,4 +336,4 @@ TODOs (7):
 - Add test-rules-parser.cpp back into project for testing [test-main.cpp:45]
 - Correctly populate and place annotations into Grammar [test-parsing-only.cpp:243]
 
-0 error(s), 7 todo(s), 133 test(s)
+0 error(s), 7 todo(s), 140 test(s)

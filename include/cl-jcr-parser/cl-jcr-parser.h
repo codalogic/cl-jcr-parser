@@ -146,6 +146,13 @@ struct Rule : private detail::NonCopyable
     children_container_t children;
 
     Rule() : p_parent( 0 ), type( NONE ) {}
+
+    Rule * append_child_rule( uniq_ptr pu_child_rule )
+    {
+        pu_child_rule->p_parent = this;
+        children.push_back( pu_child_rule.get() );
+        return pu_child_rule.release();
+    }
 };
 
 struct Grammar : private detail::NonCopyable
