@@ -91,3 +91,31 @@ TFEATURE( "ValueConstraint" )
     TTEST( vc.is_set() == false );
     TTEST( vc == "" );
 }
+
+TFEATURE( "MemberName" )
+{
+    MemberName mn;
+
+    TTEST( mn.is_absent() == true );
+    TTEST( mn.is_literal() == false );
+    TTEST( mn.is_regex() == false );
+    TTEST( mn.name() == "" );
+
+    TSETUP( mn.set_literal( "foo" ) );
+    TTEST( mn.is_absent() == false );
+    TTEST( mn.is_literal() == true );
+    TTEST( mn.is_regex() == false );
+    TTEST( mn.name() == "foo" );
+
+    TSETUP( mn.set_regex( "/name*/i" ) );
+    TTEST( mn.is_absent() == false );
+    TTEST( mn.is_literal() == false );
+    TTEST( mn.is_regex() == true );
+    TTEST( mn.name() == "/name*/i" );
+
+    TSETUP( mn.set_absent() );
+    TTEST( mn.is_absent() == true );
+    TTEST( mn.is_literal() == false );
+    TTEST( mn.is_regex() == false );
+    TTEST( mn.name() == "" );
+}
