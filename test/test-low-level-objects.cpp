@@ -180,7 +180,7 @@ TFEATURE( "Grammar" )
 
     TTEST( r_g.has_aliased_import( "blah" ) == false );
     TTEST( r_g.get_aliased_import( "blah" ).is_found() == false );
-    
+
     TDOC( "Adding rules" );
     TTEST( g.rules.size() == 0 );
     TSETUP( Rule::uniq_ptr pu_r( new Rule ) );

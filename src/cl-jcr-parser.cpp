@@ -188,6 +188,7 @@ private:
     bool ruleset_id();
     bool not_space();
     STAR( not_space )
+    ONE_STAR( not_space )
     bool ruleset_id_alias();
     bool tbd_directive_d();
     bool directive_name();
@@ -328,6 +329,7 @@ private:
     bool uri_dotdot_kw();
     bool uri_kw();
     bool ALPHA();
+    ONE_STAR( ALPHA )
     bool CR();
     bool DIGIT();
     STAR( DIGIT )
@@ -905,14 +907,14 @@ bool GrammarParser::primitive_rule()
     // primitive_rule() = annotations() ":" && *sp_cmt() && primimitive_def()
 
     annotations();
-    
+
     if( is_get_char( ':' ) )
     {
         cl::locator loc( this );    // Taking rollback position after parsing annotations avoid repeated parsing of annotations!
 
         return sp_cmt() && primimitive_def() || location_top( false );
     }
-    
+
     return false;
 }
 
@@ -1035,161 +1037,200 @@ bool GrammarParser::float_type()
 {
     // float_type() = float_kw()
 
-    return false;
+    return float_kw() && set( m.p_rule->type, Rule::FLOAT );
 }
 
 bool GrammarParser::float_range()
 {
-    // float_range() = float_min() ".." [ float_max() ] || ".." && float_max()
+    // float_range() = float_min() && ".." && [ float_max() ] || ".." && float_max()
 
-    return false;
+    cl::accumulator float_min_accumulator( this );
+    cl::accumulator_deferred float_max_accumulator( this );
+
+    cl::locator loc( this );
+
+    return optional_rewind( float_min() && fixed( ".." ) &&
+                    set( m.p_rule->type, Rule::FLOAT ) &&
+                    set( m.p_rule->min, float_min_accumulator.get() ) &&
+                optional( float_max_accumulator.select() && float_max() &&
+                        set( m.p_rule->max, float_max_accumulator.get() ) ) ) ||
+            optional_rewind( fixed( ".." ) && float_max_accumulator.select() && float_max() &&
+                    set( m.p_rule->type, Rule::FLOAT ) &&
+                    set( m.p_rule->max, float_max_accumulator.get() ) );
 }
 
 bool GrammarParser::float_min()
 {
     // float_min() = float()
 
-    return false;
+    return float_num();
 }
 
 bool GrammarParser::float_max()
 {
     // float_max() = float()
 
-    return false;
+    return float_num();
 }
 
 bool GrammarParser::float_value()
 {
     // float_value() = float()
 
-    return false;
+    cl::accumulator float_accumulator( this );
+
+    return float_num() &&
+            set( m.p_rule->type, Rule::FLOAT ) &&
+            set( m.p_rule->min, float_accumulator.get() ) &&
+            set( m.p_rule->max, float_accumulator.get() );
 }
 
 bool GrammarParser::integer_type()
 {
     // integer_type() = integer_kw()
 
-    return false;
+    return integer_kw() && set( m.p_rule->type, Rule::INTEGER );
 }
 
 bool GrammarParser::integer_range()
 {
-    // integer_range() = integer_min() ".." [ integer_max() ] || ".." && integer_max()
+    // integer_range() = integer_min() && ".." && [ integer_max() ] || ".." && integer_max()
 
-    return false;
+    cl::accumulator integer_min_accumulator( this );
+    cl::accumulator_deferred integer_max_accumulator( this );
+
+    cl::locator loc( this );
+
+    return optional_rewind( integer_min() && fixed( ".." ) &&
+                    set( m.p_rule->type, Rule::INTEGER ) &&
+                    set( m.p_rule->min, integer_min_accumulator.get() ) &&
+                optional( integer_max_accumulator.select() && integer_max() &&
+                        set( m.p_rule->max, integer_max_accumulator.get() ) ) ) ||
+            optional_rewind( fixed( ".." ) && integer_max_accumulator.select() && integer_max() &&
+                    set( m.p_rule->type, Rule::INTEGER ) &&
+                    set( m.p_rule->max, integer_max_accumulator.get() ) );
 }
 
 bool GrammarParser::integer_min()
 {
     // integer_min() = integer()
 
-    return false;
+    return integer();
 }
 
 bool GrammarParser::integer_max()
 {
     // integer_max() = integer()
 
-    return false;
+    return integer();
 }
 
 bool GrammarParser::integer_value()
 {
     // integer_value() = integer()
 
-    return false;
+    cl::accumulator integer_accumulator( this );
+
+    return integer() &&
+            set( m.p_rule->type, Rule::INTEGER ) &&
+            set( m.p_rule->min, integer_accumulator.get() ) &&
+            set( m.p_rule->max, integer_accumulator.get() );
 }
 
 bool GrammarParser::ip4_type()
 {
     // ip4_type() = ip4_kw()
 
-    return false;
+    return ip4_kw() && set( m.p_rule->type, Rule::IP4 );
 }
 
 bool GrammarParser::ip6_type()
 {
     // ip6_type() = ip6_kw()
 
-    return false;
+    return ip6_kw() && set( m.p_rule->type, Rule::IP6 );
 }
 
 bool GrammarParser::fqdn_type()
 {
     // fqdn_type() = fqdn_kw()
 
-    return false;
+    return fqdn_kw() && set( m.p_rule->type, Rule::FQDN );
 }
 
 bool GrammarParser::idn_type()
 {
     // idn_type() = idn_kw()
 
-    return false;
+    return idn_kw() && set( m.p_rule->type, Rule::IDN );
 }
 
 bool GrammarParser::uri_range()
 {
     // uri_range() = uri_dotdot_kw() && uri_template()
 
-    return false;
+    cl::accumulator uri_accumulator( this );
+
+    return uri_dotdot_kw() && uri_template() &&
+            set( m.p_rule->type, Rule::URI_RANGE ) &&
+            set( m.p_rule->min, uri_accumulator.get() ) &&
+            set( m.p_rule->max, uri_accumulator.get() );
 }
 
 bool GrammarParser::uri_type()
 {
     // uri_type() = uri_kw()
 
-    return false;
+    return uri_kw() && set( m.p_rule->type, Rule::URI_TYPE );
 }
 
 bool GrammarParser::phone_type()
 {
     // phone_type() = phone_kw()
 
-    return false;
+    return phone_kw() && set( m.p_rule->type, Rule::PHONE );
 }
 
 bool GrammarParser::email_type()
 {
     // email_type() = email_kw()
 
-    return false;
+    return email_kw() && set( m.p_rule->type, Rule::EMAIL );
 }
 
 bool GrammarParser::full_date_type()
 {
     // full_date_type() = full_date_kw()
 
-    return false;
+    return full_date_kw() && set( m.p_rule->type, Rule::DATE );
 }
 
 bool GrammarParser::full_time_type()
 {
     // full_time_type() = full_time_kw()
 
-    return false;
+    return full_time_kw() && set( m.p_rule->type, Rule::TIME );
 }
 
 bool GrammarParser::date_time_type()
 {
     // date_time_type() = date_time_kw()
 
-    return false;
+    return date_time_kw() && set( m.p_rule->type, Rule::DATETIME );
 }
 
 bool GrammarParser::base64_type()
 {
     // base64_type() = base64_kw()
 
-    return false;
+    return base64_kw() && set( m.p_rule->type, Rule::BASE64 );
 }
 
 bool GrammarParser::any()
 {
     // any() = any_kw()
 
-    return false;
+    return any_kw() && set( m.p_rule->type, Rule::ANY );
 }
 
 bool GrammarParser::object_rule()
@@ -1308,7 +1349,7 @@ bool GrammarParser::sequence_combiner()
 
 bool GrammarParser::choice_combiner()
 {
-    // choice_combiner() = *sp_cmt() "|" && *sp_cmt()
+    // choice_combiner() = *sp_cmt() && "|" && *sp_cmt()
 
     return false;
 }
@@ -1324,21 +1365,21 @@ bool GrammarParser::optional_marker()
 {
     // optional_marker() = "?"
 
-    return false;
+    return is_get_char( '?' ) && set( m.p_rule->repetition.min, 0 ) && set( m.p_rule->repetition.max, 1 );
 }
 
 bool GrammarParser::one_or_more()
 {
     // one_or_more() = "+"
 
-    return false;
+    return is_get_char( '+' ) && set( m.p_rule->repetition.min, 1 ) && set( m.p_rule->repetition.max, -1 );
 }
 
 bool GrammarParser::zero_or_more()
 {
     // zero_or_more() = "*"
 
-    return false;
+    return is_get_char( '*' ) && set( m.p_rule->repetition.min, 0 ) && set( m.p_rule->repetition.max, -1 );
 }
 
 bool GrammarParser::min_max_repetition()
@@ -1366,28 +1407,28 @@ bool GrammarParser::min_repeat()
 {
     // min_repeat() = p_integer()
 
-    return false;
+    return p_integer();
 }
 
 bool GrammarParser::max_repeat()
 {
     // max_repeat() = p_integer()
 
-    return false;
+    return p_integer();
 }
 
 bool GrammarParser::specific_repetition()
 {
     // specific_repetition() = p_integer()
 
-    return false;
+    return p_integer();
 }
 
 bool GrammarParser::integer()
 {
     // integer() = ["-"] && 1*DIGIT()
 
-    return false;
+    return optional( minus() ) && one_star_DIGIT();
 }
 
 bool GrammarParser::p_integer()
@@ -1401,70 +1442,74 @@ bool GrammarParser::float_num()
 {
     // float() = [ minus() ] && int() && frac() [ exp() ]
 
-    return false;
+    cl::locator loc( this );
+
+    return optional( minus() ) && int_num() && frac() && optional( exp() ) || location_top( false );
 }
 
 bool GrammarParser::minus()
 {
     // minus() = %x2D                          ; -
 
-    return false;
+    return accumulate( '-' );
 }
 
 bool GrammarParser::plus()
 {
     // plus() = %x2B                          ; +
 
-    return false;
+    return accumulate( '+' );
 }
 
 bool GrammarParser::int_num()
 {
     // int() = zero() || ( digit1_9() && *DIGIT() )
 
-    return false;
+    return accumulate( '0' ) || ( digit1_9() && star_DIGIT() );
 }
+
+cl::alphabet_char_class digit1_9_alphabet( "[1-9]" );
 
 bool GrammarParser::digit1_9()
 {
     // digit1_9() = %x31-39                       ; 1-9
 
-    return false;
+    return accumulate( digit1_9_alphabet );
 }
 
 bool GrammarParser::frac()
 {
     // frac() = decimal_point() && 1*DIGIT()
 
-    return false;
+    return decimal_point() && one_star_DIGIT();
 }
 
 bool GrammarParser::decimal_point()
 {
     // decimal_point() = %x2E                          ; .
 
-    return false;
+    return accumulate( '.' );
 }
 
 bool GrammarParser::exp()
 {
     // exp() = e() [ minus() || plus() ] && 1*DIGIT()
 
-    return false;
+    return e() && optional( minus() || plus() ) && one_star_DIGIT();
 }
 
 bool GrammarParser::e()
 {
     // e() = %x65 / %x45                   ; e() && E
 
-    return false;
+    return accumulate( 'e' ) || accumulate( 'E' );
 }
 
 bool GrammarParser::zero()
 {
     // zero() = %x30                          ; 0
 
-    return false;
+    return accumulate( '0' );
 }
 
 bool GrammarParser::q_string()
@@ -1485,7 +1530,7 @@ bool GrammarParser::quotation_mark()
 {
     // quotation-mark   = %x22      ; "
 
-    return accumulate( cl::alphabet_char( '"' ) );
+    return is_get_char( '"' );
 }
 
 bool GrammarParser::qs_char()
@@ -1588,9 +1633,9 @@ bool GrammarParser::regex_modifiers()
 
 bool GrammarParser::uri_template()
 {
-    // uri_template() = 1*ALPHA() ":" && not_space()
+    // uri_template() = 1*ALPHA() && ":" && not_space()
 
-    return false;
+    return one_star_ALPHA() && accumulate( ':' ) && one_star_not_space();
 }
 
 bool GrammarParser::any_kw()

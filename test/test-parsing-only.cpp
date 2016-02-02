@@ -293,6 +293,305 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TTEST( ph.grammar().rules[0].max == "false" );
         TTEST( ph.grammar().rules[0].max.to_bool() == false );
     }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : string\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::STRING_TYPE );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : \"a string\"\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::STRING_LITERAL );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min == "a string" );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max == "a string" );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : /pref\\d+/i\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::STRING_REGEX );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min == "/pref\\d+/i" );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max == "/pref\\d+/i" );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : float\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::FLOAT );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : 1.0..\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::FLOAT );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.to_float() == 1.0 );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : -1.0..3.5e-2\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::FLOAT );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.to_float() == -1.0 );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.to_float() == 3.5e-2 );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : -1.0..-3.5e-2\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::FLOAT );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.to_float() == -1.0 );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.to_float() == -3.5e-2 );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : ..-3.5e-2\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::FLOAT );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.to_float() == -3.5e-2 );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : 4.0\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::FLOAT );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.to_float() == 4.0 );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.to_float() == 4.0 );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : -3.5e-2\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::FLOAT );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.to_float() == -3.5e-2 );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.to_float() == -3.5e-2 );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : integer\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::INTEGER );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : 100..\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::INTEGER );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.to_int() == 100 );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : -100..-50\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::INTEGER );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.to_int() == -100 );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.to_int() == -50 );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : ..50\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::INTEGER );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.to_int() == 50 );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : 64\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::INTEGER );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.to_int() == 64 );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.to_int() == 64 );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : ip4\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::IP4 );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : ip6\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::IP6 );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : idn\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::IDN );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : fqdn\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::FQDN );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : uri..http://example.com/foo#place\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::URI_RANGE );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].max == "http://example.com/foo#place" );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max == "http://example.com/foo#place" );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : uri..http://example.com/foo#place" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::URI_RANGE );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].max == "http://example.com/foo#place" );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max == "http://example.com/foo#place" );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : uri\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::URI_TYPE );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : phone\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::PHONE );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : email\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::EMAIL );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : full-date\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::DATE );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : full-time\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::TIME );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : date-time\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::DATETIME );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : base64\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::BASE64 );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
+        TSETUP( ParserHarness ph( "rule-2 : any\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::ANY );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
 }
 
 TFEATURETODO( "Correctly populate and place annotations into Grammar" )
