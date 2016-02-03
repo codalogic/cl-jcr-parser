@@ -42,6 +42,7 @@
 #define CL_DSL_PA_DSL_PA
 
 #include <string>
+#include <cstdlib>
 
 #include "dsl-pa-reader.h"
 #include "dsl-pa-alphabet.h"
@@ -197,7 +198,9 @@ public:
     bool accumulate( const alphabet & r_alphabet );
     bool accumulate( char c );
     size_t accumulate_all( const alphabet & r_alphabet );
-    friend class accumulator_deferred;   // Use an instance of the acculator class to store accumulated input
+    bool accumulator_append( char c );          // Append character c to the active accumulator
+    bool accumulator_append( const char * s );  // Append the string s to the active accumulator
+    friend class accumulator_deferred;      // Use an instance of the acculator class to store accumulated input
 
     // Low-level reader access
     reader & get_reader() { return r_reader; }  // Primarily for use with locator class
@@ -330,11 +333,12 @@ public:
 };
 
 class accumulator_deferred      // Control access to dsl_pa::p_accumulator so it has to be used in a RAII fashion
-{                               // Do: accumulator my_value_accumulator( this, my_value );
+{                               // Do: accumulator my_value_accumulator( this );
 private:
     dsl_pa * p_dsl_pa;
     std::string * p_previous_accumulator;
     std::string my_accumulator;
+
 public:
     accumulator_deferred( dsl_pa * p_dsl_pa_in )
         :
@@ -343,13 +347,18 @@ public:
     {
     }
     ~accumulator_deferred() { previous(); }
+
     bool select() { p_dsl_pa->p_accumulator = &my_accumulator; return true; }
     bool previous() { p_dsl_pa->p_accumulator = p_previous_accumulator; return true; }
     bool none() { p_dsl_pa->p_accumulator = 0; return true; }
     bool clear() { my_accumulator.clear(); return true; }
     bool select_and_clear() { select(); return clear(); }
+
     const std::string & get() const { return my_accumulator; }
     bool put_in( std::string & r_place_where ) const { r_place_where = get(); return true; }
+    int to_int() const { return atoi( my_accumulator.c_str() ); }
+    double to_float() const { return atof( my_accumulator.c_str() ); }
+    // bool to_bool() const = delete - Textual definitions of Boolean are very application specific so not supported here
 };
 
 class accumulator : public accumulator_deferred
