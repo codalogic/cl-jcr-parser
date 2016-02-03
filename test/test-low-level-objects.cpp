@@ -194,3 +194,5 @@ TFEATURE( "Grammar" )
     TTEST( ! p_r->p_parent );           // Using append_rule() sets p-parent pointer to null
     TTEST( g.rules.size() == 1 );
 }
+
+TFEATURETODO( "Test low level GrammarSet class" );

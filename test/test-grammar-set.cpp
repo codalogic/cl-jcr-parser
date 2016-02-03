@@ -39,7 +39,5 @@ using namespace cljcr;
 
 TFEATURE( "GrammarSet TODOS" )
 {
-    TTODO( "Test GrammarSet class" );
-
     TTODO( "Implement and test GrammarSet::link()" );
 }

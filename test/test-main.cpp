@@ -36,11 +36,5 @@
 
 TFEATURE( "Miscellaneous TODOs" )
 {
-    TTODO( "Implement ValueRuleAdapters" );
-
-    TTODO( "Make RefRule set method split input into module and local parts" );
-
-    TTODO( "Enhance GrammarParser::q_string() and QStringParsert to full spec" );
-
-    TTODO( "Add test-rules-parser.cpp back into project for testing" );
+    TTODO( "Enhance GrammarParser::q_string() and QStringParser to full spec" );
 }
