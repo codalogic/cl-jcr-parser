@@ -1,4 +1,4 @@
-Tests table of contents generated on Wed Feb 03 11:09:00 2016
+Tests table of contents generated on Wed Feb 03 11:38:37 2016
 
 # test-grammar-set.cpp
 | Description | Line |
@@ -29,3 +29,4 @@ Tests table of contents generated on Wed Feb 03 11:09:00 2016
 | GrammarParser - Syntax parsing - TBD directive | 205 |
 | GrammarParser - Syntax parsing - target_rule_name | 219 |
 | GrammarParser - Syntax parsing - Primitive rules | 240 |
+| GrammarParser - Syntax parsing - root rule | 595 |

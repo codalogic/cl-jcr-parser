@@ -1,4 +1,4 @@
-Tests run on Wed Feb 03 11:09:00 2016
+Tests run on Wed Feb 03 11:38:37 2016
 
     GrammarSet TODOS [test-grammar-set.cpp:40]
     ==========================================
@@ -372,10 +372,6 @@ jcr-version
 
     GrammarParser - Syntax parsing - Primitive rules [test-parsing-only.cpp:240]
     ============================================================================
-      Calling: test_parsing_only( "my_rule : null\n" ) (243)
-      my_rule : null
-
-    ok: status == JCRParser::S_OK
       : ParserHarness ph( "my_rule : flubber\n" )
     ok: ph.status() != JCRParser::S_OK
       : ParserHarness ph( "my_rule : null\n" )
@@ -633,6 +629,33 @@ jcr-version
     ok: ph.grammar().rules[0].max.is_set() == false
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
+    GrammarParser - Syntax parsing - root rule [test-parsing-only.cpp:595]
+    ======================================================================
+      : ParserHarness ph( " : integer" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == ""
+    ok: ph.grammar().rules[0].annotations.is_root == true
+    ok: ph.grammar().rules[0].type == Rule::INTEGER
+    ok: ph.grammar().rules[0].repetition.min == 1
+    ok: ph.grammar().rules[0].repetition.max == 1
+      : ParserHarness ph( ": integer \n my_rule : null\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 2
+    ok: ph.grammar().rules[0].rule_name == ""
+    ok: ph.grammar().rules[0].type == Rule::INTEGER
+    ok: ph.grammar().rules[1].rule_name == "my_rule"
+    ok: ph.grammar().rules[1].type == Rule::TNULL
+      : ParserHarness ph( "#ruleset-id http://example.com/jcr\n : integer \n my_rule : null\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().ruleset_id == "http://example.com/jcr"
+    ok: ph.grammar().rules.size() == 2
+    ok: ph.grammar().rules[0].rule_name == ""
+    ok: ph.grammar().rules[0].type == Rule::INTEGER
+    ok: ph.grammar().rules[1].rule_name == "my_rule"
+    ok: ph.grammar().rules[1].type == Rule::TNULL
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
 
@@ -644,6 +667,6 @@ TODOs (7):
 - Make RefRule set method split input into module and local parts [test-main.cpp:41]
 - Enhance GrammarParser::q_string() and QStringParsert to full spec [test-main.cpp:43]
 - Add test-rules-parser.cpp back into project for testing [test-main.cpp:45]
-- Correctly populate and place annotations into Grammar [test-parsing-only.cpp:597]
+- Correctly populate and place annotations into Grammar [test-parsing-only.cpp:629]
 
-0 error(s), 7 todo(s), 383 test(s)
+0 error(s), 7 todo(s), 403 test(s)

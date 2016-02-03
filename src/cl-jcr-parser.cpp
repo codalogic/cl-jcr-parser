@@ -666,13 +666,23 @@ bool GrammarParser::eol()
 
 bool GrammarParser::root_rule()
 {
-    // root_rule() = value_rule() || member_rule() || group_rule()
+    // root_rule() = value_rule() || group_rule()
 
     cl::locator loc( this );
 
-    return optional_rewind( value_rule() ) ||
-            optional_rewind( member_rule() ) ||
-            optional_rewind( group_rule() );
+    Rule::uniq_ptr pu_rule( new Rule );
+    RuleStackLogger rule_stack_logger( this, pu_rule );
+
+    if( optional_rewind( value_rule() ) || optional_rewind( group_rule() ) )
+    {
+        m.p_rule->annotations.is_root = true;
+
+        m.p_grammar->append_rule( pu_rule );
+
+        return true;
+    }
+
+    return false;
 }
 
 bool GrammarParser::rule()

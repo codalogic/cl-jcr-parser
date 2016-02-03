@@ -239,8 +239,6 @@ TFEATURE( "GrammarParser - Syntax parsing - target_rule_name" )
 
 TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
 {
-    TCALL( test_parsing_only(
-                        "my_rule : null\n" ) );
     {
         TSETUP( ParserHarness ph( "my_rule : flubber\n" ) );
         TCRITICALTEST( ph.status() != JCRParser::S_OK );
@@ -591,6 +589,40 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
 
         TTEST( ph.grammar().rules[0].min.is_set() == false );
         TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+}
+
+TFEATURE( "GrammarParser - Syntax parsing - root rule" )
+{
+    {
+        TSETUP( ParserHarness ph( " : integer" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "" );
+        TCRITICALTEST( ph.grammar().rules[0].annotations.is_root == true );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::INTEGER );
+
+        TTEST( ph.grammar().rules[0].repetition.min == 1 );
+        TTEST( ph.grammar().rules[0].repetition.max == 1 );
+    }
+    {
+        TSETUP( ParserHarness ph( ": integer \n my_rule : null\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 2 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::INTEGER );
+        TCRITICALTEST( ph.grammar().rules[1].rule_name == "my_rule" );
+        TCRITICALTEST( ph.grammar().rules[1].type == Rule::TNULL );
+    }
+    {
+        TSETUP( ParserHarness ph( "#ruleset-id http://example.com/jcr\n : integer \n my_rule : null\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().ruleset_id == "http://example.com/jcr" );
+        TCRITICALTEST( ph.grammar().rules.size() == 2 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::INTEGER );
+        TCRITICALTEST( ph.grammar().rules[1].rule_name == "my_rule" );
+        TCRITICALTEST( ph.grammar().rules[1].type == Rule::TNULL );
     }
 }
 
