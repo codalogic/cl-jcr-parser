@@ -256,6 +256,8 @@ private:
     bool object_group();
     bool array_rule();
     bool array_items();
+    bool star_sequence_combiner_and_array_item();
+    bool star_choice_combiner_and_array_item();
     bool array_item();
     bool array_item_types();
     bool array_group();
@@ -266,7 +268,7 @@ private:
     bool group_group();
     bool sequence_combiner();
     bool choice_combiner();
-    bool repetition( Repetition & reps );
+    bool repetition();
     bool optional_marker();
     bool one_or_more();
     bool zero_or_more();
@@ -397,7 +399,10 @@ bool GrammarParser::jcr()
 
     try
     {
-        return star_comment_or_directive() && optional( root_rule() ) && star_comment_or_directive_or_rule() && is_peek_at_end();
+        return star_comment_or_directive() &&
+                optional( root_rule() ) &&
+                star_comment_or_directive_or_rule() &&
+                is_peek_at_end() || fatal( "Unexpected input" );
     }
     catch( const GrammarParserFatalError & )
     {
@@ -742,7 +747,7 @@ bool GrammarParser::target_rule_name()
                 m.p_rule->target_rule.local_name = second_accumulator.get();
             }
             else
-                return error( "Expected 'rule_name' after 'ruleset_id_alias'" );
+                return error( "Expected 'rule_name' after 'rulesetid_alias'" );
         }
         else
         {
@@ -806,12 +811,39 @@ bool GrammarParser::member_rule()
 {
     // member_rule() = annotations() && member_name_spec() && *sp_cmt() && type_rule()
 
+    // No need to record location because primitive_rule() is always part of a rewound choice
+
+    if( annotations() && member_name_spec() )
+    {
+        star_sp_cmt() && type_rule() || fatal( "Expected type-rule after member-name" );
+
+        return true;
+    }
+
+    m.p_rule->annotations.clear();
+
     return false;
 }
 
 bool GrammarParser::member_name_spec()
 {
     // member_name_spec() = regex() || q_string()
+
+    cl::accumulator member_name_accumulator( this );
+
+    if( regex() )
+    {
+        m.p_rule->member_name.set_regex( member_name_accumulator.get() );
+
+        return true;
+    }
+
+    else if( member_name_accumulator.clear() && q_string() )
+    {
+        m.p_rule->member_name.set_literal( member_name_accumulator.get() );
+
+        return true;
+    }
 
     return false;
 }
@@ -820,12 +852,30 @@ bool GrammarParser::type_choice_rule()
 {
     // type_choice_rule() = ":" && *sp_cmt() && type_choice()
 
-    return false;
+    return is_get_char( ':' ) && star_sp_cmt() && type_choice();
 }
 
 bool GrammarParser::type_choice()
 {
-    // type_choice() = annotations() "(" && type_choice_items() && *( choice_combiner() && type_choice_items() ) ")"
+    // type_choice() = annotations() && "(" && type_choice_items() && *( choice_combiner() && type_choice_items() ) && ")"
+
+    if( annotations() && is_get_char( '(' ) )
+    {
+        m.p_rule->type = Rule::TYPE_CHOICE;
+
+        type_choice_items() || fatal( "Must be at least one type specified within a type-choice" );
+
+        while( choice_combiner() )
+        {
+            type_choice_items() || fatal( "Expected type-choice-item after choice-combiner in type-choice" );
+        }
+
+        is_get_char( ')' ) || fatal( "Expected ')' at end of type-choice" );
+
+        return true;
+    }
+
+    m.p_rule->annotations.clear();
 
     return false;
 }
@@ -833,6 +883,19 @@ bool GrammarParser::type_choice()
 bool GrammarParser::type_choice_items()
 {
     // type_choice_items() = *sp_cmt() && ( type_choice() || type_rule() ) && *sp_cmt()
+
+    cl::locator loc( this );
+
+    Rule * p_parent = m.p_rule;
+
+    Rule::uniq_ptr pu_rule( new Rule );
+    RuleStackLogger rule_stack_logger( this, pu_rule );
+
+    if( star_sp_cmt() && ( type_choice() || type_rule() ) && star_sp_cmt() )
+    {
+        p_parent->append_child_rule( pu_rule );
+        return true;
+    }
 
     return false;
 }
@@ -916,14 +979,12 @@ bool GrammarParser::primitive_rule()
 {
     // primitive_rule() = annotations() ":" && *sp_cmt() && primimitive_def()
 
-    annotations();
+    // No need to record location because primitive_rule() is always part of a rewound choice
 
-    if( is_get_char( ':' ) )
-    {
-        cl::locator loc( this );    // Taking rollback position after parsing annotations avoid repeated parsing of annotations!
+    if( annotations() && is_get_char( ':' ) && star_sp_cmt() && primimitive_def() )
+        return true;
 
-        return sp_cmt() && primimitive_def() || location_top( false );
-    }
+    m.p_rule->annotations.clear();
 
     return false;
 }
@@ -1284,6 +1345,19 @@ bool GrammarParser::array_rule()
 {
     // array_rule() = annotations() [ ":" && *sp_cmt() ] "[" && *sp_cmt() [ array_items() && *sp_cmt() ] "]"
 
+    // No need to record location because array_rule() is always part of a rewound choice
+
+    if( annotations() && optional( is_get_char( ':' ) && star_sp_cmt() ) && is_get_char( '[' ) )
+    {
+        m.p_rule->type = Rule::ARRAY;
+
+        star_sp_cmt() && optional( array_items() ) && star_sp_cmt();
+
+        is_get_char( ']' ) || fatal( "Expected ']' at end of array rule" );
+
+        return true;
+    }
+
     return false;
 }
 
@@ -1291,12 +1365,68 @@ bool GrammarParser::array_items()
 {
     // array_items() = array_item() && (*( sequence_combiner() && array_item() ) || *( choice_combiner() && array_item() ) )
 
+    if( array_item() )
+    {
+        star_sequence_combiner_and_array_item() && set( m.p_rule->child_combiner, Rule::Sequence ) ||
+            star_choice_combiner_and_array_item() && set( m.p_rule->child_combiner, Rule::Choice );
+        return true;
+    }
+
     return false;
+}
+
+bool GrammarParser::star_sequence_combiner_and_array_item()
+{
+    bool is_used = false;
+
+    while( sequence_combiner() )
+    {
+        is_used = true;
+        array_item() || fatal( "Expected array-item after sequence-combiner in array definition" );
+    }
+
+    if( is_used && choice_combiner() )
+        fatal( "choice-combiner can not be used with sequence-combiner without Parentheses" );
+
+    return is_used;
+}
+
+bool GrammarParser::star_choice_combiner_and_array_item()
+{
+    bool is_used = false;
+
+    while( choice_combiner() )
+    {
+        is_used = true;
+        array_item() || fatal( "Expected array-item after choice-combiner in array definition" );
+    }
+
+    if( is_used && sequence_combiner() )
+        fatal( "sequence-combiner can not be used with choice-combiner without Parentheses" );
+
+    return is_used;
 }
 
 bool GrammarParser::array_item()
 {
     // array_item() = [ repetition() ] && *sp_cmt() && array_item_types()
+
+    bool has_repetition = false;
+
+    Rule * p_parent = m.p_rule;
+
+    Rule::uniq_ptr pu_rule( new Rule );
+    RuleStackLogger rule_stack_logger( this, pu_rule );
+
+    if( optional( record( has_repetition, repetition() ) ) && star_sp_cmt() && array_item_types() )
+    {
+        p_parent->append_child_rule( pu_rule );
+
+        return true;
+    }
+
+    if( has_repetition )
+        fatal( "Expected array-item-types after repetition" );
 
     return false;
 }
@@ -1305,12 +1435,25 @@ bool GrammarParser::array_item_types()
 {
     // array_item_types() = type_rule() || array_group()
 
-    return false;
+    cl::locator loc( this );
+
+    return optional_rewind( type_rule() ) ||
+            optional_rewind( array_group() );
 }
 
 bool GrammarParser::array_group()
 {
-    // array_group() = "(" && *sp_cmt() [ array_items() && *sp_cmt() ] ")"
+    // array_group() = "(" && *sp_cmt() && [ array_items() && *sp_cmt() ] && ")"
+
+    if( is_get_char( '(' ) )
+    {
+        m.p_rule->type = Rule::ARRAY;
+
+        star_sp_cmt() && optional( array_items() ) && star_sp_cmt();
+        is_get_char( ')' ) || fatal( "Expected ')' at end of array-group" );
+
+        return true;
+    }
 
     return false;
 }
@@ -1354,21 +1497,30 @@ bool GrammarParser::sequence_combiner()
 {
     // sequence_combiner() = *sp_cmt() "," && *sp_cmt()
 
-    return false;
+    return star_sp_cmt() && is_get_char( ',' ) && star_sp_cmt();
 }
 
 bool GrammarParser::choice_combiner()
 {
     // choice_combiner() = *sp_cmt() && "|" && *sp_cmt()
 
-    return false;
+    return star_sp_cmt() && is_get_char( '|' ) && star_sp_cmt();
 }
 
-bool GrammarParser::repetition( Repetition & reps )
+bool GrammarParser::repetition()
 {
     // repetition() = optional_marker() || one_or_more() || min_max_repetition() || min_repetition() || max_repetition() || zero_or_more() || specific_repetition()
 
-    return false;
+    cl::locator loc( this );
+
+    // The order of these routines is important
+    return optional_rewind( optional_marker() ) ||
+            optional_rewind( one_or_more() ) ||
+            optional_rewind( min_max_repetition() ) ||
+            optional_rewind( min_repetition() ) ||
+            optional_rewind( max_repetition() ) ||
+            optional_rewind( zero_or_more() ) ||
+            optional_rewind( specific_repetition() );
 }
 
 bool GrammarParser::optional_marker()
@@ -1396,21 +1548,31 @@ bool GrammarParser::min_max_repetition()
 {
     // min_max_repetition() = min_repeat() && *sp_cmt() "*" && *sp_cmt() && max_repeat()
 
-    return false;
+    cl::accumulator min_accumulator( this );
+    cl::accumulator_deferred max_accumulator( this );
+
+    return min_repeat() && star_sp_cmt() && is_get_char( '*' ) && star_sp_cmt() && max_accumulator.select() && max_repeat() &&
+            set( m.p_rule->repetition.min, min_accumulator.to_int() ) && set( m.p_rule->repetition.max, max_accumulator.to_int() );
 }
 
 bool GrammarParser::min_repetition()
 {
     // min_repetition() = min_repeat() && *sp_cmt() "*"
 
-    return false;
+    cl::accumulator min_accumulator( this );
+
+    return min_repeat() && star_sp_cmt() && is_get_char( '*' ) &&
+            set( m.p_rule->repetition.min, min_accumulator.to_int() ) && set( m.p_rule->repetition.max, -1 );
 }
 
 bool GrammarParser::max_repetition()
 {
     // max_repetition() = "*" && *sp_cmt() && max_repeat()
 
-    return false;
+    cl::accumulator max_accumulator( this );
+
+    return is_get_char( '*' ) && star_sp_cmt() && max_repeat() &&
+            set( m.p_rule->repetition.min, 0 ) && set( m.p_rule->repetition.max, max_accumulator.to_int() );
 }
 
 bool GrammarParser::min_repeat()
@@ -1431,7 +1593,10 @@ bool GrammarParser::specific_repetition()
 {
     // specific_repetition() = p_integer()
 
-    return p_integer();
+    cl::accumulator min_max_accumulator( this );
+
+    return p_integer() &&
+            set( m.p_rule->repetition.min, min_max_accumulator.to_int() ) && set( m.p_rule->repetition.max, min_max_accumulator.to_int() );
 }
 
 bool GrammarParser::integer()

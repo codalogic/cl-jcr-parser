@@ -58,6 +58,7 @@ struct Annotations
     bool is_root;
 
     Annotations() : reject( false ), is_unordered( false ), is_root( false ) {}
+    void clear() { reject = is_unordered = is_root = false; }
 };
 
 class MemberName
@@ -76,9 +77,9 @@ public:
     void set_literal( const std::string & name ) { m.form = Literal; m.name = name; }
     void set_regex( const std::string & name ) { m.form = Regex; m.name = name; }
 
-    bool is_absent() { return m.form == Absent; }
-    bool is_literal() { return m.form == Literal; }
-    bool is_regex() { return m.form == Regex; }
+    bool is_absent() const { return m.form == Absent; }
+    bool is_literal() const { return m.form == Literal; }
+    bool is_regex() const { return m.form == Regex; }
     const std::string & name() const { return m.name; }
 };
 
@@ -132,7 +133,7 @@ struct Rule : private detail::NonCopyable
             URI_TYPE, URI_RANGE, IP4, IP6, FQDN, IDN,
             DATETIME, DATE, TIME,
             EMAIL, PHONE, BASE64, ANY,
-            VALUE_CHOICE, OBJECT, ARRAY, GROUP,
+            TYPE_CHOICE, OBJECT, ARRAY, GROUP,
             TARGET_RULE };
 
     Rule * p_parent;
@@ -145,9 +146,10 @@ struct Rule : private detail::NonCopyable
     ValueConstraint max;
     typedef clutils::ptr_vector< Rule > children_container_t;
     children_container_t children;
+    enum ChildCombiner { None, Sequence, Choice } child_combiner;
     TargetRule target_rule;
 
-    Rule() : p_parent( 0 ), type( NONE ) {}
+    Rule() : p_parent( 0 ), type( NONE ), child_combiner( None ) {}
 
     Rule * append_child_rule( uniq_ptr pu_child_rule )
     {
