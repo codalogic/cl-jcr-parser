@@ -1,4 +1,4 @@
-Tests run on Tue Feb 02 18:00:02 2016
+Tests run on Wed Feb 03 11:09:00 2016
 
     GrammarSet TODOS [test-grammar-set.cpp:40]
     ==========================================
@@ -11,6 +11,8 @@ Tests run on Tue Feb 02 18:00:02 2016
     ok: vc.is_set() == true
     ok: vc == "true"
     ok: vc == std::string( "true" )
+    ok: vc != "other"
+    ok: vc != std::string( "other" )
     ok: vc.to_string() == "true"
     ok: vc.to_bool() == true
     ok: vc.to_int() == 0
@@ -50,7 +52,7 @@ Tests run on Tue Feb 02 18:00:02 2016
     ok: vc == ""
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    MemberName [test-low-level-objects.cpp:95]
+    MemberName [test-low-level-objects.cpp:97]
     ==========================================
     ok: mn.is_absent() == true
     ok: mn.is_literal() == false
@@ -73,12 +75,12 @@ Tests run on Tue Feb 02 18:00:02 2016
     ok: mn.name() == ""
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    TargetRule [test-low-level-objects.cpp:123]
+    TargetRule [test-low-level-objects.cpp:125]
     ===========================================
     ok: ! tr.p_rule
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Rule [test-low-level-objects.cpp:130]
+    Rule [test-low-level-objects.cpp:132]
     =====================================
     ok: ! r.p_parent
     ok: r.type == Rule::NONE
@@ -91,7 +93,7 @@ Tests run on Tue Feb 02 18:00:02 2016
     ok: p_appended_rule->p_parent == &r
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Grammar [test-low-level-objects.cpp:148]
+    Grammar [test-low-level-objects.cpp:150]
     ========================================
       Adding and accessing unaliased imports
       : g.add_unaliased_import( "foo" )
@@ -644,4 +646,4 @@ TODOs (7):
 - Add test-rules-parser.cpp back into project for testing [test-main.cpp:45]
 - Correctly populate and place annotations into Grammar [test-parsing-only.cpp:597]
 
-0 error(s), 7 todo(s), 381 test(s)
+0 error(s), 7 todo(s), 383 test(s)

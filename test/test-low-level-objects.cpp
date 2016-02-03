@@ -47,6 +47,8 @@ TFEATURE( "ValueConstraint" )
     TTEST( vc.is_set() == true );
     TTEST( vc == "true" );
     TTEST( vc == std::string( "true" ) );
+    TTEST( vc != "other" );
+    TTEST( vc != std::string( "other" ) );
     TTEST( vc.to_string() == "true" );
     TTEST( vc.to_bool() == true );
     TTEST( vc.to_int() == 0 );      // This is undefined behaviour

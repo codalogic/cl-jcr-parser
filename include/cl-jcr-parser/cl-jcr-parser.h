@@ -15,6 +15,7 @@
 #include <memory>
 #include <map>
 #include <string>
+#include <cstdlib>
 
 namespace cl { class reader; }
 
@@ -101,8 +102,8 @@ public:
     bool is_set() const { return m.is_set; }
     bool operator == ( const std::string & r_rhs ) const { return m.value == r_rhs; }
     bool operator == ( const char * p_rhs ) const { return m.value == p_rhs; }
-    bool operator != ( const std::string & r_rhs ) const { return m.value == r_rhs; }
-    bool operator != ( const char * p_rhs ) const { return m.value == p_rhs; }
+    bool operator != ( const std::string & r_rhs ) const { return m.value != r_rhs; }
+    bool operator != ( const char * p_rhs ) const { return m.value != p_rhs; }
     const std::string & to_string() const { return m.value; }
     bool to_bool() const { return m.value == "true"; }
     int to_int() const { return atoi( m.value.c_str() ); }
