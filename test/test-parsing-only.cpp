@@ -202,15 +202,33 @@ TFEATURE( "GrammarParser - Syntax parsing - import directive" )
     }
 }
 
+TFEATURE( "GrammarParser - Syntax parsing - multi-line directive" )
+{
+    TCALL( test_parsing_only(
+                        "#{constraint foo \n"
+                        "  $id == 'None' }\n" ) );
+    {
+        TSETUP( ParserHarness ph(
+                        "#{constraint foo\n"
+                        "    $name == /p\\d{1,5}/ && ; Must allow } and { in comments\n"
+                        "    $when == \"} with {\"\n"
+                        "}\n"
+                        "my_rule other_rule\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "my_rule" );
+    }
+}
+
 TFEATURE( "GrammarParser - Syntax parsing - TBD directive" )
 {
-    TCALL( test_parsing_bad_input(
+    TCALL( test_parsing_only(
                         "#TBD\n" ) );
-    TCALL( test_parsing_bad_input(
+    TCALL( test_parsing_only(
                         "#TBD  we\n" ) );
-    TCALL( test_parsing_bad_input(
+    TCALL( test_parsing_only(
                         "#TBD  we don't know\n" ) );
-    TCALL( test_parsing_bad_input(
+    TCALL( test_parsing_only(
                         "; Hello\n"
                         "#TBD\n"
                         "#jcr-version 0.5\n" ) );
@@ -236,7 +254,7 @@ TFEATURE( "GrammarParser - Syntax parsing - target_rule_name" )
         TCRITICALTEST( ph.grammar().rules[0].target_rule.local_name == "other_rule" );
     }
     TCALL( test_parsing_bad_input(
-                        "my_rule @(root) other_rule\n" ) );
+                        "my_rule @{root} other_rule\n" ) );
 }
 
 TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
@@ -623,7 +641,7 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TTEST( ph.grammar().rules[0].max.is_set() == false );
     }
     {
-        TSETUP( ParserHarness ph( "my_rule @(root) : null\n" ) );
+        TSETUP( ParserHarness ph( "my_rule @{root} : null\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
         TCRITICALTEST( ph.grammar().rules[0].annotations.is_root == true );
@@ -774,7 +792,7 @@ TFEATURE( "GrammarParser - Syntax parsing - type-choice" )
         TCRITICALTEST( ph.grammar().rules[0].children[1].target_rule.local_name == "my_type" );
     }
     {
-        TSETUP( ParserHarness ph( "my_rule : @(reject) ( : null | : integer )\n" ) );
+        TSETUP( ParserHarness ph( "my_rule : @{reject} ( : null | : integer )\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
         TCRITICALTEST( ph.grammar().rules[0].rule_name == "my_rule" );

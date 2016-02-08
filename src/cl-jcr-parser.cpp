@@ -179,6 +179,8 @@ private:
     bool comment_char();
     bool comment_end_char();
     bool directive();
+    bool one_line_directive();
+    bool multi_line_directive();
     bool directive_def();
     bool jcr_version_d();
     bool major_version();
@@ -190,9 +192,13 @@ private:
     STAR( not_space )
     ONE_STAR( not_space )
     bool ruleset_id_alias();
-    bool tbd_directive_d();
+    bool one_line_tbd_directive_d();
     bool directive_name();
-    bool directive_parameters();
+    bool one_line_directive_parameters();
+    bool multi_line_tbd_directive_d();
+    bool multi_line_directive_parameters();
+    bool multi_line_parameters();
+    bool not_multi_line_special();
     bool not_eol();
     STAR( not_eol )
     bool eol();
@@ -345,7 +351,7 @@ private:
     ONE_STAR( WSP )
     bool WSPs();
 
-    // This is a temporary place holder
+    // These are temporary place holders
     bool warning( const char * p_message )
     {
         std::cout << p_message << "\n";
@@ -364,12 +370,12 @@ private:
         throw GrammarParserFatalError();
         return false;
     }
-    bool recover_to_eol()
+    bool recover_to_eol( bool ret = true )
     {
         while( is_get_char_in( cl::alphabet_not( cl::alphabet_eol() ) ) )
         {}
         get();  // Get the end of line character
-        return true;
+        return ret;
     }
 };
 
@@ -483,29 +489,61 @@ bool GrammarParser::comment_end_char()
 
 bool GrammarParser::directive()
 {
-    // Old: directive() = "#" && [ spaces() ] && directive_def() && eol()
-    // Fixed: directive() = "#" && *WSP() && directive_def() && *WSP() && eol()
+    // directive = "#" (one-line-directive / multi-line-directive)
 
     if( is_get_char( '#' ) )
     {
-        return star_WSP() &&
-                (directive_def() || error( "Invalid #directive format" ) ) &&
-                star_WSP() &&
-                (eol() || error( "Unexpected additional material in directive" ) || recover_to_eol() );
+        cl::locator loc( this );
+
+        (one_line_directive() || multi_line_directive() || error( "Invalid #directive format" ) );
+
+        return true;
     }
+
+    return false;
+}
+
+bool GrammarParser::one_line_directive()
+{
+    // one-line-directive = [ *WSP ] (directive-def / one-line-tbd-directive-d) *WSP eol
+
+    cl::locator loc( this );
+
+    if( star_WSP() && (directive_def() || one_line_tbd_directive_d()) )
+    {
+        star_WSP() && eol() || error( "Unexpected additional material in directive" );
+
+        return true;
+    }
+
+    location_top();
+
+    return false;
+}
+
+bool GrammarParser::multi_line_directive()
+{
+    // multi-line-directive = "{" *sp-cmt (directive-def / multi-line-tbd-directive-d) *sp-cmt "}"
+
+    if( is_get_char( '{' ) )
+    {
+        star_sp_cmt() && (directive_def() || multi_line_tbd_directive_d()) &&
+            star_sp_cmt() && is_get_char( '}' ) || error( "Invalid multi-line #{directive} format" );
+        return true;
+    }
+
     return false;
 }
 
 bool GrammarParser::directive_def()
 {
-    // directive_def() = jcr_version_d() || ruleset_id_d() || import_d() || tbd_directive_d()
+    // directive_def() = jcr_version_d() || ruleset_id_d() || import_d()
 
     cl::locator loc( this );
 
     return optional_rewind( jcr_version_d() ) ||
             optional_rewind( ruleset_id_d() ) ||
-            optional_rewind( import_d() ) ||
-            optional_rewind( tbd_directive_d() );
+            optional_rewind( import_d() );
 }
 
 bool GrammarParser::jcr_version_d()
@@ -517,11 +555,11 @@ bool GrammarParser::jcr_version_d()
 
     if( jcr_version_kw() )
     {
-        if( WSPs() &&
+        if( (WSPs() || error( "Expected WSP tokens after 'jcr-version' keyword")) &&
                 major_version_accumulator.select() && major_version() &&
                 is_get_char( '.' ) &&
                 minor_version_accumulator.select() && minor_version()
-                || error( "Bad #jcr-version directive format" ) || recover_to_eol() )
+                || error( "Bad #jcr-version directive format" ) || recover_to_eol( false ) )
         {
             std::string major_number = major_version_accumulator.get();
             std::string minor_number = minor_version_accumulator.get();
@@ -623,17 +661,17 @@ bool GrammarParser::ruleset_id_alias()
     return name();
 }
 
-bool GrammarParser::tbd_directive_d()
+bool GrammarParser::one_line_tbd_directive_d()
 {
-    // tbd_directive_d() = directive_name() [ spaces() && directive_parameters() ]
+    // tbd_directive_d() = directive_name() [ spaces() && one_line_directive_parameters() ]
 
     cl::accumulator tbd_directive_name_accumulator( this );
     cl::accumulator_deferred tbd_directive_parameters_accumulator( this );
 
     if( directive_name() &&
-        optional( WSPs() && tbd_directive_parameters_accumulator.select() && directive_parameters() ) )
+        optional( WSPs() && tbd_directive_parameters_accumulator.select() && one_line_directive_parameters() ) )
     {
-        error( (std::string( "Unknown directive: " ) + tbd_directive_name_accumulator.get() +
+        warning( (std::string( "Unknown directive: " ) + tbd_directive_name_accumulator.get() +
                 ", parameters: " + tbd_directive_parameters_accumulator.get()).c_str() );
         return true;
     }
@@ -648,7 +686,7 @@ bool GrammarParser::directive_name()
     return name();
 }
 
-bool GrammarParser::directive_parameters()
+bool GrammarParser::one_line_directive_parameters()
 {
     // directive_parameters() = *not_eol()
 
@@ -667,6 +705,49 @@ bool GrammarParser::eol()
     // eol() = CR() || LF()
 
     return is_get_char_in( cl::alphabet_eol() ) || is_peek_at_end();
+}
+
+bool GrammarParser::multi_line_tbd_directive_d()
+{
+    // multi-line-tbd-directive-d = directive-name [ spaces multi-line-directive-parameters ]
+
+    cl::accumulator tbd_directive_name_accumulator( this );
+    cl::accumulator_deferred tbd_directive_parameters_accumulator( this );
+
+    if( directive_name() &&
+        optional( WSPs() && tbd_directive_parameters_accumulator.select() && multi_line_directive_parameters() ) )
+    {
+        warning( (std::string( "Unknown directive: " ) + tbd_directive_name_accumulator.get()).c_str() );
+        return true;
+    }
+
+    return false;
+}
+
+bool GrammarParser::multi_line_directive_parameters()
+{
+    // multi-line-directive-parameters = multi-line-parameters
+
+    return multi_line_parameters();
+}
+
+bool GrammarParser::multi_line_parameters()
+{
+    // multi-line-parameters = *(comment / q-string / regex / not-multi-line-special)
+
+    while( comment() || q_string() || regex() || not_multi_line_special() )
+    {}
+
+    return true;
+}
+
+cl::alphabet_char_class not_dquote_or_slash_or_semicolon_or_right_brace( "^\"/;}" );
+
+bool GrammarParser::not_multi_line_special()
+{
+    // not-multi-line-special = spaces / %x21 / %x23-2E / %x30-3A / %x3C-7C / %x7E-10FFFF ; not ", /, ; or }
+
+    return skip( not_dquote_or_slash_or_semicolon_or_right_brace ) > 0;
 }
 
 bool GrammarParser::root_rule()
@@ -902,12 +983,12 @@ bool GrammarParser::type_choice_items()
 
 bool GrammarParser::annotations()
 {
-    // annotations() = *( "@(" && *sp_cmt() && annotation_set() && *sp_cmt() && ")" && *sp_cmt() )
+    // annotations() = *( "@{" && *sp_cmt() && annotation_set() && *sp_cmt() && "}" && *sp_cmt() )
 
-    while( fixed( "@(" ) )
+    while( fixed( "@{" ) )
     {
         star_sp_cmt() && annotation_set() && star_sp_cmt() &&
-            (fixed( ")" ) || fatal( "Expected ')' at end of annotation" )) &&
+            (fixed( "}" ) || fatal( "Expected ')' at end of annotation" )) &&
             star_sp_cmt();
     }
 
@@ -970,9 +1051,9 @@ bool GrammarParser::annotation_name()
 
 bool GrammarParser::annotation_parameters()
 {
-    // annotation_parameters() = *( spaces() / %x21-28 / %x2A-10FFFF )
+    // annotation_parameters() = multi-line-parameters
 
-    return skip( cl::alphabet_not( cl::alphabet_char( ')' ) ) ) >= 0;
+    return multi_line_parameters();
 }
 
 bool GrammarParser::primitive_rule()
@@ -1643,7 +1724,7 @@ bool GrammarParser::int_num()
     return accumulate( '0' ) || ( digit1_9() && star_DIGIT() );
 }
 
-cl::alphabet_char_class digit1_9_alphabet( "[1-9]" );
+cl::alphabet_char_class digit1_9_alphabet( "1-9" );
 
 bool GrammarParser::digit1_9()
 {

@@ -1,4 +1,4 @@
-Tests table of contents generated on Wed Feb 03 16:34:57 2016
+Tests table of contents generated on Mon Feb 08 15:03:20 2016
 
 # test-grammar-set.cpp
 | Description | Line |
@@ -26,11 +26,12 @@ Tests table of contents generated on Wed Feb 03 16:34:57 2016
 | GrammarParser - Syntax parsing - JCR directive | 87 |
 | GrammarParser - Syntax parsing - ruleset-id directive | 127 |
 | GrammarParser - Syntax parsing - import directive | 154 |
-| GrammarParser - Syntax parsing - TBD directive | 205 |
-| GrammarParser - Syntax parsing - target_rule_name | 219 |
-| GrammarParser - Syntax parsing - Primitive rules | 242 |
-| GrammarParser - Syntax parsing - root rule | 635 |
-| GrammarParser - Syntax parsing - Member name | 673 |
-| GrammarParser - Syntax parsing - type-choice | 707 |
-| GrammarParser - Syntax parsing - array | 801 |
-| GrammarParser - Syntax parsing - repetition | 1013 |
+| GrammarParser - Syntax parsing - multi-line directive | 205 |
+| GrammarParser - Syntax parsing - TBD directive | 223 |
+| GrammarParser - Syntax parsing - target_rule_name | 237 |
+| GrammarParser - Syntax parsing - Primitive rules | 260 |
+| GrammarParser - Syntax parsing - root rule | 653 |
+| GrammarParser - Syntax parsing - Member name | 691 |
+| GrammarParser - Syntax parsing - type-choice | 725 |
+| GrammarParser - Syntax parsing - array | 819 |
+| GrammarParser - Syntax parsing - repetition | 1031 |
