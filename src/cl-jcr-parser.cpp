@@ -296,10 +296,12 @@ private:
     bool exp();
     bool e();
     bool zero();
-    bool q_string();
+    bool q_string_as_utf8();
+    enum QuotesHandling { IncludeQuotes, ExcludeQuotes };
+    bool q_string( QuotesHandling quotes_hanlding = IncludeQuotes );
     bool qs_char();
     STAR( qs_char )
-    bool quotation_mark();
+    bool quotation_mark( QuotesHandling quotes_hanlding = IncludeQuotes );
     bool unescaped();
     bool escape();
     bool escaped_code();
@@ -919,7 +921,7 @@ bool GrammarParser::member_name_spec()
         return true;
     }
 
-    else if( member_name_accumulator.clear() && q_string() )
+    else if( member_name_accumulator.clear() && q_string_as_utf8() )
     {
         m.p_rule->member_name.set_literal( member_name_accumulator.get() );
 
@@ -1157,7 +1159,7 @@ bool GrammarParser::string_value()
 
     cl::accumulator q_string_accumulator( this );
 
-    if( q_string() )
+    if( q_string_as_utf8() )
     {
         m.p_rule->type = Rule::STRING_LITERAL;
         m.p_rule->min = m.p_rule->max = q_string_accumulator.get();
@@ -1768,13 +1770,20 @@ bool GrammarParser::zero()
     return accumulate( '0' );
 }
 
-bool GrammarParser::q_string()
+bool GrammarParser::q_string_as_utf8()
+{
+    // DEBUG - TODO: This needs replacing with proper QString to UTF-8 processing
+
+    return q_string( ExcludeQuotes );
+}
+
+bool GrammarParser::q_string( QuotesHandling quotes_hanlding /* = IncludeQuotes */ )
 {
     // q_string() = quotation_mark() && *qs_char() && quotation_mark()
 
-    if( quotation_mark() )
+    if( quotation_mark( quotes_hanlding ) )
     {
-        star_qs_char() && quotation_mark() || fatal( "Badly formed QString" );
+        star_qs_char() && quotation_mark( quotes_hanlding ) || fatal( "Badly formed QString" );
 
         return true;
     }
@@ -1782,11 +1791,11 @@ bool GrammarParser::q_string()
     return false;
 }
 
-bool GrammarParser::quotation_mark()
+bool GrammarParser::quotation_mark( QuotesHandling quotes_hanlding /* = IncludeQuotes */ )
 {
     // quotation-mark   = %x22      ; "
 
-    return is_get_char( '"' );
+    return quotes_hanlding == IncludeQuotes ? accumulate( '"' ) : is_get_char( '"' );
 }
 
 bool GrammarParser::qs_char()
