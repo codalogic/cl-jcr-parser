@@ -1,4 +1,4 @@
-Tests run on Mon Feb 08 17:34:22 2016
+Tests run on Wed Feb 10 10:45:23 2016
 
     GrammarSet TODOS [test-grammar-set.cpp:40]
     ==========================================
@@ -383,10 +383,10 @@ jcr-version
     ok: ph.grammar().rules[0].type == Rule::TARGET_RULE
     ok: ph.grammar().rules[0].target_rule.rulesetid == "http://foo.bar"
     ok: ph.grammar().rules[0].target_rule.local_name == "other_rule"
-      Calling: test_parsing_bad_input( "my_rule @{root} other_rule\n" ) (257)
+      Calling: test_parsing_only( "my_rule @{root} other_rule\n" ) (257)
       my_rule @{root} other_rule
 
-    ok: status != JCRParser::S_OK
+    ok: status == JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
     GrammarParser - Syntax parsing - Primitive rules [test-parsing-only.cpp:260]

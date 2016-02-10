@@ -253,7 +253,7 @@ TFEATURE( "GrammarParser - Syntax parsing - target_rule_name" )
         TCRITICALTEST( ph.grammar().rules[0].target_rule.rulesetid == "http://foo.bar" );
         TCRITICALTEST( ph.grammar().rules[0].target_rule.local_name == "other_rule" );
     }
-    TCALL( test_parsing_bad_input(
+    TCALL( test_parsing_only(
                         "my_rule @{root} other_rule\n" ) );
 }
 

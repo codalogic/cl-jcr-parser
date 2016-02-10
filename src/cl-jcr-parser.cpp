@@ -805,7 +805,7 @@ bool GrammarParser::rule_name()
 
 bool GrammarParser::target_rule_name()
 {
-    // target_rule_name() = [ ruleset_id_alias() "." ] && rule_name()
+    // target_rule_name() = annotations [ ruleset_id_alias() "." ] && rule_name()
 
     // Both ruleset_id_alias() and rule_name() ultimately map to name()
     // so a little juggling of values is required to get parsed values
@@ -814,7 +814,7 @@ bool GrammarParser::target_rule_name()
     cl::accumulator first_accumulator( this );
     cl::accumulator_deferred second_accumulator( this );
 
-    if( ruleset_id_alias() )
+    if( annotations() && ruleset_id_alias() )
     {
         if( is_get_char( '.' ) )
         {
@@ -839,6 +839,8 @@ bool GrammarParser::target_rule_name()
         }
         return true;
     }
+
+    m.p_rule->annotations.clear();
 
     return false;
 }
@@ -1440,6 +1442,8 @@ bool GrammarParser::array_rule()
 
         return true;
     }
+
+    m.p_rule->annotations.clear();
 
     return false;
 }
