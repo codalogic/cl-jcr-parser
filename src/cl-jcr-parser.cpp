@@ -298,10 +298,10 @@ private:
     bool zero();
     bool q_string_as_utf8();
     enum QuotesHandling { IncludeQuotes, ExcludeQuotes };
-    bool q_string( QuotesHandling quotes_hanlding = IncludeQuotes );
+    bool q_string( QuotesHandling quotes_handling = IncludeQuotes );
     bool qs_char();
     STAR( qs_char )
-    bool quotation_mark( QuotesHandling quotes_hanlding = IncludeQuotes );
+    bool quotation_mark( QuotesHandling quotes_handling = IncludeQuotes );
     bool unescaped();
     bool escape();
     bool escaped_code();
@@ -1781,13 +1781,13 @@ bool GrammarParser::q_string_as_utf8()
     return q_string( ExcludeQuotes );
 }
 
-bool GrammarParser::q_string( QuotesHandling quotes_hanlding /* = IncludeQuotes */ )
+bool GrammarParser::q_string( QuotesHandling quotes_handling /* = IncludeQuotes */ )
 {
     // q_string() = quotation_mark() && *qs_char() && quotation_mark()
 
-    if( quotation_mark( quotes_hanlding ) )
+    if( quotation_mark( quotes_handling ) )
     {
-        star_qs_char() && quotation_mark( quotes_hanlding ) || fatal( "Badly formed QString" );
+        star_qs_char() && quotation_mark( quotes_handling ) || fatal( "Badly formed QString" );
 
         return true;
     }
@@ -1795,11 +1795,11 @@ bool GrammarParser::q_string( QuotesHandling quotes_hanlding /* = IncludeQuotes 
     return false;
 }
 
-bool GrammarParser::quotation_mark( QuotesHandling quotes_hanlding /* = IncludeQuotes */ )
+bool GrammarParser::quotation_mark( QuotesHandling quotes_handling /* = IncludeQuotes */ )
 {
     // quotation-mark   = %x22      ; "
 
-    return quotes_hanlding == IncludeQuotes ? accumulate( '"' ) : is_get_char( '"' );
+    return quotes_handling == IncludeQuotes ? accumulate( '"' ) : is_get_char( '"' );
 }
 
 bool GrammarParser::qs_char()
