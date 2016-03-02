@@ -38,71 +38,6 @@ bool is_supported_jcr_version( const std::string & major, const std::string & mi
 }
 
 //----------------------------------------------------------------------------
-//                           class QStringParser
-//----------------------------------------------------------------------------
-
-class QStringParser
-{
-    //  ; The defintion of a JSON string, from RFC 4627 s 2
-    //  q-string        = %x20-21 / %x23-5B / %x5D-10FFFF / "\" (
-    //                     %x22 /      ; "  u+0022
-    //                     %x5C /      ; \  u+005C
-    //                     %x2F /      ; /  u+002F
-    //                     %x62 /      ; BS u+0008
-    //                     %x66 /      ; FF u+000C
-    //                     %x6E /      ; LF u+000A
-    //                     %x72 /      ; CR u+000D
-    //                     %x74 /      ; HT u+0009
-    //                     ( %x75 4HEXDIG ) ) ; uXXXX u+XXXX
-
-private:
-    struct Members
-    {
-        cl::dsl_pa * p_dsl_pa;
-        std::string * p_v;
-
-        Members( cl::dsl_pa * p_dsl_pa_in, std::string * p_v_in )
-            : p_dsl_pa( p_dsl_pa_in ), p_v( p_v_in )
-        {}
-    } m;
-
-    QStringParser( cl::dsl_pa * p_dsl_pa, std::string * p_v )
-        : m( p_dsl_pa, p_v )
-    {}
-
-    bool read()
-    {
-        if( ! m.p_dsl_pa->is_get_char( '"' ) )
-            return false;
-
-        return read_post_quote();
-    }
-
-    bool read_post_quote()
-    {
-        int c;
-        while( (c = m.p_dsl_pa->get()) != '"' )
-        {
-            if( m.p_dsl_pa->is_current_at_end() )
-                return false;
-            *m.p_v += c;
-        }
-        return true;
-    }
-
-public:
-    static bool read( cl::dsl_pa * p_dsl_pa, std::string * p_v )
-    {
-        return QStringParser( p_dsl_pa, p_v ).read();
-    }
-
-    static bool read_post_quote( cl::dsl_pa * p_dsl_pa, std::string * p_v )
-    {
-        return QStringParser( p_dsl_pa, p_v ).read_post_quote();
-    }
-};
-
-//----------------------------------------------------------------------------
 //                       class GrammarParserFatalError
 //----------------------------------------------------------------------------
 
@@ -298,10 +233,10 @@ private:
     bool zero();
     bool q_string_as_utf8();
     enum QuotesHandling { IncludeQuotes, ExcludeQuotes };
-    bool q_string( QuotesHandling quotes_hanlding = IncludeQuotes );
+    bool q_string( QuotesHandling quotes_handling = IncludeQuotes );
     bool qs_char();
     STAR( qs_char )
-    bool quotation_mark( QuotesHandling quotes_hanlding = IncludeQuotes );
+    bool quotation_mark( QuotesHandling quotes_handling = IncludeQuotes );
     bool unescaped();
     bool escape();
     bool escaped_code();
@@ -1781,13 +1716,13 @@ bool GrammarParser::q_string_as_utf8()
     return q_string( ExcludeQuotes );
 }
 
-bool GrammarParser::q_string( QuotesHandling quotes_hanlding /* = IncludeQuotes */ )
+bool GrammarParser::q_string( QuotesHandling quotes_handling /* = IncludeQuotes */ )
 {
     // q_string() = quotation_mark() && *qs_char() && quotation_mark()
 
-    if( quotation_mark( quotes_hanlding ) )
+    if( quotation_mark( quotes_handling ) )
     {
-        star_qs_char() && quotation_mark( quotes_hanlding ) || fatal( "Badly formed QString" );
+        star_qs_char() && quotation_mark( quotes_handling ) || fatal( "Badly formed QString" );
 
         return true;
     }
@@ -1795,11 +1730,11 @@ bool GrammarParser::q_string( QuotesHandling quotes_hanlding /* = IncludeQuotes 
     return false;
 }
 
-bool GrammarParser::quotation_mark( QuotesHandling quotes_hanlding /* = IncludeQuotes */ )
+bool GrammarParser::quotation_mark( QuotesHandling quotes_handling /* = IncludeQuotes */ )
 {
     // quotation-mark   = %x22      ; "
 
-    return quotes_hanlding == IncludeQuotes ? accumulate( '"' ) : is_get_char( '"' );
+    return quotes_handling == IncludeQuotes ? accumulate( '"' ) : is_get_char( '"' );
 }
 
 bool GrammarParser::qs_char()
