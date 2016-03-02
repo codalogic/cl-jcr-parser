@@ -89,13 +89,15 @@ public:
     }
 };
 
+class accumulator_deferred;
+
 class dsl_pa
 {
 private:
     const static size_t unbounded = ~0;
 
     reader & r_reader;
-    std::string * p_accumulator;
+    accumulator_deferred * p_accumulator;
 
     template< typename Twriter >
     size_t read_or_skip_handler( std::string * p_output, const alphabet & r_alphabet, size_t max_chars );
@@ -157,6 +159,7 @@ public:
     bool /*is_parsed*/ read_sci_float( std::string * p_num );
     bool /*is_parsed*/ get_sci_float( double * p_float );
     bool /*is_parsed*/ get_sci_float( float * p_float );
+    bool /*is_parsed*/ get_qstring_contents( std::string * p_string );   // Assumes opening quotes already read. Does NOT consume closing quotes.
 
     // The primary workhorse functions
     // These get...() functions clear the output string before reading the input
@@ -194,13 +197,14 @@ public:
     bool read_fixed( std::string * p_output, const char * p_seeking );
     bool read_ifixed( std::string * p_output, const char * p_seeking );
 
-    // If the next input character is in the alphabet then add it to the string in the active accumulator object
-    bool accumulate( const alphabet & r_alphabet );
+    friend class accumulator_deferred;      // Use an instance of the accumulator class to store accumulated input
     bool accumulate( char c );
+    bool accumulate( const alphabet & r_alphabet ); // If next input character is in alphabet then add it to the active accumulator
     size_t accumulate_all( const alphabet & r_alphabet );
     bool accumulator_append( char c );          // Append character c to the active accumulator
     bool accumulator_append( const char * s );  // Append the string s to the active accumulator
-    friend class accumulator_deferred;      // Use an instance of the acculator class to store accumulated input
+    bool accumulator_append( const std::string & r_s );  // Append the string r_s to the active accumulator
+    bool accumulator_append( const accumulator_deferred & r_a );  // Append another accumulator to the active accumulator
 
     // Low-level reader access
     reader & get_reader() { return r_reader; }  // Primarily for use with locator class
@@ -213,6 +217,7 @@ public:
     // See class reader for documentation.  A typical code sequence might be:
     // location_push(); path_a() || location_top() && path_b(); location_pop();
     void location_push() { r_reader.location_push(); }
+    bool location_revise() { r_reader.location_revise(); return true; } // Allows incremental revision of the topmost stored location
     bool location_top() { r_reader.location_top(); return true; }
     bool location_top( bool ret ) { r_reader.location_top(); return ret; }
     void location_pop() { r_reader.location_pop(); }    // pop should always be called, so discourage it's use in a shortcircuit sequence
@@ -336,7 +341,7 @@ class accumulator_deferred      // Control access to dsl_pa::p_accumulator so it
 {                               // Do: accumulator my_value_accumulator( this );
 private:
     dsl_pa * p_dsl_pa;
-    std::string * p_previous_accumulator;
+    accumulator_deferred * p_previous_accumulator;
     std::string my_accumulator;
 
 public:
@@ -348,11 +353,17 @@ public:
     }
     ~accumulator_deferred() { previous(); }
 
-    bool select() { p_dsl_pa->p_accumulator = &my_accumulator; return true; }
+    bool select() { p_dsl_pa->p_accumulator = this; return true; }
     bool previous() { p_dsl_pa->p_accumulator = p_previous_accumulator; return true; }
     bool none() { p_dsl_pa->p_accumulator = 0; return true; }
     bool clear() { my_accumulator.clear(); return true; }
     bool select_and_clear() { select(); return clear(); }
+
+    bool append( char c ) { my_accumulator += c; return true; }
+    bool append( const char * s ) { my_accumulator += s; return true; }
+    bool append( const std::string & r_s ) { my_accumulator += r_s; return true; }
+    bool append( const accumulator_deferred & r_a ) { my_accumulator += r_a.my_accumulator; return true; }
+    bool append_to_previous() const { if( p_previous_accumulator ) p_previous_accumulator->append( my_accumulator ); return true; }
 
     const std::string & get() const { return my_accumulator; }
     bool put_in( std::string & r_place_where ) const { r_place_where = get(); return true; }
@@ -409,6 +420,31 @@ public:
 //        return true;
 //    }
 //};
+
+//----------------------------------------------------------------------------
+//                             Unicode utilities
+//----------------------------------------------------------------------------
+
+int code_point_from_hex( const std::string & r_hex_string );
+bool is_high_surrogate( int code_point );
+bool is_low_surrogate( int code_point );
+int code_point_from_surrogates( int high_surrogate, int low_surrogate );
+
+class MakeUTF8
+{
+private:
+    char utf8[6];
+
+public:
+    MakeUTF8( int code_point );
+
+    // Use as 'MakeUTF8( combined_code_point ).get()'
+    const char * get() const { return utf8; }
+
+private:
+    void pack_ascii( int code_point );
+    void pack( char marker, size_t length, int code_point );
+};
 
 } // End of namespace cl
 

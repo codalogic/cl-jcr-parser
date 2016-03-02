@@ -307,6 +307,265 @@ bool dsl_pa::get_sci_float( double * p_float )
     return true;
 }
 
+class QStringParser : public dsl_pa
+{
+    //  ; The defintion of a JSON string, from RFC 4627 s 2
+    //  q-string        = %x20-21 / %x23-5B / %x5D-10FFFF / "\" (
+    //                     %x22 /      ; "  u+0022
+    //                     %x5C /      ; \  u+005C
+    //                     %x2F /      ; /  u+002F
+    //                     %x62 /      ; BS u+0008
+    //                     %x66 /      ; FF u+000C
+    //                     %x6E /      ; LF u+000A
+    //                     %x72 /      ; CR u+000D
+    //                     %x74 /      ; HT u+0009
+    //                     ( %x75 4HEXDIG ) ) ; uXXXX u+XXXX
+
+private:
+    struct Members
+    {
+        std::string * p_v;
+        bool is_errored;
+
+        Members( std::string * p_v_in )
+            : p_v( p_v_in ), is_errored( false )
+        {}
+    } m;
+
+public:
+    QStringParser( cl::dsl_pa * p_dsl_pa, std::string * p_v )
+        : dsl_pa( p_dsl_pa->get_reader() ), m( p_v )
+    {}
+
+    bool read() // Assumes we have already consumed the opening quotation mark
+    {
+        cl::locator loc( this );
+
+        cl::accumulator q_string_accumulator( this );
+
+        star_qs_char();
+
+        *m.p_v = q_string_accumulator.get();
+
+        if( m.is_errored )
+            location_top();
+
+        return ! m.is_errored;
+    }
+
+    bool is_errored() const
+    {
+        return m.is_errored;
+    }
+
+private:
+    bool star_qs_char()
+    {
+        while( qs_char() )
+        {}
+
+        return true;
+    }
+
+    bool qs_char()
+    {
+        // qs_char     = unescaped /
+        //               escape (
+        //               %x22 /          ; "    quotation mark  U+0022
+        //               %x5C /          ; \    reverse solidus U+005C
+        //               %x2F /          ; /    solidus         U+002F
+        //               %x62 /          ; b    backspace       U+0008
+        //               %x66 /          ; f    form feed       U+000C
+        //               %x6E /          ; n    line feed       U+000A
+        //               %x72 /          ; r    carriage return U+000D
+        //               %x74 /          ; t    tab             U+0009
+        //               %x75 4HEXDIG )  ; uXXXX                U+XXXX
+
+        return unescaped() || escape() && (escaped_code() || u() && (escaped_hex_code() || error()) );
+    }
+
+    bool unescaped()
+    {
+        return unescaped_ascii() || unescaped_utf8();
+    }
+
+    static bool is_unescaped_ascii( char c )
+    {
+        // unescaped-ascii        = %x20-21 / %x23-5B / %x5D-7F
+
+        return c >= 0x20 && c <= 0x21 || c >= 0x23 && c <= 0x5b || c >= 0x5d && c <= 0x7f;
+    }
+
+    bool unescaped_ascii()
+    {
+        // unescaped_ascii        = %x20-21 / %x23-5B / %x5D-7F
+
+        return accumulate( cl::alphabet_function( is_unescaped_ascii ) );
+    }
+
+    static bool is_unescaped_leading_utf8( char c )
+    {
+        // unescaped-utf8        = %x80-FF
+
+        return static_cast<unsigned char>(c) >= 0xc2;
+    }
+
+    static bool is_unescaped_continuation_utf8( char c )
+    {
+        // unescaped-utf8        = %x80-FF
+
+        return static_cast<unsigned char>(c) >= 0x80 && static_cast<unsigned char>(c) <= 0xbf;
+    }
+
+    bool unescaped_utf8()
+    {
+        // unescaped-utf8        = %x80-10FFFF
+
+        cl::accumulator utf8_accumulator( this );
+        
+        if( accumulate( cl::alphabet_function( is_unescaped_leading_utf8 ) ) )
+        {
+            while( accumulate( cl::alphabet_function( is_unescaped_continuation_utf8 ) ) )
+            {}
+            
+            unsigned char c1 = static_cast<unsigned char>( utf8_accumulator.get()[0] );
+            unsigned char c2 = static_cast<unsigned char>( utf8_accumulator.get()[1] );
+            size_t length = utf8_accumulator.get().length();
+
+            if( c1 == 0xef && c2 == 0xbe && ( utf8_accumulator.get()[2] == 0xbe || utf8_accumulator.get()[2] == 0xbf ) ) // U+FFFE & U+FFFF are illegal
+                return error();
+
+            // From RFC 3629 - Make sure sequence is valid (e.g. doesn't encode a surrogate etc.)
+            // UTF8-octets = *( UTF8-char )
+            // UTF8-char   = UTF8-1 / UTF8-2 / UTF8-3 / UTF8-4
+            // UTF8-1      = %x00-7F - (Handled outside this function)
+            // UTF8-2      = %xC2-DF UTF8-tail
+            // UTF8-3      = %xE0 %xA0-BF UTF8-tail / %xE1-EC 2( UTF8-tail ) /
+            //               %xED %x80-9F UTF8-tail / %xEE-EF 2( UTF8-tail )
+            // UTF8-4      = %xF0 %x90-BF 2( UTF8-tail ) / %xF1-F3 3( UTF8-tail ) /
+            //               %xF4 %x80-8F 2( UTF8-tail )
+            // UTF8-tail   = %x80-BF
+            if( (c1 >= 0xc2 && c1 <= 0xdf && length == 2) ||
+                    (c1 == 0xe0 && (c2 >= 0xa0 && c2 <= 0xbf) && length == 3) ||
+                    (c1 >= 0xe1 && c1 <= 0xec && length == 3) ||
+                    (c1 == 0xed && (c2 >= 0x80 && c2 <= 0x9f) && length == 3) ||
+                    (c1 >= 0xee && c1 <= 0xef && length == 3) ||
+                    (c1 == 0xf0 && (c2 >= 0x90 && c2 <= 0xbf) && length == 4) ||
+                    (c1 >= 0xf1 && c1 <= 0xf3 && length == 4) ||
+                    (c1 == 0xf4 && (c2 >= 0x80 && c2 <= 0x8f) && length == 4) )
+            {
+                utf8_accumulator.append_to_previous();
+
+                return true;
+            }
+
+            return error();
+        }
+        
+        return false;
+    }
+
+    bool escape()
+    {
+        // escape           = %x5C              ; \
+
+        return is_get_char( '\\' );
+    }
+
+    bool escaped_code()
+    {
+        char c = peek();
+        return ( (c == '"' && accumulator_append( '"' )) ||
+                (c == '\\' && accumulator_append( '\\' )) ||
+                (c == '/' && accumulator_append( '/' )) ||
+                (c == 'b' && accumulator_append( '\b' )) ||
+                (c == 'f' && accumulator_append( '\f' )) ||
+                (c == 'n' && accumulator_append( '\n' )) ||
+                (c == 'r' && accumulator_append( '\r' )) ||
+                (c == 't' && accumulator_append( '\t' )) )
+                && get();   // Consume peeked character if it's one we want
+    }
+
+    bool u()
+    {
+        return is_get_char( 'u' );
+    }
+
+    bool escaped_hex_code()
+    {
+        cl::accumulator hex_code_accumulator( this );
+        if( four_HEXDIG() )
+        {
+            hex_code_accumulator.previous();
+            int code_point = code_point_from_hex( hex_code_accumulator.get() );
+            if( is_high_surrogate( code_point ) )
+            {
+                return complete_surrogate_pair( code_point );
+            }
+            else if( is_low_surrogate( code_point ) )
+            {
+                return error();
+            }
+            else
+            {
+                accumulator_append( MakeUTF8( code_point_from_hex( hex_code_accumulator.get() ) ).get() );
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    bool complete_surrogate_pair( int high_surrogate_code_point )
+    {
+        cl::accumulator hex_code_accumulator( this );
+
+        if( escape() && u() && four_HEXDIG() )
+        {
+            int low_surrogate_code_point = code_point_from_hex( hex_code_accumulator.get() );
+            if( ! is_low_surrogate( low_surrogate_code_point ) )
+                return error();
+
+            int combined_code_point = code_point_from_surrogates( high_surrogate_code_point, low_surrogate_code_point );
+            hex_code_accumulator.previous();
+            accumulator_append( MakeUTF8( combined_code_point ).get() );
+
+            return true;
+        }
+
+        return error();
+    }
+
+    bool four_HEXDIG()
+    {
+        for( size_t i=0; i<4; ++i )
+            if( ! HEXDIG() )
+                return error();
+        return true;
+    }
+
+    bool HEXDIG()
+    {
+        // HEXDIG() = DIGIT() || "A" || "B" || "C" || "D" || "E" || "F"
+
+        return accumulate( cl::alphabet_hex() );
+    }
+
+    bool DIGIT()
+    {
+        // DIGIT() = %x30-39      ; 0-9
+
+        return accumulate( cl::alphabet_digit() );
+    }
+
+    bool error() { m.is_errored = true; return false; }
+};
+
+bool dsl_pa::get_qstring_contents( std::string * p_string )
+{
+    return QStringParser( this, p_string ).read();
+}
+
 size_t dsl_pa::get( std::string * p_output, const alphabet & r_alphabet )
 {
     p_output->clear();
@@ -588,26 +847,26 @@ bool dsl_pa::read_ifixed( std::string * p_output, const char * p_seeking )
     return read_fixed_or_ifixed< compare_ifixed >( p_output, p_seeking );
 }
 
-bool dsl_pa::accumulate( const alphabet & r_alphabet )
-{
-    if( r_alphabet.is_sought( get() ) )
-    {
-        if( p_accumulator )
-            *p_accumulator += current();
-        return true;
-    }
-    unget();
-    return false;
-}
-
 bool dsl_pa::accumulate( char c )
 {
     if( is_get_char( c ) )
     {
         if( p_accumulator )
-            *p_accumulator += c;
+            p_accumulator->append( c );
         return true;
     }
+    return false;
+}
+
+bool dsl_pa::accumulate( const alphabet & r_alphabet )
+{
+    if( r_alphabet.is_sought( get() ) )
+    {
+        if( p_accumulator )
+            p_accumulator->append( current() );
+        return true;
+    }
+    unget();
     return false;
 }
 
@@ -622,15 +881,110 @@ size_t dsl_pa::accumulate_all( const alphabet & r_alphabet )
 bool dsl_pa::accumulator_append( char c )
 {
     if( p_accumulator )
-        *p_accumulator += c;
+        p_accumulator->append( c );
     return true;
 }
 
 bool dsl_pa::accumulator_append( const char * s )
 {
     if( p_accumulator )
-        *p_accumulator += s;
+        p_accumulator->append( s );
     return true;
+}
+
+bool dsl_pa::accumulator_append( const std::string & r_s )
+{
+    if( p_accumulator )
+        p_accumulator->append( r_s );
+    return true;
+}
+
+bool dsl_pa::accumulator_append( const accumulator_deferred & r_a )
+{
+    if( p_accumulator )
+        p_accumulator->append( r_a.get() );
+    return true;
+}
+
+//----------------------------------------------------------------------------
+//                             Unicode utilities
+//----------------------------------------------------------------------------
+
+int code_point_from_hex( const std::string & r_hex_string )
+{
+    int code_point = 0;
+
+    for( size_t i=0; i < r_hex_string.size(); ++i )
+    {
+        char c = r_hex_string[i];
+        int new_value = 0;
+        if( isdigit( c ) )
+            new_value = c - '0';
+        else if( c >= 'a' && c <= 'f' )
+            new_value = c - 'a' + 10;
+        else if( c >= 'A' && c <= 'F' )
+            new_value = c - 'A' + 10;
+        code_point = code_point * 16 + new_value;
+    }
+
+    return code_point;
+}
+
+bool is_high_surrogate( int code_point )
+{
+    return code_point >= 0xD800 && code_point <= 0xDBFF;
+}
+
+bool is_low_surrogate( int code_point )
+{
+    return code_point >= 0xDC00 && code_point <= 0xDFFF;
+}
+
+int code_point_from_surrogates( int high_surrogate, int low_surrogate )
+{
+    return ((high_surrogate & 0x3ff) << 10) + (low_surrogate & 0x3ff) + 0x10000;
+}
+
+MakeUTF8::MakeUTF8( int code_point )
+{
+    // From rfc3629:
+    // Char. number range  |        UTF-8 octet sequence
+    //   (hexadecimal)     |              (binary)
+    // --------------------+---------------------------------------------
+    // 0000 0000-0000 007F | 0xxxxxxx
+    // 0000 0080-0000 07FF | 110xxxxx 10xxxxxx
+    // 0000 0800-0000 FFFF | 1110xxxx 10xxxxxx 10xxxxxx
+    // 0001 0000-0010 FFFF | 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+
+    if( code_point <= 0x7f )
+        pack_ascii( code_point );
+    else if( code_point >= 0x10000 )
+        pack( '\xf0', 4, code_point );
+    else if( code_point >= 0x00800 )
+        pack( '\xe0', 3, code_point );
+    else if( code_point >= 0x00080 )
+        pack( '\xc0', 2, code_point );
+    else
+        utf8[0] = '\0';
+}
+
+void MakeUTF8::pack_ascii( int code_point )
+{
+    utf8[0] = code_point;
+    utf8[1] = '\0';
+}
+
+void MakeUTF8::pack( char marker, size_t length, int code_point )
+{
+    utf8[length] = '\0';
+    int scaled_code_point = code_point;
+    for( int i = length-1; i >= 0; --i )
+    {
+        utf8[i] = scaled_code_point & 0x3f;
+        utf8[i] |= 0x80;
+        scaled_code_point >>= 6;
+    }
+    utf8[0] |= marker;
 }
 
 } // End of namespace cl
