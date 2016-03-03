@@ -192,6 +192,8 @@ private:
     bool any();
     bool object_rule();
     bool object_items();
+    bool star_sequence_combiner_and_object_item();
+    bool star_choice_combiner_and_object_item();
     bool object_item();
     bool object_item_types();
     bool object_group();
@@ -1327,7 +1329,20 @@ bool GrammarParser::object_rule()
 {
     // object_rule() = annotations() [ ":" && *sp_cmt() ] "{" && *sp_cmt() [ object_items() && *sp_cmt() ] "}"
 
-    annotations();
+    // No need to record location because array_rule() is always part of a rewound choice
+
+    if( annotations() && optional( is_get_char( ':' ) && star_sp_cmt() ) && is_get_char( '{' ) )
+    {
+        m.p_rule->type = Rule::OBJECT;
+
+        star_sp_cmt() && optional( object_items() ) && star_sp_cmt();
+
+        is_get_char( '}' ) || fatal( "Expected '}' at end of object rule" );
+
+        return true;
+    }
+
+    m.p_rule->annotations.clear();
 
     return false;
 }
@@ -1336,12 +1351,68 @@ bool GrammarParser::object_items()
 {
     // object_items() = object_item() && (*( sequence_combiner() && object_item() ) || *( choice_combiner() && object_item() ) )
 
+    if( object_item() )
+    {
+        star_sequence_combiner_and_object_item() && set( m.p_rule->child_combiner, Rule::Sequence ) ||
+            star_choice_combiner_and_object_item() && set( m.p_rule->child_combiner, Rule::Choice );
+        return true;
+    }
+
     return false;
+}
+
+bool GrammarParser::star_sequence_combiner_and_object_item()
+{
+    bool is_used = false;
+
+    while( sequence_combiner() )
+    {
+        is_used = true;
+        object_item() || fatal( "Expected object-item after sequence-combiner in object definition" );
+    }
+
+    if( is_used && choice_combiner() )
+        fatal( "choice-combiner can not be used with sequence-combiner without Parentheses" );
+
+    return is_used;
+}
+
+bool GrammarParser::star_choice_combiner_and_object_item()
+{
+    bool is_used = false;
+
+    while( choice_combiner() )
+    {
+        is_used = true;
+        object_item() || fatal( "Expected object-item after choice-combiner in object definition" );
+    }
+
+    if( is_used && sequence_combiner() )
+        fatal( "sequence-combiner can not be used with choice-combiner without Parentheses" );
+
+    return is_used;
 }
 
 bool GrammarParser::object_item()
 {
     // object_item() = [ repetition() && *sp_cmt() ] && object_item_types()
+
+    bool has_repetition = false;
+
+    Rule * p_parent = m.p_rule;
+
+    Rule::uniq_ptr pu_rule( new Rule );
+    RuleStackLogger rule_stack_logger( this, pu_rule );
+
+    if( optional( record( has_repetition, repetition() ) ) && star_sp_cmt() && object_item_types() )
+    {
+        p_parent->append_child_rule( pu_rule );
+
+        return true;
+    }
+
+    if( has_repetition )
+        fatal( "Expected object-item-types after repetition" );
 
     return false;
 }
@@ -1350,12 +1421,26 @@ bool GrammarParser::object_item_types()
 {
     // object_item_types() = member_rule() || target_rule_name() || object_group()
 
-    return false;
+    cl::locator loc( this );
+
+    return optional_rewind( member_rule() ) ||
+            optional_rewind( target_rule_name() ) ||
+            optional_rewind( object_group() );
 }
 
 bool GrammarParser::object_group()
 {
     // object_group() = "(" && *sp_cmt() [ object_items() && *sp_cmt() ] ")"
+
+    if( is_get_char( '(' ) )
+    {
+        m.p_rule->type = Rule::OBJECT;
+
+        star_sp_cmt() && optional( object_items() ) && star_sp_cmt();
+        is_get_char( ')' ) || fatal( "Expected ')' at end of object-group" );
+
+        return true;
+    }
 
     return false;
 }
