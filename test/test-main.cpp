@@ -36,5 +36,4 @@
 
 TFEATURE( "Miscellaneous TODOs" )
 {
-    TTODO( "Enhance GrammarParser::q_string() and QStringParser to full spec" );
 }

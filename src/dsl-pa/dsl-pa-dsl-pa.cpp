@@ -422,12 +422,12 @@ private:
         // unescaped-utf8        = %x80-10FFFF
 
         cl::accumulator utf8_accumulator( this );
-        
+
         if( accumulate( cl::alphabet_function( is_unescaped_leading_utf8 ) ) )
         {
             while( accumulate( cl::alphabet_function( is_unescaped_continuation_utf8 ) ) )
             {}
-            
+
             unsigned char c1 = static_cast<unsigned char>( utf8_accumulator.get()[0] );
             unsigned char c2 = static_cast<unsigned char>( utf8_accumulator.get()[1] );
             size_t length = utf8_accumulator.get().length();
@@ -461,7 +461,7 @@ private:
 
             return error();
         }
-        
+
         return false;
     }
 

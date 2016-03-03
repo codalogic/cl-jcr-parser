@@ -1,4 +1,4 @@
-Tests table of contents generated on Wed Mar 02 16:41:34 2016
+Tests table of contents generated on Thu Mar 03 11:27:14 2016
 
 # test-grammar-set.cpp
 | Description | Line |
@@ -32,6 +32,6 @@ Tests table of contents generated on Wed Mar 02 16:41:34 2016
 | GrammarParser - Syntax parsing - Primitive rules | 260 |
 | GrammarParser - Syntax parsing - root rule | 653 |
 | GrammarParser - Syntax parsing - Member name | 691 |
-| GrammarParser - Syntax parsing - type-choice | 725 |
-| GrammarParser - Syntax parsing - array | 819 |
-| GrammarParser - Syntax parsing - repetition | 1031 |
+| GrammarParser - Syntax parsing - type-choice | 753 |
+| GrammarParser - Syntax parsing - array | 847 |
+| GrammarParser - Syntax parsing - repetition | 1059 |

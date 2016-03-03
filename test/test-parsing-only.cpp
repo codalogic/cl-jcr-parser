@@ -718,6 +718,34 @@ TFEATURE( "GrammarParser - Syntax parsing - Member name" )
         TCRITICALTEST( ph.grammar().rules[0].type == Rule::TARGET_RULE );
         TCRITICALTEST( ph.grammar().rules[0].target_rule.local_name == "my_type" );
     }
+    {
+        TSETUP( ParserHarness ph( "my_rule \"abc\xE0\xAC\x8Bz\" : null\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "my_rule" );
+        TCRITICALTEST( ph.grammar().rules[0].member_name.is_literal() == true );
+        TCRITICALTEST( ph.grammar().rules[0].member_name.name() == "abc\xE0\xAC\x8Bz" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::TNULL );
+    }
+    {
+        TSETUP( ParserHarness ph( "my_rule \"X\\u0802A\" : null\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "my_rule" );
+        TCRITICALTEST( ph.grammar().rules[0].member_name.is_literal() == true );
+        TCRITICALTEST( ph.grammar().rules[0].member_name.name() == "X\xE0\xA0\x82""A" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::TNULL );
+    }
+    {
+        TSETUP( ParserHarness ph( "my_rule \"abc\\uD808\\uDF45=Ra\" : null\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "my_rule" );
+        TCRITICALTEST( ph.grammar().rules[0].member_name.is_literal() == true );
+        TCRITICALTEST( ph.grammar().rules[0].member_name.name() == "abc\xF0\x92\x8D\x85=Ra" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::TNULL );
+    }
+
     TCALL( test_parsing_bad_input(
                         "my_rule /p_ref\\d+/i * integer\n" ) );
 }
