@@ -1457,8 +1457,7 @@ TFEATURE( "GrammarParser - Syntax parsing - group" )
     }
     {
         // This rule should fail higher level validity parsing but is valid at the parsing level
-        TSETUP( ParserHarness ph( "#import http://foo.com as my_alias\n"
-                                  "my_rule ( 5 :float, ((: 1..5, \"name\":float) | my_alias.other-rule | [ :integer, :/p*/ ] ) )\n" ) );
+        TSETUP( ParserHarness ph( "#{import http://foo.com as my_alias} my_rule ( 5 :float, ((: 1..5, \"name\":float) | my_alias.other-rule | [ :integer, :/p*/ ] ) )\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
         TCRITICALTEST( ph.grammar().rules[0].rule_name == "my_rule" );
@@ -1598,4 +1597,24 @@ TFEATURE( "GrammarParser - Syntax parsing - repetition" )
         TCRITICALTEST( ph.grammar().rules[0].children[0].repetition.min == 2 );
         TCRITICALTEST( ph.grammar().rules[0].children[0].repetition.max == 5 );
     }
+}
+
+TFEATURE( "GrammarParser - Syntax parsing - annotations" )
+{
+    TCALL( test_parsing_only(
+                        "my_rule @{root} other_rule\n" ) );
+    TCALL( test_parsing_only(
+                        "my_rule [ @{id type} : string, : float ]\n" ) );
+    TCALL( test_parsing_only(
+                        "my_rule [ @{id type} : string, ? @{when $type} : float ]\n" ) );
+    TCALL( test_parsing_only(
+                        "my_rule [ @{id type} : string, ? @{when $type}@{assert $ > 15.0} : float ]\n" ) );
+    TCALL( test_parsing_only(
+                        "my_rule [ @{id type}@{assert $==\"in\" || $==\"out\"} : string, ? : float ]\n" ) );
+    TCALL( test_parsing_only(
+                        "my_rule [ @{id type}@{assert $==/^\\w{1,4}$/} : string, ? : float ]\n" ) );
+    TCALL( test_parsing_only(
+                        "my_rule [ @{id type}@{assert $==/^\\w{1,4}$/ ; Must for 4 or less chars{};} : string, ? : float ]\n" ) );
+    TCALL( test_parsing_bad_input(
+                        "my_rule [ @{unknown} : string, : float ]\n" ) );
 }

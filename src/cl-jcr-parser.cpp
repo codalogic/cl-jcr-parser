@@ -979,7 +979,10 @@ bool GrammarParser::tbd_annotation()
 
     annotation_name() && optional( spaces() && name_accumulator.none() && annotation_parameters() );
 
-    fatal( (std::string( "Annotation: '" ) + name_accumulator.get() + "' not supported").c_str() );
+    if( name_accumulator.get() == "id" || name_accumulator.get() == "assert" || name_accumulator.get() == "when" )
+        warning( (std::string( "Annotation: '" ) + name_accumulator.get() + "' not yet implemented").c_str() );
+    else
+        fatal( (std::string( "Annotation: '" ) + name_accumulator.get() + "' unknown").c_str() );
 
     return true;    // We've 'accepted' this path despite having decided to error
 }

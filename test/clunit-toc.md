@@ -1,4 +1,4 @@
-Tests table of contents generated on Fri Mar 04 11:43:02 2016
+Tests table of contents generated on Fri Mar 04 15:41:24 2016
 
 # test-grammar-set.cpp
 | Description | Line |
@@ -36,4 +36,5 @@ Tests table of contents generated on Fri Mar 04 11:43:02 2016
 | GrammarParser - Syntax parsing - object | 847 |
 | GrammarParser - Syntax parsing - array | 1120 |
 | GrammarParser - Syntax parsing - group | 1333 |
-| GrammarParser - Syntax parsing - repetition | 1510 |
+| GrammarParser - Syntax parsing - repetition | 1509 |
+| GrammarParser - Syntax parsing - annotations | 1602 |

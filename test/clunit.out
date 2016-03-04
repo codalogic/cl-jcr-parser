@@ -1,4 +1,4 @@
-Tests run on Fri Mar 04 11:43:02 2016
+Tests run on Fri Mar 04 15:41:24 2016
 
     GrammarSet TODOS [test-grammar-set.cpp:40]
     ==========================================
@@ -1356,7 +1356,7 @@ jcr-version
     ok: ph.grammar().rules[0].children[1].children[1].repetition.min == 1
     ok: ph.grammar().rules[0].children[1].children[1].repetition.max == 1
     ok: ph.grammar().rules[0].children[1].children[1].children.size() == 0
-      : ParserHarness ph( "#import http://foo.com as my_alias\n" "my_rule ( 5 :float, ((: 1..5, \"name\":float) | my_alias.other-rule | [ :integer, :/p*/ ] ) )\n" )
+      : ParserHarness ph( "#{import http://foo.com as my_alias} my_rule ( 5 :float, ((: 1..5, \"name\":float) | my_alias.other-rule | [ :integer, :/p*/ ] ) )\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].rule_name == "my_rule"
@@ -1389,17 +1389,17 @@ jcr-version
     ok: ph.grammar().rules[0].children[1].children[2].children[1].type == Rule::STRING_REGEX
     ok: ph.grammar().rules[0].children[1].children[2].children[1].member_name.is_absent()
     ok: ph.grammar().rules[0].children[1].children[2].children[1].min == "/p*/"
-      Calling: test_parsing_bad_input( "my_rule (: integer, :float | :string )\n" ) (1505)
+      Calling: test_parsing_bad_input( "my_rule (: integer, :float | :string )\n" ) (1504)
       my_rule (: integer, :float | :string )
 
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "my_rule (: integer, )\n" ) (1507)
+      Calling: test_parsing_bad_input( "my_rule (: integer, )\n" ) (1506)
       my_rule (: integer, )
 
     ok: status != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - Syntax parsing - repetition [test-parsing-only.cpp:1510]
+    GrammarParser - Syntax parsing - repetition [test-parsing-only.cpp:1509]
     ========================================================================
       : ParserHarness ph( "my_rule [ : integer ]\n" )
     ok: ph.status() == JCRParser::S_OK
@@ -1467,6 +1467,42 @@ jcr-version
     ok: ph.grammar().rules[0].children[0].repetition.min == 2
     ok: ph.grammar().rules[0].children[0].repetition.max == 5
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    GrammarParser - Syntax parsing - annotations [test-parsing-only.cpp:1602]
+    =========================================================================
+      Calling: test_parsing_only( "my_rule @{root} other_rule\n" ) (1605)
+      my_rule @{root} other_rule
+
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only( "my_rule [ @{id type} : string, : float ]\n" ) (1607)
+      my_rule [ @{id type} : string, : float ]
+
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only( "my_rule [ @{id type} : string, ? @{when $type} : float ]\n" ) (1609)
+      my_rule [ @{id type} : string, ? @{when $type} : float ]
+
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only( "my_rule [ @{id type} : string, ? @{when $type}@{assert $ > 15.0} : float ]\n" ) (1611)
+      my_rule [ @{id type} : string, ? @{when $type}@{assert $ > 15.0} : float ]
+
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only( "my_rule [ @{id type}@{assert $==\"in\" || $==\"out\"} : string, ? : float ]\n" ) (1613)
+      my_rule [ @{id type}@{assert $=="in" || $=="out"} : string, ? : float ]
+
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only( "my_rule [ @{id type}@{assert $==/^\\w{1,4}$/} : string, ? : float ]\n" ) (1615)
+      my_rule [ @{id type}@{assert $==/^\w{1,4}$/} : string, ? : float ]
+
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only( "my_rule [ @{id type}@{assert $==/^\\w{1,4}$/ ; Must for 4 or less chars{};} : string, ? : float ]\n" ) (1617)
+      my_rule [ @{id type}@{assert $==/^\w{1,4}$/ ; Must for 4 or less chars{};} : string, ? : float ]
+
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_bad_input( "my_rule [ @{unknown} : string, : float ]\n" ) (1619)
+      my_rule [ @{unknown} : string, : float ]
+
+    ok: status != JCRParser::S_OK
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
 
 TODOs (2):
@@ -1474,4 +1510,4 @@ TODOs (2):
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:42]
 - Test low level GrammarSet class [test-low-level-objects.cpp:198]
 
-0 error(s), 2 todo(s), 1085 test(s)
+0 error(s), 2 todo(s), 1094 test(s)
