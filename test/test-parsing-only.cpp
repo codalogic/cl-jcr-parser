@@ -1330,6 +1330,183 @@ TFEATURE( "GrammarParser - Syntax parsing - array" )
                         "my_rule : [: integer, ]\n" ) );
 }
 
+TFEATURE( "GrammarParser - Syntax parsing - group" )
+{
+    {
+        TSETUP( ParserHarness ph( "my_rule ( : integer )\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "my_rule" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::GROUP );
+
+        TCRITICALTEST( ph.grammar().rules[0].children.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].rule_name == "" );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].member_name.is_absent() );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].type == Rule::INTEGER );
+    }
+    {
+        TSETUP( ParserHarness ph( "my_rule ( \"name\" : integer )\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "my_rule" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::GROUP );
+
+        TCRITICALTEST( ph.grammar().rules[0].children.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].rule_name == "" );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].member_name.is_literal() );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].member_name.name() == "name" );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].type == Rule::INTEGER );
+    }
+    {
+        TSETUP( ParserHarness ph( "my_rule ( /p-\\d+/ : integer )\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "my_rule" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::GROUP );
+
+        TCRITICALTEST( ph.grammar().rules[0].children.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].rule_name == "" );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].member_name.is_regex() );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].member_name.name() == "/p-\\d+/" );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].type == Rule::INTEGER );
+    }
+    {
+        TSETUP( ParserHarness ph( "my_rule ( other-rule )\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "my_rule" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::GROUP );
+
+        TCRITICALTEST( ph.grammar().rules[0].children.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].rule_name == "" );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].member_name.is_absent() );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].type == Rule::TARGET_RULE );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].target_rule.local_name == "other-rule" );
+    }
+    {
+        TSETUP( ParserHarness ph( "my_rule ( 5 :float, ((: integer, :float) | : string) )\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "my_rule" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::GROUP );
+        TCRITICALTEST( ph.grammar().rules[0].children.size() == 2 );
+        TCRITICALTEST( ph.grammar().rules[0].child_combiner == Rule::Sequence );
+
+        TCRITICALTEST( ph.grammar().rules[0].children[0].type == Rule::FLOAT );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].repetition.min == 5 );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].repetition.max == 5 );
+
+        TCRITICALTEST( ph.grammar().rules[0].children[1].type == Rule::GROUP );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children.size() == 2 );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].child_combiner == Rule::Choice );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].type == Rule::GROUP );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].children.size() == 2 );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].children[0].type == Rule::INTEGER );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].children[1].type == Rule::FLOAT );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[1].type == Rule::STRING_TYPE );
+    }
+    {
+        TSETUP( ParserHarness ph( "my_rule ( ? \"flt\":float, ((\"int\": integer, \"flt2\":float) | \"str\" : string) )\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "my_rule" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::GROUP );
+        TCRITICALTEST( ph.grammar().rules[0].child_combiner == Rule::Sequence );
+        TCRITICALTEST( ph.grammar().rules[0].children.size() == 2 );
+
+        TCRITICALTEST( ph.grammar().rules[0].children[0].type == Rule::FLOAT );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].member_name.is_literal() );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].member_name.name() == "flt" );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].repetition.min == 0 );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].repetition.max == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].children.size() == 0 );
+
+        TCRITICALTEST( ph.grammar().rules[0].children[1].type == Rule::GROUP );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].child_combiner == Rule::Choice );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].member_name.is_absent() );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].repetition.min == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].repetition.max == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children.size() == 2 );
+
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].type == Rule::GROUP );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].child_combiner == Rule::Sequence );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].member_name.is_absent() );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].repetition.min == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].repetition.max == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].children.size() == 2 );
+
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].children[0].type == Rule::INTEGER );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].children[0].member_name.is_literal() );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].children[0].member_name.name() == "int" );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].children[0].repetition.min == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].children[0].repetition.max == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].children[0].children.size() == 0 );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].children[1].type == Rule::FLOAT );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].children[1].member_name.is_literal() );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].children[1].member_name.name() == "flt2" );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].children[1].repetition.min == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].children[1].repetition.max == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].children[1].children.size() == 0 );
+
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[1].type == Rule::STRING_TYPE );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[1].member_name.is_literal() );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[1].member_name.name() == "str" );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[1].repetition.min == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[1].repetition.max == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].children[1].children.size() == 0 );
+    }
+    {
+        // This rule should fail higher level validity parsing but is valid at the parsing level
+        TSETUP( ParserHarness ph( "#import http://foo.com as my_alias\n"
+                                  "my_rule ( 5 :float, ((: 1..5, \"name\":float) | my_alias.other-rule | [ :integer, :/p*/ ] ) )\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "my_rule" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::GROUP );
+        TCRITICALTEST( ph.grammar().rules[0].children.size() == 2 );
+        TCRITICALTEST( ph.grammar().rules[0].child_combiner == Rule::Sequence );
+
+            TCRITICALTEST( ph.grammar().rules[0].children[0].type == Rule::FLOAT );
+            TCRITICALTEST( ph.grammar().rules[0].children[0].repetition.min == 5 );
+            TCRITICALTEST( ph.grammar().rules[0].children[0].repetition.max == 5 );
+            TCRITICALTEST( ph.grammar().rules[0].children[0].member_name.is_absent() );
+
+            TCRITICALTEST( ph.grammar().rules[0].children[1].type == Rule::GROUP );
+            TCRITICALTEST( ph.grammar().rules[0].children[1].children.size() == 3 );
+            TCRITICALTEST( ph.grammar().rules[0].children[1].child_combiner == Rule::Choice );
+
+                TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].type == Rule::GROUP );
+                TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].children.size() == 2 );
+
+                    TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].children[0].type == Rule::INTEGER );
+                    TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].children[0].min == "1" );
+                    TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].children[0].max == "5" );
+
+                    TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].children[1].type == Rule::FLOAT );
+                    TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].children[1].member_name.is_literal() );
+                    TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].children[1].member_name.name() == "name" );
+
+                TCRITICALTEST( ph.grammar().rules[0].children[1].children[1].type == Rule::TARGET_RULE );
+                TCRITICALTEST( ph.grammar().rules[0].children[1].children[1].target_rule.rulesetid == "http://foo.com" );
+                TCRITICALTEST( ph.grammar().rules[0].children[1].children[1].target_rule.local_name == "other-rule" );
+                TCRITICALTEST( ph.grammar().rules[0].children[1].children[1].children.size() == 0 );
+
+                TCRITICALTEST( ph.grammar().rules[0].children[1].children[2].type == Rule::ARRAY );
+                TCRITICALTEST( ph.grammar().rules[0].children[1].children[2].children.size() == 2 );
+
+                    TCRITICALTEST( ph.grammar().rules[0].children[1].children[2].children[0].type == Rule::INTEGER );
+                    TCRITICALTEST( ph.grammar().rules[0].children[1].children[2].children[0].member_name.is_absent() );
+
+                    TCRITICALTEST( ph.grammar().rules[0].children[1].children[2].children[1].type == Rule::STRING_REGEX );
+                    TCRITICALTEST( ph.grammar().rules[0].children[1].children[2].children[1].member_name.is_absent() );
+                    TCRITICALTEST( ph.grammar().rules[0].children[1].children[2].children[1].min == "/p*/" );
+    }
+    TCALL( test_parsing_bad_input(
+                        "my_rule (: integer, :float | :string )\n" ) );   // Can't mix sequence and choice combiners
+    TCALL( test_parsing_bad_input(
+                        "my_rule (: integer, )\n" ) );  // No member defined after comma
+}
+
 TFEATURE( "GrammarParser - Syntax parsing - repetition" )
 {
     {
