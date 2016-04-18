@@ -713,7 +713,7 @@ bool GrammarParser::root_rule()
 
 bool GrammarParser::rule()
 {
-    // rule() = rule_name() && *sp_cmt() && rule_def()
+    // rule() = rule_name() && *sp_cmt() && "=" && *sp_cmt() && rule_def()
 
     cl::accumulator name_accumulator( this );
 
@@ -724,7 +724,7 @@ bool GrammarParser::rule()
 
         m.p_rule->rule_name = name_accumulator.get();
 
-        star_sp_cmt() && rule_def() || fatal( "Unable to read rule definition" );
+        star_sp_cmt() && is_get_char( '=' ) && star_sp_cmt() && rule_def() || fatal( "Unable to read rule definition" );
 
         m.p_grammar->append_rule( pu_rule );
 
