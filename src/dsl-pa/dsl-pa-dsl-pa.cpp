@@ -38,6 +38,8 @@
 
 #include "dsl-pa/dsl-pa-dsl-pa.h"
 
+#include <sstream>
+
 namespace cl {
 
 using namespace alphabet_helpers;
@@ -904,6 +906,24 @@ bool dsl_pa::accumulator_append( const accumulator_deferred & r_a )
     if( p_accumulator )
         p_accumulator->append( r_a.get() );
     return true;
+}
+
+//----------------------------------------------------------------------------
+//                             accumulator implementation
+//----------------------------------------------------------------------------
+
+int64 accumulator_deferred::to_int64() const
+{
+    int64 v;
+    std::istringstream( my_accumulator ) >> v;
+    return v;
+}
+
+uint64 accumulator_deferred::to_uint64() const
+{
+    uint64 v;
+    std::istringstream( my_accumulator ) >> v;
+    return v;
 }
 
 //----------------------------------------------------------------------------
