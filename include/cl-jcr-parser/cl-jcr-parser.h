@@ -17,6 +17,10 @@
 #include <string>
 #include <cstdlib>
 
+#if __cplusplus >= 201103L
+    #include <cstdint>
+#endif
+
 namespace cl { class reader; }
 
 namespace cljcr {
@@ -43,6 +47,14 @@ struct uniq_ptr
 #endif
 };
 
+#if __cplusplus < 201103L
+    typedef long long int64;
+    typedef unsigned long long uint64;
+#else
+    typedef std::int64_t int64;
+    typedef std::uint64_t uint64;
+#endif
+
 struct Repetition
 {
     int min;
@@ -53,12 +65,19 @@ struct Repetition
 
 struct Annotations
 {
-    bool reject;
+    bool is_not;
     bool is_unordered;
     bool is_root;
 
-    Annotations() : reject( false ), is_unordered( false ), is_root( false ) {}
-    void clear() { reject = is_unordered = is_root = false; }
+    Annotations() : is_not( false ), is_unordered( false ), is_root( false ) {}
+    void clear() { is_not = is_unordered = is_root = false; }
+    bool merge( const Annotations & r_rhs )
+    {
+        is_not = ( is_not || r_rhs.is_not );
+        is_unordered = ( is_unordered || r_rhs.is_unordered );
+        is_root = ( is_root || r_rhs.is_root );
+        return true;
+    }
 };
 
 class MemberName
@@ -87,29 +106,59 @@ class ValueConstraint
 {
 private:
     struct Members {
-        bool is_set;
-        std::string value;
+        enum Form { unset, string_form, bool_form, int_form, uint_form, float_form } form;
+        std::string string_value;
+        bool bool_value;
+        int64 int_value;
+        uint64 uint_value;
+        double float_value;
 
-        Members() : is_set( false ) {}
+        Members() : form( unset ) {}
     } m;
 
 public:
+    void clear() { m.form = Members::unset; m.string_value.clear(); }
     ValueConstraint & operator = ( const std::string & r_constraint )
     {
-        m.is_set = true;
-        m.value = r_constraint;
+        m.form = Members::string_form;
+        m.string_value = r_constraint;
         return *this;
     }
-    bool is_set() const { return m.is_set; }
-    bool operator == ( const std::string & r_rhs ) const { return m.value == r_rhs; }
-    bool operator == ( const char * p_rhs ) const { return m.value == p_rhs; }
-    bool operator != ( const std::string & r_rhs ) const { return m.value != r_rhs; }
-    bool operator != ( const char * p_rhs ) const { return m.value != p_rhs; }
-    const std::string & to_string() const { return m.value; }
-    bool to_bool() const { return m.value == "true"; }
-    int to_int() const { return atoi( m.value.c_str() ); }
-    double to_float() const { return atof( m.value.c_str() ); }
-    void clear() { m.is_set = false; m.value.clear(); }
+    ValueConstraint & operator = ( bool constraint )
+    {
+        m.form = Members::bool_form;
+        m.bool_value = constraint;
+        return *this;
+    }
+    ValueConstraint & operator = ( int64 constraint )
+    {
+        m.form = Members::int_form;
+        m.int_value = constraint;
+        return *this;
+    }
+    ValueConstraint & operator = ( uint64 constraint )
+    {
+        m.form = Members::uint_form;
+        m.uint_value = constraint;
+        return *this;
+    }
+    ValueConstraint & operator = ( double constraint )
+    {
+        m.form = Members::float_form;
+        m.float_value = constraint;
+        return *this;
+    }
+    bool is_set() const { return m.form != Members::unset; }
+    bool is_string() const { return m.form == Members::string_form; }
+    bool is_bool() const { return m.form == Members::bool_form; }
+    bool is_int() const { return m.form == Members::int_form; }
+    bool is_uint() const { return m.form == Members::uint_form; }
+    bool is_float() const { return m.form == Members::float_form; }
+    const std::string & as_string() const { assert( m.form == Members::string_form ); return m.string_value; }
+    bool as_bool() const { assert( m.form == Members::bool_form ); return m.bool_value; }
+    int64 as_int() const { assert( m.form == Members::int_form ); return m.int_value; }
+    uint64 as_uint() const { assert( m.form == Members::uint_form ); return m.uint_value; }
+    double as_float() const { assert( m.form == Members::float_form ); return m.float_value; }
 };
 
 struct Rule;
@@ -128,11 +177,13 @@ struct Rule : private detail::NonCopyable
     typedef uniq_ptr<Rule>::type uniq_ptr;
 
     enum Type {
-            NONE, TNULL, BOOLEAN, INTEGER, FLOAT,
+            NONE, TNULL, BOOLEAN, INTEGER, UINTEGER, DOUBLE, FLOAT,
             STRING_TYPE, STRING_REGEX, STRING_LITERAL,
-            URI_TYPE, URI_RANGE, IP4, IP6, FQDN, IDN,
+            IPV4, IPV6, IPADDR, FQDN, IDN,
+            URI_TYPE, URI_RANGE, EMAIL, PHONE,
             DATETIME, DATE, TIME,
-            EMAIL, PHONE, BASE64, ANY,
+            HEX, BASE32, BASE32HEX, BASE64, BASE64URL,
+            ANY,
             TYPE_CHOICE, OBJECT, ARRAY, GROUP,
             TARGET_RULE };
 
