@@ -254,6 +254,9 @@ private:
     bool escape();
     bool quotation_mark();
     bool unescaped();
+    bool escaped_code();
+    bool u();
+    bool four_HEXDIG();
     bool regex();
     bool not_slash();
     bool regex_modifiers();
@@ -2351,7 +2354,8 @@ bool GrammarParser::integer()
     */
     // "0" / ["-"] && pos_integer()
 
-    return false;
+    return (zero() && (peek_is_in( cl::alphabet_not( cl::alphabet_digit() ) ) || error( "Leading zeros not allow on integers" ) ) ) ||
+            optional( minus() ) && pos_integer();
 }
 
 bool GrammarParser::non_neg_integer()
@@ -2361,7 +2365,8 @@ bool GrammarParser::non_neg_integer()
     */
     // "0" || pos_integer()
 
-    return false;
+    return (zero() && (peek_is_in( cl::alphabet_not( cl::alphabet_digit() ) ) || error( "Leading zeros not allow on integers" ) ) ) ||
+            pos_integer();
 }
 
 bool GrammarParser::pos_integer()
@@ -2371,7 +2376,7 @@ bool GrammarParser::pos_integer()
     */
     // digit1_9() && *DIGIT()
 
-    return false;
+    return digit1_9() && star_DIGIT();
 }
 
 bool GrammarParser::float_num()
@@ -2381,7 +2386,9 @@ bool GrammarParser::float_num()
     */
     // [ minus() ] && int() && frac() [ exp() ]
 
-    return false;
+    cl::locator loc( this );
+
+    return optional( minus() ) && int_num() && frac() && optional( exp() ) || location_top( false );
 }
 
 bool GrammarParser::minus()
@@ -2391,7 +2398,7 @@ bool GrammarParser::minus()
     */
     // %x2D                          ; -
 
-    return false;
+    return accumulate( '-' );
 }
 
 bool GrammarParser::plus()
@@ -2401,7 +2408,7 @@ bool GrammarParser::plus()
     */
     // %x2B                          ; +
 
-    return false;
+    return accumulate( '+' );
 }
 
 bool GrammarParser::int_num()
@@ -2411,8 +2418,10 @@ bool GrammarParser::int_num()
     */
     // zero() || ( digit1_9() && *DIGIT() )
 
-    return false;
+    return zero() || ( digit1_9() && star_DIGIT() );
 }
+
+cl::alphabet_char_class digit1_9_alphabet( "1-9" );
 
 bool GrammarParser::digit1_9()
 {
@@ -2421,7 +2430,7 @@ bool GrammarParser::digit1_9()
     */
     // %x31-39                       ; 1-9
 
-    return false;
+    return accumulate( digit1_9_alphabet );
 }
 
 bool GrammarParser::frac()
@@ -2431,7 +2440,7 @@ bool GrammarParser::frac()
     */
     // decimal_point() && 1*DIGIT()
 
-    return false;
+    return decimal_point() && one_star_DIGIT();
 }
 
 bool GrammarParser::decimal_point()
@@ -2441,7 +2450,7 @@ bool GrammarParser::decimal_point()
     */
     // %x2E                          ; .
 
-    return false;
+    return accumulate( '.' );
 }
 
 bool GrammarParser::exp()
@@ -2451,7 +2460,7 @@ bool GrammarParser::exp()
     */
     // e() [ minus() || plus() ] && 1*DIGIT()
 
-    return false;
+    return e() && optional( minus() || plus() ) && one_star_DIGIT();
 }
 
 bool GrammarParser::e()
@@ -2461,7 +2470,7 @@ bool GrammarParser::e()
     */
     // %x65 / %x45                   ; e() && E
 
-    return false;
+    return accumulate( 'e' ) || accumulate( 'E' );
 }
 
 bool GrammarParser::zero()
@@ -2471,7 +2480,7 @@ bool GrammarParser::zero()
     */
     // %x30                          ; 0
 
-    return false;
+    return accumulate( '0' );
 }
 
 bool GrammarParser::q_string_as_utf8()
@@ -2492,9 +2501,26 @@ bool GrammarParser::q_string()
     /* ABNF: 
     q-string         = quotation-mark *char quotation-mark 
     */
-    // quotation_mark() && *char() && quotation_mark() 
+    // quotation_mark() && *qs_char() && quotation_mark()
+
+    if( quotation_mark() )
+    {
+        star_qs_char() && quotation_mark() || fatal( "Badly formed QString" );
+
+        return true;
+    }
 
     return false;
+}
+
+bool GrammarParser::quotation_mark()
+{
+    /* ABNF: 
+    quotation-mark   = %x22      ; "
+    */
+    // %x22      ; "
+
+    return accumulate( '"' );
 }
 
 bool GrammarParser::qs_char()
@@ -2523,27 +2549,14 @@ bool GrammarParser::qs_char()
     //                    %x74 /          ; t    tab             U+0009
     //                    %x75 4HEXDIG )  ; uXXXX                U+XXXX
 
-    return false;
+    return unescaped() || escape() && (escaped_code() || u() && four_HEXDIG());
 }
 
-bool GrammarParser::escape()
+bool is_qstring_unescaped( char c )
 {
-    /* ABNF: 
-    escape           = %x5C              ; \
-    */
-    // %x5C              ; \
+    // unescaped        = %x20-21 / %x23-5B / %x5D-10FFFF
 
-    return false;
-}
-
-bool GrammarParser::quotation_mark()
-{
-    /* ABNF: 
-    quotation-mark   = %x22      ; "
-    */
-    // %x22      ; "
-
-    return false;
+    return c >= 0x20 && c <= 0x21 || c >= 0x23 && c <= 0x5b || c >= 0x5d;
 }
 
 bool GrammarParser::unescaped()
@@ -2553,7 +2566,37 @@ bool GrammarParser::unescaped()
     */
     // %x20-21 / %x23-5B / %x5D-10FFFF
 
-    return false;
+    return accumulate( cl::alphabet_function( is_qstring_unescaped ) );
+}
+
+bool GrammarParser::escape()
+{
+    /* ABNF: 
+    escape           = %x5C              ; \
+    */
+    // %x5C              ; \
+
+    return accumulate( '\\' );
+}
+
+cl::alphabet_char_class escaped_code_alphabet( "\"\\/bfnrt" );
+
+bool GrammarParser::escaped_code()
+{
+    return accumulate( escaped_code_alphabet );
+}
+
+bool GrammarParser::u()
+{
+    return accumulate( 'u' );
+}
+
+bool GrammarParser::four_HEXDIG()
+{
+    for( size_t i=0; i<4; ++i )
+        if( ! HEXDIG() )
+            return false;
+    return true;
 }
 
 bool GrammarParser::regex()
@@ -2563,7 +2606,24 @@ bool GrammarParser::regex()
     */
     // "/" && *( escape() "/" || not_slash() ) "/" [ regex_modifiers() ]
 
+    if( accumulate( '/' ) )
+    {
+        while( (escape() && accumulate( '/' )) || not_slash() )
+        {}
+        accumulate( '/' ) && optional( regex_modifiers() ) || fatal( "Error reading regular expression" );
+
+        return true;
+    }
+
     return false;
+}
+
+bool is_not_slash( char c )
+{
+    // not_slash() = HTAB() || CR() || LF() / %x20-2E / %x30-10FFFF
+
+    return c == '\t' || c == '\r' || c == '\n' ||
+            c >= 0x20 && c <= 0x2e || c >= 0x30;
 }
 
 bool GrammarParser::not_slash()
@@ -2573,8 +2633,10 @@ bool GrammarParser::not_slash()
     */
     // HTAB() || CR() || LF() / %x20-2E / %x30-10FFFF
 
-    return false;
+    return accumulate( cl::alphabet_function( is_not_slash ) );
 }
+
+cl::alphabet_char_class regex_modifiers_alphabet( "isx" );
 
 bool GrammarParser::regex_modifiers()
 {
@@ -2583,7 +2645,7 @@ bool GrammarParser::regex_modifiers()
     */
     // *( "i" || "s" || "x" )
 
-    return false;
+    return accumulate( regex_modifiers_alphabet );
 }
 
 bool GrammarParser::uri_template()
@@ -2591,9 +2653,9 @@ bool GrammarParser::uri_template()
     /* ABNF: 
     uri-template     = 1*ALPHA ":" 1*not-space
     */
-    // 1*ALPHA() ":" && 1*not_space()
+    // 1*ALPHA() && ":" && 1*not_space()
 
-    return false;
+    return one_star_ALPHA() && accumulate( ':' ) && one_star_not_space();
 }
 
 bool GrammarParser::any_kw()
