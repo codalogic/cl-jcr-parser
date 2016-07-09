@@ -19,6 +19,7 @@
 #endif
 
 #include <iostream>
+#include <cassert>
 
 namespace cljcr {
 
@@ -202,16 +203,22 @@ private:
     bool any();
     bool object_rule();
     bool object_items();
+    bool star_sequence_combiner_and_object_item();
+    bool star_choice_combiner_and_object_item();
     bool object_item();
     bool object_item_types();
     bool object_group();
     bool array_rule();
     bool array_items();
+    bool star_sequence_combiner_and_array_item();
+    bool star_choice_combiner_and_array_item();
     bool array_item();
     bool array_item_types();
     bool array_group();
     bool group_rule();
     bool group_items();
+    bool star_sequence_combiner_and_group_item();
+    bool star_choice_combiner_and_group_item();
     bool group_item();
     bool group_item_types();
     bool group_group();
@@ -1554,7 +1561,9 @@ bool GrammarParser::integer_value()
 
 int64 sized_int_min( int bits )
 {
-    if( bits < 0 || bits > 64 )
+    assert( bits >= 1 && bits <= 64 );
+
+    if( bits <= 0 || bits > 64 )
         return -1;
     uint64 v = ~0;
     v = v << (bits-1);
@@ -1615,7 +1624,7 @@ bool GrammarParser::ipv4_type()
     */
     // ipv4_kw()
 
-    return false;
+    return ipv4_kw() && set( m.p_rule->type, Rule::IPV4 );
 }
 
 bool GrammarParser::ipv6_type()
@@ -1625,7 +1634,7 @@ bool GrammarParser::ipv6_type()
     */
     // ipv6_kw()
 
-    return false;
+    return ipv6_kw() && set( m.p_rule->type, Rule::IPV6 );
 }
 
 bool GrammarParser::ipaddr_type()
@@ -1635,7 +1644,7 @@ bool GrammarParser::ipaddr_type()
     */
     // ipaddr_kw()
 
-    return false;
+    return ipaddr_kw() && set( m.p_rule->type, Rule::IPADDR );
 }
 
 bool GrammarParser::fqdn_type()
@@ -1645,7 +1654,7 @@ bool GrammarParser::fqdn_type()
     */
     // fqdn_kw()
 
-    return false;
+    return fqdn_kw() &&  set( m.p_rule->type, Rule::FQDN );
 }
 
 bool GrammarParser::idn_type()
@@ -1655,7 +1664,7 @@ bool GrammarParser::idn_type()
     */
     // idn_kw()
 
-    return false;
+    return idn_kw() &&  set( m.p_rule->type, Rule::IDN );
 }
 
 bool GrammarParser::uri_range()
@@ -1665,7 +1674,12 @@ bool GrammarParser::uri_range()
     */
     // uri_dotdot_kw() && uri_template()
 
-    return false;
+    cl::accumulator uri_accumulator( this );
+
+    return uri_dotdot_kw() && uri_template() &&
+            set( m.p_rule->type, Rule::URI_RANGE ) &&
+            set( m.p_rule->min, uri_accumulator.get() ) &&
+            set( m.p_rule->max, uri_accumulator.get() );
 }
 
 bool GrammarParser::uri_type()
@@ -1675,7 +1689,7 @@ bool GrammarParser::uri_type()
     */
     // uri_kw()
 
-    return false;
+    return uri_kw() && set( m.p_rule->type, Rule::URI_TYPE );
 }
 
 bool GrammarParser::phone_type()
@@ -1685,7 +1699,7 @@ bool GrammarParser::phone_type()
     */
     // phone_kw()
 
-    return false;
+    return phone_kw() && set( m.p_rule->type, Rule::PHONE );
 }
 
 bool GrammarParser::email_type()
@@ -1695,7 +1709,7 @@ bool GrammarParser::email_type()
     */
     // email_kw()
 
-    return false;
+    return email_kw() && set( m.p_rule->type, Rule::EMAIL );
 }
 
 bool GrammarParser::datetime_type()
@@ -1705,7 +1719,7 @@ bool GrammarParser::datetime_type()
     */
     // datetime_kw()
 
-    return false;
+    return datetime_kw() && set( m.p_rule->type, Rule::DATETIME );
 }
 
 bool GrammarParser::date_type()
@@ -1715,7 +1729,9 @@ bool GrammarParser::date_type()
     */
     // date_kw()
 
-    return false;
+    // full_date_type() = full_date_kw()
+
+    return date_kw() && set( m.p_rule->type, Rule::DATE );
 }
 
 bool GrammarParser::time_type()
@@ -1725,7 +1741,7 @@ bool GrammarParser::time_type()
     */
     // time_kw()
 
-    return false;
+    return time_kw() && set( m.p_rule->type, Rule::TIME );
 }
 
 bool GrammarParser::hex_type()
@@ -1735,7 +1751,7 @@ bool GrammarParser::hex_type()
     */
     // hex_kw()
 
-    return false;
+    return hex_kw() && set( m.p_rule->type, Rule::HEX );
 }
 
 bool GrammarParser::base32hex_type()
@@ -1745,7 +1761,7 @@ bool GrammarParser::base32hex_type()
     */
     // base32hex_kw()
 
-    return false;
+    return base32hex_kw() && set( m.p_rule->type, Rule::BASE32HEX );
 }
 
 bool GrammarParser::base32_type()
@@ -1755,7 +1771,7 @@ bool GrammarParser::base32_type()
     */
     // base32_kw()
 
-    return false;
+    return base32_kw() && set( m.p_rule->type, Rule::BASE32 );
 }
 
 bool GrammarParser::base64url_type()
@@ -1765,7 +1781,7 @@ bool GrammarParser::base64url_type()
     */
     // base64url_kw()
 
-    return false;
+    return base64url_kw() && set( m.p_rule->type, Rule::BASE64URL );
 }
 
 bool GrammarParser::base64_type()
@@ -1775,7 +1791,7 @@ bool GrammarParser::base64_type()
     */
     // base64_kw()
 
-    return false;
+    return base64_kw() && set( m.p_rule->type, Rule::BASE64 );
 }
 
 bool GrammarParser::any()
@@ -1785,7 +1801,7 @@ bool GrammarParser::any()
     */
     // any_kw()
 
-    return false;
+    return any_kw() && set( m.p_rule->type, Rule::ANY );
 }
 
 bool GrammarParser::object_rule()
@@ -1794,6 +1810,22 @@ bool GrammarParser::object_rule()
     object-rule      = annotations "{" *sp-cmt [ object-items *sp-cmt ] "}"
     */
     // annotations() "{" && *sp_cmt() [ object_items() && *sp_cmt() ] "}"
+
+    // No need to record location because array_rule() is always part of a rewound choice
+
+    Annotations object_annotations;
+
+    if( annotations( object_annotations ) && is_get_char( '{' ) )
+    {
+        m.p_rule->type = Rule::OBJECT;
+        m.p_rule->annotations.merge( object_annotations );
+
+        star_sp_cmt() && optional( object_items() ) && star_sp_cmt();
+
+        is_get_char( '}' ) || fatal( "Expected '}' at end of object rule" );
+
+        return true;
+    }
 
     return false;
 }
@@ -1806,15 +1838,66 @@ bool GrammarParser::object_items()
     */
     // object_item() && (*( sequence_combiner() && object_item() ) || *( choice_combiner() && object_item() ) )
 
+    if( object_item() )
+    {
+        star_sequence_combiner_and_object_item() && set( m.p_rule->child_combiner, Rule::Sequence ) ||
+            star_choice_combiner_and_object_item() && set( m.p_rule->child_combiner, Rule::Choice );
+        return true;
+    }
+
     return false;
+}
+
+bool GrammarParser::star_sequence_combiner_and_object_item()
+{
+    bool is_used = false;
+
+    while( sequence_combiner() )
+    {
+        is_used = true;
+        object_item() || fatal( "Expected object-item after sequence-combiner in object definition" );
+    }
+
+    if( is_used && choice_combiner() )
+        fatal( "choice-combiner can not be used with sequence-combiner without Parentheses" );
+
+    return is_used;
+}
+
+bool GrammarParser::star_choice_combiner_and_object_item()
+{
+    bool is_used = false;
+
+    while( choice_combiner() )
+    {
+        is_used = true;
+        object_item() || fatal( "Expected object-item after choice-combiner in object definition" );
+    }
+
+    if( is_used && sequence_combiner() )
+        fatal( "sequence-combiner can not be used with choice-combiner without Parentheses" );
+
+    return is_used;
 }
 
 bool GrammarParser::object_item()
 {
     /* ABNF: 
-    object-item      = object-item-types [ *sp-cmt repetition ]
+    object-item      = object-item-types *sp-cmt [ repetition ]
     */
     // object_item_types() [ *sp_cmt() && repetition() ]
+
+    Rule * p_parent = m.p_rule;
+
+    Rule::uniq_ptr pu_rule( new Rule );
+    RuleStackLogger rule_stack_logger( this, pu_rule );
+
+    if( object_item_types() && star_sp_cmt() && optional( repetition() ) )
+    {
+        p_parent->append_child_rule( pu_rule );
+
+        return true;
+    }
 
     return false;
 }
@@ -1826,7 +1909,11 @@ bool GrammarParser::object_item_types()
     */
     // member_rule() || target_rule_name() || object_group()
 
-    return false;
+    cl::locator loc( this );
+
+    return optional_rewind( member_rule() ) ||
+            optional_rewind( target_rule_name() ) ||
+            optional_rewind( object_group() );
 }
 
 bool GrammarParser::object_group()
@@ -1835,6 +1922,16 @@ bool GrammarParser::object_group()
     object-group     = "(" *sp-cmt [ object-items *sp-cmt ] ")"
     */
     // "(" && *sp_cmt() [ object_items() && *sp_cmt() ] ")"
+
+    if( is_get_char( '(' ) )
+    {
+        m.p_rule->type = Rule::OBJECT;
+
+        star_sp_cmt() && optional( object_items() ) && star_sp_cmt();
+        is_get_char( ')' ) || fatal( "Expected ')' at end of object-group" );
+
+        return true;
+    }
 
     return false;
 }
@@ -1845,6 +1942,24 @@ bool GrammarParser::array_rule()
     array-rule       = annotations "[" *sp-cmt [ array-items *sp-cmt ] "]"
     */
     // annotations() "[" && *sp_cmt() [ array_items() && *sp_cmt() ] "]"
+
+    // annotations() "[" && *sp_cmt() [ array_items() && *sp_cmt() ] "]"
+
+    // No need to record location because array_rule() is always part of a rewound choice
+
+    Annotations array_annotations;
+
+    if( annotations( array_annotations ) && is_get_char( '[' ) )
+    {
+        m.p_rule->type = Rule::ARRAY;
+        m.p_rule->annotations.merge( array_annotations );
+
+        star_sp_cmt() && optional( array_items() ) && star_sp_cmt();
+
+        is_get_char( ']' ) || fatal( "Expected ']' at end of array rule" );
+
+        return true;
+    }
 
     return false;
 }
@@ -1857,15 +1972,66 @@ bool GrammarParser::array_items()
     */
     // array_item() && (*( sequence_combiner() && array_item() ) || *( choice_combiner() && array_item() ) )
 
+    if( array_item() )
+    {
+        star_sequence_combiner_and_array_item() && set( m.p_rule->child_combiner, Rule::Sequence ) ||
+            star_choice_combiner_and_array_item() && set( m.p_rule->child_combiner, Rule::Choice );
+        return true;
+    }
+
     return false;
+}
+
+bool GrammarParser::star_sequence_combiner_and_array_item()
+{
+    bool is_used = false;
+
+    while( sequence_combiner() )
+    {
+        is_used = true;
+        array_item() || fatal( "Expected array-item after sequence-combiner in array definition" );
+    }
+
+    if( is_used && choice_combiner() )
+        fatal( "choice-combiner can not be used with sequence-combiner without Parentheses" );
+
+    return is_used;
+}
+
+bool GrammarParser::star_choice_combiner_and_array_item()
+{
+    bool is_used = false;
+
+    while( choice_combiner() )
+    {
+        is_used = true;
+        array_item() || fatal( "Expected array-item after choice-combiner in array definition" );
+    }
+
+    if( is_used && sequence_combiner() )
+        fatal( "sequence-combiner can not be used with choice-combiner without Parentheses" );
+
+    return is_used;
 }
 
 bool GrammarParser::array_item()
 {
     /* ABNF: 
-    array-item       = *sp-cmt array-item-types *sp-cmt [ repetition ]
+    array-item       = array-item-types *sp-cmt [ repetition ]
     */
-    // *sp_cmt() && array_item_types() && *sp_cmt() [ repetition() ]
+    // array_item_types() && *sp_cmt() [ repetition() ]
+
+    Rule * p_parent = m.p_rule;
+
+    Rule::uniq_ptr pu_rule( new Rule );
+    RuleStackLogger rule_stack_logger( this, pu_rule );
+
+    if( array_item_types() && star_sp_cmt() && repetition() )
+    {
+        p_parent->append_child_rule( pu_rule );
+
+        return true;
+    }
 
     return false;
 }
@@ -1877,7 +2043,10 @@ bool GrammarParser::array_item_types()
     */
     // type_rule() || array_group()
 
-    return false;
+    cl::locator loc( this );
+
+    return optional_rewind( type_rule() ) ||
+            optional_rewind( array_group() );
 }
 
 bool GrammarParser::array_group()
@@ -1885,7 +2054,17 @@ bool GrammarParser::array_group()
     /* ABNF: 
     array-group      = "(" *sp-cmt [ array-items *sp-cmt ] ")"
     */
-    // "(" && *sp_cmt() [ array_items() && *sp_cmt() ] ")"
+    // "(" && *sp_cmt() && [ array_items() && *sp_cmt() ] && ")"
+
+    if( is_get_char( '(' ) )
+    {
+        m.p_rule->type = Rule::ARRAY;
+
+        star_sp_cmt() && optional( array_items() ) && star_sp_cmt();
+        is_get_char( ')' ) || fatal( "Expected ')' at end of array-group" );
+
+        return true;
+    }
 
     return false;
 }
@@ -1896,6 +2075,22 @@ bool GrammarParser::group_rule()
     group-rule       = annotations "(" *sp-cmt [ group-items *sp-cmt ] ")"
     */
     // annotations() "(" && *sp_cmt() [ group_items() && *sp_cmt() ] ")"
+
+    // No need to record location because array_rule() is always part of a rewound choice
+
+    Annotations group_annotations;
+
+    if( annotations( group_annotations ) && is_get_char( '(' ) )
+    {
+        m.p_rule->type = Rule::GROUP;
+        m.p_rule->annotations.merge( group_annotations );
+
+        star_sp_cmt() && optional( group_items() ) && star_sp_cmt();
+
+        is_get_char( ')' ) || fatal( "Expected ')' at end of group rule" );
+
+        return true;
+    }
 
     return false;
 }
@@ -1908,15 +2103,66 @@ bool GrammarParser::group_items()
     */
     // group_item() && (*( sequence_combiner() && group_item() ) || *( choice_combiner() && group_item() ) )
 
+    if( group_item() )
+    {
+        star_sequence_combiner_and_group_item() && set( m.p_rule->child_combiner, Rule::Sequence ) ||
+            star_choice_combiner_and_group_item() && set( m.p_rule->child_combiner, Rule::Choice );
+        return true;
+    }
+
     return false;
+}
+
+bool GrammarParser::star_sequence_combiner_and_group_item()
+{
+    bool is_used = false;
+
+    while( sequence_combiner() )
+    {
+        is_used = true;
+        group_item() || fatal( "Expected group-item after sequence-combiner in group definition" );
+    }
+
+    if( is_used && choice_combiner() )
+        fatal( "choice-combiner can not be used with sequence-combiner without Parentheses" );
+
+    return is_used;
+}
+
+bool GrammarParser::star_choice_combiner_and_group_item()
+{
+    bool is_used = false;
+
+    while( choice_combiner() )
+    {
+        is_used = true;
+        group_item() || fatal( "Expected group-item after choice-combiner in group definition" );
+    }
+
+    if( is_used && sequence_combiner() )
+        fatal( "sequence-combiner can not be used with choice-combiner without Parentheses" );
+
+    return is_used;
 }
 
 bool GrammarParser::group_item()
 {
     /* ABNF: 
-    group-item       = *sp-cmt group-item-types *sp-cmt [ repetition ]
+    group-item       = group-item-types *sp-cmt [ repetition ]
     */
-    // *sp_cmt() && group_item_types() && *sp_cmt() [ repetition() ]
+    // group_item_types() && *sp_cmt() [ repetition() ]
+
+    Rule * p_parent = m.p_rule;
+
+    Rule::uniq_ptr pu_rule( new Rule );
+    RuleStackLogger rule_stack_logger( this, pu_rule );
+
+    if( group_item_types() && star_sp_cmt() && repetition() )
+    {
+        p_parent->append_child_rule( pu_rule );
+
+        return true;
+    }
 
     return false;
 }
@@ -1928,7 +2174,11 @@ bool GrammarParser::group_item_types()
     */
     // member_rule() || type_rule() || group_group()
 
-    return false;
+    cl::locator loc( this );
+
+    return optional_rewind( member_rule() ) ||
+            optional_rewind( type_rule() ) ||
+            optional_rewind( group_group() );
 }
 
 bool GrammarParser::group_group()
@@ -1938,7 +2188,7 @@ bool GrammarParser::group_group()
     */
     // group_rule()
 
-    return false;
+    return group_rule();
 }
 
 bool GrammarParser::sequence_combiner()
@@ -1946,9 +2196,9 @@ bool GrammarParser::sequence_combiner()
     /* ABNF: 
     sequence-combiner = *sp-cmt "," *sp-cmt
     */
-    // *sp_cmt() "," && *sp_cmt()
+    // *sp_cmt() && "," && *sp_cmt()
 
-    return false;
+    return star_sp_cmt() && is_get_char( ',' ) && star_sp_cmt();
 }
 
 bool GrammarParser::choice_combiner()
@@ -1956,9 +2206,9 @@ bool GrammarParser::choice_combiner()
     /* ABNF: 
     choice-combiner  = *sp-cmt "|" *sp-cmt
     */
-    // *sp_cmt() "|" && *sp_cmt()
+    // *sp_cmt() && "|" && *sp_cmt()
 
-    return false;
+    return star_sp_cmt() && is_get_char( '|' ) && star_sp_cmt();
 }
 
 bool GrammarParser::repetition()
@@ -1970,6 +2220,25 @@ bool GrammarParser::repetition()
     */
     // "@" && *sp_cmt() && ( optional() || one_or_more() || min_max_repetition() || min_repetition() || max_repetition() || zero_or_more() || specific_repetition() )
 
+    cl::locator loc_outer( this );
+
+    if( is_get_char( '@' ) && star_sp_cmt() )
+    {
+        cl::locator loc_inner( this );
+
+        // The order of these routines is important
+        if( optional_rewind( optional_marker() ) ||
+                optional_rewind( one_or_more() ) ||
+                optional_rewind( min_max_repetition() ) ||
+                optional_rewind( min_repetition() ) ||
+                optional_rewind( max_repetition() ) ||
+                optional_rewind( zero_or_more() ) ||
+                optional_rewind( specific_repetition() ) )
+            true;   // if false, fall through to loc_outer recorded location
+    }
+    
+    location_top();
+    
     return false;
 }
 
@@ -1980,7 +2249,7 @@ bool GrammarParser::optional_marker()
     */
     // "?"
 
-    return false;
+    return is_get_char( '?' ) && set( m.p_rule->repetition.min, 0 ) && set( m.p_rule->repetition.max, 1 );
 }
 
 bool GrammarParser::one_or_more()
@@ -1990,7 +2259,7 @@ bool GrammarParser::one_or_more()
     */
     // "+"
 
-    return false;
+    return is_get_char( '+' ) && set( m.p_rule->repetition.min, 1 ) && set( m.p_rule->repetition.max, -1 );
 }
 
 bool GrammarParser::zero_or_more()
@@ -2000,7 +2269,7 @@ bool GrammarParser::zero_or_more()
     */
     // "*"
 
-    return false;
+    return is_get_char( '*' ) && set( m.p_rule->repetition.min, 0 ) && set( m.p_rule->repetition.max, -1 );
 }
 
 bool GrammarParser::min_max_repetition()
@@ -2008,9 +2277,13 @@ bool GrammarParser::min_max_repetition()
     /* ABNF: 
     min-max-repetition = min-repeat ".." max-repeat
     */
-    // min_repeat() ".." && max_repeat()
+    // min_repeat() && ".." && max_repeat()
 
-    return false;
+    cl::accumulator min_accumulator( this );
+    cl::accumulator_deferred max_accumulator( this );
+
+    return min_repeat() && fixed( ".." ) && max_accumulator.select() && max_repeat() &&
+            set( m.p_rule->repetition.min, min_accumulator.to_int() ) && set( m.p_rule->repetition.max, max_accumulator.to_int() );
 }
 
 bool GrammarParser::min_repetition()
@@ -2020,7 +2293,10 @@ bool GrammarParser::min_repetition()
     */
     // min_repeat() ".."
 
-    return false;
+    cl::accumulator min_accumulator( this );
+
+    return min_repeat() && fixed( ".." ) &&
+            set( m.p_rule->repetition.min, min_accumulator.to_int() ) && set( m.p_rule->repetition.max, -1 );
 }
 
 bool GrammarParser::max_repetition()
@@ -2030,7 +2306,12 @@ bool GrammarParser::max_repetition()
     */
     // ".." && max_repeat()
 
-    return false;
+    // max_repetition() = "*" && *sp_cmt() && max_repeat()
+
+    cl::accumulator max_accumulator( this );
+
+    return fixed( ".." ) && max_repeat() &&
+            set( m.p_rule->repetition.min, 0 ) && set( m.p_rule->repetition.max, max_accumulator.to_int() );
 }
 
 bool GrammarParser::min_repeat()
@@ -2040,7 +2321,7 @@ bool GrammarParser::min_repeat()
     */
     // non_neg_integer()
 
-    return false;
+    return non_neg_integer();
 }
 
 bool GrammarParser::max_repeat()
@@ -2050,7 +2331,7 @@ bool GrammarParser::max_repeat()
     */
     // non_neg_integer()
 
-    return false;
+    return non_neg_integer();
 }
 
 bool GrammarParser::specific_repetition()
@@ -2060,7 +2341,7 @@ bool GrammarParser::specific_repetition()
     */
     // non_neg_integer()
 
-    return false;
+    return non_neg_integer();
 }
 
 bool GrammarParser::integer()
@@ -2320,7 +2601,7 @@ bool GrammarParser::any_kw()
     /* ABNF: 
     any-kw           = %x61.6E.79                      ; "any"
     */
-    // %x61.6E.79                      ; "any()"
+    // %x61.6E.79                      ; "any"
 
     return false;
 }
@@ -2540,7 +2821,7 @@ bool GrammarParser::jcr_version_kw()
     /* ABNF: 
     jcr-version-kw   = %x6A.63.72.2D.76.65.72.73.69.6F.6E ; "jcr-version"
     */
-    // %x6A.63.72.2D.76.65.72.73.69.6F.6E ; "jcr()-version"
+    // %x6A.63.72.2D.76.65.72.73.69.6F.6E ; "jcr-version"
 
     return false;
 }
