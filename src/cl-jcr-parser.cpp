@@ -150,7 +150,6 @@ private:
     bool member_rule();
     bool member_name_spec();
     bool type_rule();
-    bool type_choice_rule();
     bool type_choice();
     bool type_choice_items();
     bool annotations( Annotations & );
@@ -817,7 +816,9 @@ bool GrammarParser::rule()
     */
     // annotations() && "$" && rule_name() && *sp_cmt() && "=" && *sp_cmt() && rule_def()
 
-    if( is_get_char( '$' ) )
+    Annotations rule_annotations;
+
+    if( annotations( rule_annotations ) && is_get_char( '$' ) )
     {
         cl::accumulator name_accumulator( this );
 
@@ -827,6 +828,7 @@ bool GrammarParser::rule()
         rule_name() && star_sp_cmt() && is_get_char( '=' ) && star_sp_cmt() && rule_def() || fatal( "Unable to read rule definition" );
 
         m.p_rule->rule_name = name_accumulator.get();
+        m.p_rule->annotations.merge( rule_annotations );
 
         m.p_grammar->append_rule( pu_rule );
 
@@ -950,12 +952,12 @@ bool GrammarParser::rule_def_type_rule()
     /* ABNF: 
     rule-def-type-rule = value-rule / type-choice-rule
     */
-    // value_rule() || type_choice_rule()
+    // value_rule() || type_choice()
 
     cl::locator loc( this );
 
     return optional_rewind( value_rule() ) ||
-            optional_rewind( type_choice_rule() );
+            optional_rewind( type_choice() );
 }
 
 bool GrammarParser::value_rule()
@@ -1028,23 +1030,13 @@ bool GrammarParser::type_rule()
     /* ABNF: 
     type-rule        = value-rule / type-choice-rule / target-rule-name
     */
-    // value_rule() || type_choice_rule() || target_rule_name()
+    // value_rule() || type_choice() || target_rule_name()
 
     cl::locator loc( this );
 
     return optional_rewind( value_rule() ) ||
-            optional_rewind( type_choice_rule() ) ||
+            optional_rewind( type_choice() ) ||
             optional_rewind( target_rule_name() );
-}
-
-bool GrammarParser::type_choice_rule()
-{
-    /* ABNF: 
-    type-choice-rule = *sp-cmt type-choice
-    */
-    // *sp_cmt() && type_choice()
-
-    return star_sp_cmt() && type_choice();
 }
 
 bool GrammarParser::type_choice()
@@ -1082,22 +1074,27 @@ bool GrammarParser::type_choice_items()
     /* ABNF: 
     type-choice-items = *sp-cmt ( type-choice-rule / type-rule ) *sp-cmt
     */
-    // *sp_cmt() && ( type_choice_rule() || type_rule() ) && *sp_cmt()
+    // *sp_cmt() && ( type_choice() || type_rule() ) && *sp_cmt()
 
-    cl::locator loc( this );
+    cl::locator loc_outer( this );
+    
+    star_sp_cmt();
+
+    cl::locator loc_inner( this );
 
     Rule * p_parent = m.p_rule;
 
     Rule::uniq_ptr pu_rule( new Rule );
     RuleStackLogger rule_stack_logger( this, pu_rule );
 
-    if( star_sp_cmt() &&
-            ( optional_rewind( type_choice_rule() ) || optional_rewind( type_rule() ) ) &&
+    if( ( optional_rewind( type_choice() ) || optional_rewind( type_rule() ) ) &&
             star_sp_cmt() )
     {
         p_parent->append_child_rule( pu_rule );
         return true;
     }
+    
+    location_top();
 
     return false;
 }
@@ -1423,12 +1420,12 @@ bool GrammarParser::float_range()
 
     return optional_rewind( float_min() && fixed( ".." ) &&
                     set( m.p_rule->type, Rule::DOUBLE ) &&
-                    set( m.p_rule->min, float_min_accumulator.get() ) &&
+                    set( m.p_rule->min, float_min_accumulator.to_float() ) &&
                 optional( float_max_accumulator.select() && float_max() &&
-                        set( m.p_rule->max, float_max_accumulator.get() ) ) ) ||
+                        set( m.p_rule->max, float_max_accumulator.to_float() ) ) ) ||
             optional_rewind( fixed( ".." ) && float_max_accumulator.select() && float_max() &&
                     set( m.p_rule->type, Rule::DOUBLE ) &&
-                    set( m.p_rule->max, float_max_accumulator.get() ) );
+                    set( m.p_rule->max, float_max_accumulator.to_float() ) );
 }
 
 bool GrammarParser::float_min()
@@ -1462,8 +1459,8 @@ bool GrammarParser::float_value()
 
     return float_num() &&
             set( m.p_rule->type, Rule::DOUBLE ) &&
-            set( m.p_rule->min, float_accumulator.get() ) &&
-            set( m.p_rule->max, float_accumulator.get() );
+            set( m.p_rule->min, float_accumulator.to_float() ) &&
+            set( m.p_rule->max, float_accumulator.to_float() );
 }
 
 bool GrammarParser::integer_type()
@@ -1491,10 +1488,12 @@ bool GrammarParser::integer_range()
     if( optional_rewind( integer_min() && fixed( ".." ) && optional( integer_max_accumulator.select() && integer_max() ) ) ||
             optional_rewind( fixed( ".." ) && integer_max_accumulator.select() && integer_max() ) )
     {
-        if( (! integer_min_accumulator.get().empty() && integer_min_accumulator.get()[0] == '-') ||
-                (! integer_max_accumulator.get().empty() && integer_max_accumulator.get()[0] == '-') )
+        if( (integer_min_accumulator.get().empty() || integer_min_accumulator.get()[0] == '-') ||       // Assume signed if 'min' is absent
+                (! integer_max_accumulator.get().empty() && integer_max_accumulator.get()[0] == '-') )  // If 'max' is absent, assume min case will decide if signed
         {
             m.p_rule->type = Rule::INTEGER;
+            if( ! integer_min_accumulator.get().empty() && ! integer_max_accumulator.get().empty() )
+                (integer_min_accumulator.to_int64() <= integer_max_accumulator.to_int64()) || error( "integer range minimum greater than maximum" );
             if( ! integer_min_accumulator.get().empty() )
                 m.p_rule->min = integer_min_accumulator.to_int64();
             if( ! integer_max_accumulator.get().empty() )
@@ -1503,6 +1502,8 @@ bool GrammarParser::integer_range()
         else
         {
             m.p_rule->type = Rule::UINTEGER;
+            if( ! integer_min_accumulator.get().empty() && ! integer_max_accumulator.get().empty() )
+                (integer_min_accumulator.to_uint64() <= integer_max_accumulator.to_uint64()) || error( "integer range minimum greater than maximum" );
             if( ! integer_min_accumulator.get().empty() )
                 m.p_rule->min = integer_min_accumulator.to_uint64();
             if( ! integer_max_accumulator.get().empty() )
@@ -1888,7 +1889,7 @@ bool GrammarParser::object_item()
     /* ABNF: 
     object-item      = object-item-types *sp-cmt [ repetition ]
     */
-    // object_item_types() [ *sp_cmt() && repetition() ]
+    // object_item_types() && *sp_cmt() && [ repetition() ]
 
     Rule * p_parent = m.p_rule;
 
@@ -2029,7 +2030,7 @@ bool GrammarParser::array_item()
     Rule::uniq_ptr pu_rule( new Rule );
     RuleStackLogger rule_stack_logger( this, pu_rule );
 
-    if( array_item_types() && star_sp_cmt() && repetition() )
+    if( array_item_types() && star_sp_cmt() && optional( repetition() ) )
     {
         p_parent->append_child_rule( pu_rule );
 
@@ -2160,7 +2161,7 @@ bool GrammarParser::group_item()
     Rule::uniq_ptr pu_rule( new Rule );
     RuleStackLogger rule_stack_logger( this, pu_rule );
 
-    if( group_item_types() && star_sp_cmt() && repetition() )
+    if( group_item_types() && star_sp_cmt() && optional( repetition() ) )
     {
         p_parent->append_child_rule( pu_rule );
 
@@ -2237,7 +2238,7 @@ bool GrammarParser::repetition()
                 optional_rewind( max_repetition() ) ||
                 optional_rewind( zero_or_more() ) ||
                 optional_rewind( specific_repetition() ) )
-            true;   // if false, fall through to loc_outer recorded location
+            return true;   // if false, fall through to loc_outer recorded location
     }
     
     location_top();
