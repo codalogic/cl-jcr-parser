@@ -2665,7 +2665,7 @@ bool GrammarParser::any_kw()
     */
     // %x61.6E.79                      ; "any"
 
-    return false;
+    return fixed( "any" );
 }
 
 bool GrammarParser::as_kw()
@@ -2675,7 +2675,7 @@ bool GrammarParser::as_kw()
     */
     // %x61.73                         ; "as"
 
-    return false;
+    return fixed( "as" );
 }
 
 bool GrammarParser::base32_kw()
@@ -2685,7 +2685,7 @@ bool GrammarParser::base32_kw()
     */
     // %x62.61.73.65.33.32             ; "base32"
 
-    return false;
+    return fixed( "base32" );
 }
 
 bool GrammarParser::base32hex_kw()
@@ -2695,7 +2695,7 @@ bool GrammarParser::base32hex_kw()
     */
     // %x62.61.73.65.33.32.68.65.78    ; "base32hex"
 
-    return false;
+    return fixed( "base32hex" );
 }
 
 bool GrammarParser::base64_kw()
@@ -2705,7 +2705,7 @@ bool GrammarParser::base64_kw()
     */
     // %x62.61.73.65.36.34             ; "base64"
 
-    return false;
+    return fixed( "base64" );
 }
 
 bool GrammarParser::base64url_kw()
@@ -2715,7 +2715,7 @@ bool GrammarParser::base64url_kw()
     */
     // %x62.61.73.65.36.34.75.72.6C    ; "base64url"
 
-    return false;
+    return fixed( "base64url" );
 }
 
 bool GrammarParser::boolean_kw()
@@ -2725,7 +2725,7 @@ bool GrammarParser::boolean_kw()
     */
     // %x62.6F.6F.6C.65.61.6E          ; "boolean"
 
-    return false;
+    return fixed( "boolean" );
 }
 
 bool GrammarParser::date_kw()
@@ -2735,7 +2735,7 @@ bool GrammarParser::date_kw()
     */
     // %x64.61.74.65                   ; "date"
 
-    return false;
+    return fixed( "date" );
 }
 
 bool GrammarParser::datetime_kw()
@@ -2745,7 +2745,7 @@ bool GrammarParser::datetime_kw()
     */
     // %x64.61.74.65.74.69.6D.65       ; "datetime"
 
-    return false;
+    return fixed( "datetime" );
 }
 
 bool GrammarParser::double_kw()
@@ -2755,7 +2755,7 @@ bool GrammarParser::double_kw()
     */
     // %x64.6F.75.62.6C.65             ; "double"
 
-    return false;
+    return fixed( "double" );
 }
 
 bool GrammarParser::email_kw()
@@ -2765,7 +2765,7 @@ bool GrammarParser::email_kw()
     */
     // %x65.6D.61.69.6C                ; "email"
 
-    return false;
+    return fixed( "email" );
 }
 
 bool GrammarParser::false_kw()
@@ -2775,7 +2775,7 @@ bool GrammarParser::false_kw()
     */
     // %x66.61.6C.73.65                ; "false"
 
-    return false;
+    return fixed( "false" );
 }
 
 bool GrammarParser::float_kw()
@@ -2785,7 +2785,7 @@ bool GrammarParser::float_kw()
     */
     // %x66.6C.6F.61.74                ; "float()"
 
-    return false;
+    return fixed( "float" );
 }
 
 bool GrammarParser::fqdn_kw()
@@ -2795,7 +2795,7 @@ bool GrammarParser::fqdn_kw()
     */
     // %x66.71.64.6E                   ; "fqdn"
 
-    return false;
+    return fixed( "fqdn" );
 }
 
 bool GrammarParser::hex_kw()
@@ -2805,7 +2805,7 @@ bool GrammarParser::hex_kw()
     */
     // %x68.65.78                      ; "hex"
 
-    return false;
+    return fixed( "hex" );
 }
 
 bool GrammarParser::idn_kw()
@@ -2815,7 +2815,7 @@ bool GrammarParser::idn_kw()
     */
     // %x69.64.6E                      ; "idn"
 
-    return false;
+    return fixed( "idn" );
 }
 
 bool GrammarParser::import_kw()
@@ -2825,7 +2825,7 @@ bool GrammarParser::import_kw()
     */
     // %x69.6D.70.6F.72.74             ; "import"
 
-    return false;
+    return fixed( "import" );
 }
 
 bool GrammarParser::int_kw()
@@ -2833,9 +2833,9 @@ bool GrammarParser::int_kw()
     /* ABNF: 
     int-kw           = %x69.6E.74                      ; "int"
     */
-    // %x69.6E.74                      ; "int()"
+    // %x69.6E.74                      ; "int"
 
-    return false;
+    return fixed( "int" );
 }
 
 bool GrammarParser::integer_kw()
@@ -2845,7 +2845,7 @@ bool GrammarParser::integer_kw()
     */
     // %x69.6E.74.65.67.65.72          ; "integer()"
 
-    return false;
+    return fixed( "integer" );
 }
 
 bool GrammarParser::ipaddr_kw()
@@ -2855,7 +2855,7 @@ bool GrammarParser::ipaddr_kw()
     */
     // %x69.70.61.64.64.72             ; "ipaddr"
 
-    return false;
+    return fixed( "ipaddr" );
 }
 
 bool GrammarParser::ipv4_kw()
@@ -2865,7 +2865,7 @@ bool GrammarParser::ipv4_kw()
     */
     // %x69.70.76.34                   ; "ipv4"
 
-    return false;
+    return fixed( "ipv4" );
 }
 
 bool GrammarParser::ipv6_kw()
@@ -2875,7 +2875,7 @@ bool GrammarParser::ipv6_kw()
     */
     // %x69.70.76.36                   ; "ipv6"
 
-    return false;
+    return fixed( "ipv6" );
 }
 
 bool GrammarParser::jcr_version_kw()
@@ -2885,7 +2885,7 @@ bool GrammarParser::jcr_version_kw()
     */
     // %x6A.63.72.2D.76.65.72.73.69.6F.6E ; "jcr-version"
 
-    return false;
+    return fixed( "jcr-version" );
 }
 
 bool GrammarParser::not_kw()
@@ -2895,7 +2895,7 @@ bool GrammarParser::not_kw()
     */
     // %x6E.6F.74                      ; "not"
 
-    return false;
+    return fixed( "not" );
 }
 
 bool GrammarParser::null_kw()
@@ -2905,7 +2905,7 @@ bool GrammarParser::null_kw()
     */
     // %x6E.75.6C.6C                   ; "null"
 
-    return false;
+    return fixed( "null" );
 }
 
 bool GrammarParser::phone_kw()
@@ -2915,7 +2915,7 @@ bool GrammarParser::phone_kw()
     */
     // %x70.68.6F.6E.65                ; "phone"
 
-    return false;
+    return fixed( "phone" );
 }
 
 bool GrammarParser::root_kw()
@@ -2925,7 +2925,7 @@ bool GrammarParser::root_kw()
     */
     // %x72.6F.6F.74                   ; "root"
 
-    return false;
+    return fixed( "root" );
 }
 
 bool GrammarParser::ruleset_id_kw()
@@ -2935,7 +2935,7 @@ bool GrammarParser::ruleset_id_kw()
     */
     // %x72.75.6C.65.73.65.74.2D.69.64 ; "ruleset_id()"
 
-    return false;
+    return fixed( "ruleset-id" );
 }
 
 bool GrammarParser::string_kw()
@@ -2945,7 +2945,7 @@ bool GrammarParser::string_kw()
     */
     // %x73.74.72.69.6E.67             ; "string"
 
-    return false;
+    return fixed( "string" );
 }
 
 bool GrammarParser::time_kw()
@@ -2955,7 +2955,7 @@ bool GrammarParser::time_kw()
     */
     // %x74.69.6D.65                   ; "time"
 
-    return false;
+    return fixed( "time" );
 }
 
 bool GrammarParser::true_kw()
@@ -2965,7 +2965,7 @@ bool GrammarParser::true_kw()
     */
     // %x74.72.75.65                   ; "true"
 
-    return false;
+    return fixed( "true" );
 }
 
 bool GrammarParser::type_kw()
@@ -2985,7 +2985,7 @@ bool GrammarParser::uint_kw()
     */
     // %x75.69.6E.74                   ; "uint"
 
-    return false;
+    return fixed( "uint" );
 }
 
 bool GrammarParser::unordered_kw()
@@ -2995,7 +2995,7 @@ bool GrammarParser::unordered_kw()
     */
     // %x75.6E.6F.72.64.65.72.65.64    ; "unordered"
 
-    return false;
+    return fixed( "unordered" );
 }
 
 bool GrammarParser::uri_dotdot_kw()
@@ -3005,7 +3005,7 @@ bool GrammarParser::uri_dotdot_kw()
     */
     // %x75.72.69.2E.2E                ; "uri.."
 
-    return false;
+    return fixed( "uri.." );
 }
 
 bool GrammarParser::uri_kw()
@@ -3015,7 +3015,7 @@ bool GrammarParser::uri_kw()
     */
     // %x75.72.69                      ; "uri"
 
-    return false;
+    return fixed( "uri" );
 }
 
 bool GrammarParser::ALPHA()
@@ -3025,7 +3025,7 @@ bool GrammarParser::ALPHA()
     */
     // %x41-5A / %x61-7A   ; A-Z / a-z
 
-    return false;
+    return accumulate( cl::alphabet_alpha() );
 }
 
 bool GrammarParser::CR()
@@ -3035,7 +3035,7 @@ bool GrammarParser::CR()
     */
     // %x0D         ; carriage return
 
-    return false;
+    return is_get_char( '\r' );
 }
 
 bool GrammarParser::DIGIT()
@@ -3045,7 +3045,7 @@ bool GrammarParser::DIGIT()
     */
     // %x30-39      ; 0-9
 
-    return false;
+    return accumulate( cl::alphabet_digit() );
 }
 
 bool GrammarParser::HEXDIG()
@@ -3055,7 +3055,7 @@ bool GrammarParser::HEXDIG()
     */
     // DIGIT() || "A" || "B" || "C" || "D" || "E" || "F"
 
-    return false;
+    return accumulate( cl::alphabet_hex() );
 }
 
 bool GrammarParser::HTAB()
@@ -3065,7 +3065,7 @@ bool GrammarParser::HTAB()
     */
     // %x09         ; horizontal tab
 
-    return false;
+    return is_get_char( '\t' );
 }
 
 bool GrammarParser::LF()
@@ -3075,7 +3075,7 @@ bool GrammarParser::LF()
     */
     // %x0A         ; linefeed
 
-    return false;
+    return is_get_char( '\x0a' );
 }
 
 bool GrammarParser::SP()
@@ -3085,7 +3085,7 @@ bool GrammarParser::SP()
     */
     // %x20         ; space
 
-    return false;
+    return is_get_char( ' ' );
 }
 
 bool GrammarParser::WSP()
@@ -3095,7 +3095,7 @@ bool GrammarParser::WSP()
     */
     // SP() || HTAB()    ; white space
 
-    return false;
+    return SP() || HTAB();
 }
 
 } // End of Anonymous namespace
