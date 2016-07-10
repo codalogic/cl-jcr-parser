@@ -124,6 +124,12 @@ public:
         m.string_value = r_constraint;
         return *this;
     }
+    ValueConstraint & operator = ( const char * p_constraint )
+    {
+        m.form = Members::string_form;
+        m.string_value = p_constraint;
+        return *this;
+    }
     ValueConstraint & operator = ( bool constraint )
     {
         m.form = Members::bool_form;

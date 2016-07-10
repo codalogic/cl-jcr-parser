@@ -1,4 +1,4 @@
-Tests table of contents generated on Mon Apr 18 18:46:44 2016
+Tests table of contents generated on Sun Jul 10 14:10:35 2016
 
 # test-grammar-set.cpp
 | Description | Line |
@@ -9,10 +9,10 @@ Tests table of contents generated on Mon Apr 18 18:46:44 2016
 | Description | Line |
 |-------------|------|
 | ValueConstraint | 40 |
-| MemberName | 97 |
-| TargetRule | 125 |
-| Rule | 132 |
-| Grammar | 150 |
+| MemberName | 129 |
+| TargetRule | 157 |
+| Rule | 164 |
+| Grammar | 182 |
 
 # test-main.cpp
 | Description | Line |
@@ -30,11 +30,11 @@ Tests table of contents generated on Mon Apr 18 18:46:44 2016
 | GrammarParser - Syntax parsing - TBD directive | 223 |
 | GrammarParser - Syntax parsing - target_rule_name | 237 |
 | GrammarParser - Syntax parsing - Primitive rules | 260 |
-| GrammarParser - Syntax parsing - root rule | 694 |
-| GrammarParser - Syntax parsing - Member name | 732 |
-| GrammarParser - Syntax parsing - type-choice | 794 |
-| GrammarParser - Syntax parsing - object | 888 |
-| GrammarParser - Syntax parsing - array | 1161 |
-| GrammarParser - Syntax parsing - group | 1374 |
-| GrammarParser - Syntax parsing - repetition | 1550 |
-| GrammarParser - Syntax parsing - annotations | 1643 |
+| GrammarParser - Syntax parsing - root rule | 725 |
+| GrammarParser - Syntax parsing - Member name | 763 |
+| GrammarParser - Syntax parsing - type-choice | 825 |
+| GrammarParser - Syntax parsing - object | 921 |
+| GrammarParser - Syntax parsing - array | 1194 |
+| GrammarParser - Syntax parsing - group | 1407 |
+| GrammarParser - Syntax parsing - repetition | 1586 |
+| GrammarParser - Syntax parsing - annotations | 1679 |

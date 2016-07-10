@@ -43,55 +43,87 @@ TFEATURE( "ValueConstraint" )
 
     TTEST( vc.is_set() == false );
 
-    TSETUP( vc = "true" );
+    TSETUP( vc = "string" );
     TTEST( vc.is_set() == true );
-    TTEST( vc == "true" );
-    TTEST( vc == std::string( "true" ) );
-    TTEST( vc != "other" );
-    TTEST( vc != std::string( "other" ) );
-    TTEST( vc.to_string() == "true" );
-    TTEST( vc.to_bool() == true );
-    TTEST( vc.to_int() == 0 );      // This is undefined behaviour
-    TTEST( vc.to_float() == 0 );    // This is undefined behaviour
+    TTEST( vc.is_string() == true );
+    TTEST( vc.as_string() == "string" );
+    TTEST( vc.as_string() != "other" );
+    TTEST( vc.is_bool() == false );
+    TTEST( vc.is_int() == false );
+    TTEST( vc.is_uint() == false );
+    TTEST( vc.is_float() == false );
 
-    TSETUP( vc = "false" );
+    TSETUP( vc = std::string( "string" ) );
     TTEST( vc.is_set() == true );
-    TTEST( vc == "false" );
-    TTEST( vc.to_bool() == false );
-    TTEST( vc.to_int() == 0 );      // This is undefined behaviour
-    TTEST( vc.to_float() == 0 );    // This is undefined behaviour
+    TTEST( vc.is_string() == true );
+    TTEST( vc.as_string() == "string" );
+    TTEST( vc.as_string() != "other" );
+    TTEST( vc.is_bool() == false );
+    TTEST( vc.is_int() == false );
+    TTEST( vc.is_uint() == false );
+    TTEST( vc.is_float() == false );
 
-    TSETUP( vc = "foo" );
+    TSETUP( vc = true );
     TTEST( vc.is_set() == true );
-    TTEST( vc == "foo" );
-    TTEST( vc.to_bool() == false ); // This is undefined behaviour - no attempt made to convert to 'sensible' bool value when non-bool value present
-    TTEST( vc.to_int() == 0 );      // This is undefined behaviour
-    TTEST( vc.to_float() == 0 );    // This is undefined behaviour
+    TTEST( vc.is_bool() == true );
+    TTEST( vc.as_bool() == true );
+    TTEST( vc.is_string() == false );
+    TTEST( vc.is_int() == false );
+    TTEST( vc.is_uint() == false );
+    TTEST( vc.is_float() == false );
 
-    TSETUP( vc = "10" );
+    TSETUP( vc = false );
     TTEST( vc.is_set() == true );
-    TTEST( vc == "10" );
-    TTEST( vc.to_bool() == false ); // This is undefined behaviour - no attempt made to convert to 'sensible' bool value when non-bool value present
-    TTEST( vc.to_int() == 10 );
-    TTEST( vc.to_float() == 10.0 );
+    TTEST( vc.is_bool() == true );
+    TTEST( vc.as_bool() == false );
+    TTEST( vc.is_string() == false );
+    TTEST( vc.is_int() == false );
+    TTEST( vc.is_uint() == false );
+    TTEST( vc.is_float() == false );
 
-    TSETUP( vc = "10.5" );
+    TSETUP( vc = (int64)10 );
     TTEST( vc.is_set() == true );
-    TTEST( vc == "10.5" );
-    TTEST( vc.to_bool() == false ); // This is undefined behaviour - no attempt made to convert to 'sensible' bool value when non-bool value present
-    TTEST( vc.to_int() == 10 );     // This is undefined behaviour
-    TTEST( vc.to_float() == 10.5 );
+    TTEST( vc.is_int() == true );
+    TTEST( vc.as_int() == 10 );
+    TTEST( vc.is_string() == false );
+    TTEST( vc.is_bool() == false );
+    TTEST( vc.is_uint() == false );
+    TTEST( vc.is_float() == false );
 
-    TSETUP( vc = "2.5e+3" );
+    TSETUP( vc = (uint64)10 );
     TTEST( vc.is_set() == true );
-    TTEST( vc == "2.5e+3" );
-    TTEST( vc.to_bool() == false ); // This is undefined behaviour - no attempt made to convert to 'sensible' bool value when non-bool value present
-    TTEST( vc.to_int() == 2 );      // This is undefined behaviour
-    TTEST( vc.to_float() == 2500.0 );
+    TTEST( vc.is_uint() == true );
+    TTEST( vc.as_uint() == 10 );
+    TTEST( vc.is_string() == false );
+    TTEST( vc.is_bool() == false );
+    TTEST( vc.is_int() == false );
+    TTEST( vc.is_float() == false );
+
+    TSETUP( vc = 10.5 );
+    TTEST( vc.is_set() == true );
+    TTEST( vc.is_float() == true );
+    TTEST( vc.as_float() == 10.5 );
+    TTEST( vc.is_string() == false );
+    TTEST( vc.is_bool() == false );
+    TTEST( vc.is_int() == false );
+    TTEST( vc.is_uint() == false );
+
+    TSETUP( vc = 2.5e+3 );
+    TTEST( vc.is_set() == true );
+    TTEST( vc.is_float() == true );
+    TTEST( vc.as_float() == 2500.0 );
+    TTEST( vc.is_string() == false );
+    TTEST( vc.is_bool() == false );
+    TTEST( vc.is_int() == false );
+    TTEST( vc.is_uint() == false );
 
     TSETUP( vc.clear() );
     TTEST( vc.is_set() == false );
-    TTEST( vc == "" );
+    TTEST( vc.is_string() == false );
+    TTEST( vc.is_bool() == false );
+    TTEST( vc.is_int() == false );
+    TTEST( vc.is_uint() == false );
+    TTEST( vc.is_float() == false );
 }
 
 TFEATURE( "MemberName" )
