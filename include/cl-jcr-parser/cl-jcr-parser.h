@@ -59,8 +59,9 @@ struct Repetition
 {
     int min;
     int max;
+    int step;
 
-    Repetition() : min( 1 ), max( 1 ) {}
+    Repetition() : min( 1 ), max( 1 ), step( 1 ) {}
 };
 
 struct Annotations
@@ -190,7 +191,8 @@ struct Rule : private detail::NonCopyable
             DATETIME, DATE, TIME,
             HEX, BASE32, BASE32HEX, BASE64, BASE64URL,
             ANY,
-            TYPE_CHOICE, OBJECT, ARRAY, GROUP,
+            TYPE_CHOICE,
+            OBJECT, OBJECT_GROUP, ARRAY, ARRAY_GROUP, GROUP, GROUP_GROUP,
             TARGET_RULE };
 
     Rule * p_parent;

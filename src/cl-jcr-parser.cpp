@@ -6,6 +6,8 @@
 // this file, you can obtain one at http://opensource.org/licenses/LGPL-3.0.
 //----------------------------------------------------------------------------
 
+// Implements jcr-abnf - 2016-07-11T15-33
+
 #include "cl-jcr-parser/cl-jcr-parser.h"
 
 #include "dsl-pa/dsl-pa.h"
@@ -150,6 +152,7 @@ private:
     bool member_rule();
     bool member_name_spec();
     bool type_rule();
+    bool explicit_type_choice();
     bool type_choice();
     bool type_choice_items();
     bool annotations( Annotations & );
@@ -233,6 +236,7 @@ private:
     bool min_repeat();
     bool max_repeat();
     bool specific_repetition();
+    bool repetition_step();
     bool integer();
     bool non_neg_integer();
     bool pos_integer();
@@ -1052,6 +1056,7 @@ bool GrammarParser::type_choice()
     if( annotations( type_choice_annotations ) && is_get_char( '(' ) )
     {
         m.p_rule->type = Rule::TYPE_CHOICE;
+        m.p_rule->child_combiner = Rule::Choice;
         m.p_rule->annotations.merge( type_choice_annotations );
 
         type_choice_items() || fatal( "Must be at least one type specified within a type-choice" );
@@ -1069,6 +1074,18 @@ bool GrammarParser::type_choice()
     return false;
 }
 
+bool GrammarParser::explicit_type_choice()
+{
+    /* ABNF: 
+    explicit-type-choice = type-designator type-choice
+    */
+    // type_designator() && type_choice()
+
+    cl::locator loc_outer( this );
+
+    return type_designator() && type_choice() || location_top( false );
+}
+
 bool GrammarParser::type_choice_items()
 {
     /* ABNF: 
@@ -1077,7 +1094,7 @@ bool GrammarParser::type_choice_items()
     // *sp_cmt() && ( type_choice() || type_rule() ) && *sp_cmt()
 
     cl::locator loc_outer( this );
-    
+
     star_sp_cmt();
 
     cl::locator loc_inner( this );
@@ -1909,15 +1926,15 @@ bool GrammarParser::object_item()
 bool GrammarParser::object_item_types()
 {
     /* ABNF: 
-    object-item-types = member-rule / target-rule-name / object-group
+    object-item-types = object-group / member-rule / target-rule-name
     */
-    // member_rule() || target_rule_name() || object_group()
+    // object_group() || member_rule() || target_rule_name()
 
     cl::locator loc( this );
 
-    return optional_rewind( member_rule() ) ||
-            optional_rewind( target_rule_name() ) ||
-            optional_rewind( object_group() );
+    return optional_rewind( object_group() ) ||
+            optional_rewind( member_rule() ) ||
+            optional_rewind( target_rule_name() );
 }
 
 bool GrammarParser::object_group()
@@ -1929,7 +1946,7 @@ bool GrammarParser::object_group()
 
     if( is_get_char( '(' ) )
     {
-        m.p_rule->type = Rule::OBJECT;
+        m.p_rule->type = Rule::OBJECT_GROUP;
 
         star_sp_cmt() && optional( object_items() ) && star_sp_cmt();
         is_get_char( ')' ) || fatal( "Expected ')' at end of object-group" );
@@ -2043,14 +2060,15 @@ bool GrammarParser::array_item()
 bool GrammarParser::array_item_types()
 {
     /* ABNF: 
-    array-item-types = type-rule / array-group
+    array-item-types = array-group / type-rule / explicit-type-choice
     */
-    // type_rule() || array_group()
+    // array_group() || type_rule() || explicit_type_choice()
 
     cl::locator loc( this );
 
-    return optional_rewind( type_rule() ) ||
-            optional_rewind( array_group() );
+    return optional_rewind( array_group() ) ||
+            optional_rewind( type_rule() ) ||
+            optional_rewind( explicit_type_choice() );
 }
 
 bool GrammarParser::array_group()
@@ -2062,7 +2080,7 @@ bool GrammarParser::array_group()
 
     if( is_get_char( '(' ) )
     {
-        m.p_rule->type = Rule::ARRAY;
+        m.p_rule->type = Rule::ARRAY_GROUP;
 
         star_sp_cmt() && optional( array_items() ) && star_sp_cmt();
         is_get_char( ')' ) || fatal( "Expected ')' at end of array-group" );
@@ -2174,15 +2192,16 @@ bool GrammarParser::group_item()
 bool GrammarParser::group_item_types()
 {
     /* ABNF: 
-    group-item-types = member-rule / type-rule / group-group
+    group-item-types = group-group / member-rule / type-rule / explicit-type-choice
     */
-    // member_rule() || type_rule() || group_group()
+    // group_group() || member_rule() || type_rule() || explicit_type_choice()
 
     cl::locator loc( this );
 
-    return optional_rewind( member_rule() ) ||
+    return optional_rewind( group_group() ) ||
+            optional_rewind( member_rule() ) ||
             optional_rewind( type_rule() ) ||
-            optional_rewind( group_group() );
+            optional_rewind( explicit_type_choice() );
 }
 
 bool GrammarParser::group_group()
@@ -2192,7 +2211,7 @@ bool GrammarParser::group_group()
     */
     // group_rule()
 
-    return group_rule();
+    return group_rule() && set( m.p_rule->type, Rule::GROUP_GROUP );
 }
 
 bool GrammarParser::sequence_combiner()
@@ -2259,63 +2278,66 @@ bool GrammarParser::optional_marker()
 bool GrammarParser::one_or_more()
 {
     /* ABNF: 
-    one-or-more      = "+"
+    one-or-more      = "+" [ repetition-step ]
     */
-    // "+"
+    // "+" [ repetition_step() ]
 
-    return is_get_char( '+' ) && set( m.p_rule->repetition.min, 1 ) && set( m.p_rule->repetition.max, -1 );
+    return is_get_char( '+' ) && set( m.p_rule->repetition.min, 1 ) && set( m.p_rule->repetition.max, -1 ) &&
+            optional( repetition_step() );
 }
 
 bool GrammarParser::zero_or_more()
 {
     /* ABNF: 
-    zero-or-more     = "*"
+    zero-or-more     = "*" [ repetition-step ]
     */
-    // "*"
+    // "*" [ repetition_step() ]
 
-    return is_get_char( '*' ) && set( m.p_rule->repetition.min, 0 ) && set( m.p_rule->repetition.max, -1 );
+    return is_get_char( '*' ) && set( m.p_rule->repetition.min, 0 ) && set( m.p_rule->repetition.max, -1 ) &&
+            optional( repetition_step() );
 }
 
 bool GrammarParser::min_max_repetition()
 {
     /* ABNF: 
-    min-max-repetition = min-repeat ".." max-repeat
+    min-max-repetition = min-repeat ".." max-repeat [ repetition-step ]
     */
-    // min_repeat() && ".." && max_repeat()
+    // min_repeat() && ".." && max_repeat() [ repetition_step() ]
 
     cl::accumulator min_accumulator( this );
     cl::accumulator_deferred max_accumulator( this );
 
     return min_repeat() && fixed( ".." ) && max_accumulator.select() && max_repeat() &&
-            set( m.p_rule->repetition.min, min_accumulator.to_int() ) && set( m.p_rule->repetition.max, max_accumulator.to_int() );
+            set( m.p_rule->repetition.min, min_accumulator.to_int() ) && set( m.p_rule->repetition.max, max_accumulator.to_int() ) &&
+            optional( repetition_step() );
 }
 
 bool GrammarParser::min_repetition()
 {
     /* ABNF: 
-    min-repetition   = min-repeat ".."
+    min-repetition   = min-repeat ".." [ repetition-step ]
     */
-    // min_repeat() ".."
+    // min_repeat() ".." [ repetition_step() ]
 
     cl::accumulator min_accumulator( this );
 
     return min_repeat() && fixed( ".." ) &&
-            set( m.p_rule->repetition.min, min_accumulator.to_int() ) && set( m.p_rule->repetition.max, -1 );
+            set( m.p_rule->repetition.min, min_accumulator.to_int() ) && set( m.p_rule->repetition.max, -1 ) &&
+            optional( repetition_step() );
 }
 
 bool GrammarParser::max_repetition()
 {
     /* ABNF: 
-    max-repetition   = ".."  max-repeat
+    max-repetition   = ".."  max-repeat [ repetition-step ]
     */
-    // ".." && max_repeat()
-
-    // max_repetition() = "*" && *sp_cmt() && max_repeat()
+    // ".." && max_repeat() [ repetition_step() ]
 
     cl::accumulator max_accumulator( this );
 
     return fixed( ".." ) && max_repeat() &&
-            set( m.p_rule->repetition.min, 0 ) && set( m.p_rule->repetition.max, max_accumulator.to_int() );
+            set( m.p_rule->repetition.min, 0 ) && set( m.p_rule->repetition.max, max_accumulator.to_int() ) &&
+            optional( repetition_step() );
 }
 
 bool GrammarParser::min_repeat()
@@ -2345,7 +2367,30 @@ bool GrammarParser::specific_repetition()
     */
     // non_neg_integer()
 
-    return non_neg_integer();
+    cl::accumulator specific_repetition_accumulator( this );
+
+    return non_neg_integer() &&
+            set( m.p_rule->repetition.min, specific_repetition_accumulator.to_int() ) &&
+            set( m.p_rule->repetition.max, specific_repetition_accumulator.to_int() );
+}
+
+bool GrammarParser::repetition_step()
+{
+    /* ABNF: 
+    repetition-step  = "%" non-neg-integer
+    */
+    // "%" && non_neg_integer()
+
+    if( is_get_char( '%' ) )
+    {
+        cl::accumulator repetition_accumulator( this );
+        
+        non_neg_integer() && set( m.p_rule->repetition.step, repetition_accumulator.to_int() ) || fatal( "Expected repetition step size after '%'" );
+
+        return true;
+    }
+
+    return false;
 }
 
 bool GrammarParser::integer()
