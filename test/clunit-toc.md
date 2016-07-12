@@ -1,4 +1,4 @@
-Tests table of contents generated on Mon Jul 11 20:56:36 2016
+Tests table of contents generated on Tue Jul 12 12:57:19 2016
 
 # test-grammar-set.cpp
 | Description | Line |
@@ -30,11 +30,11 @@ Tests table of contents generated on Mon Jul 11 20:56:36 2016
 | GrammarParser - Syntax parsing - TBD directive | 223 |
 | GrammarParser - Syntax parsing - target_rule_name | 237 |
 | GrammarParser - Syntax parsing - Primitive rules | 260 |
-| GrammarParser - Syntax parsing - root rule | 765 |
-| GrammarParser - Syntax parsing - Member name | 825 |
-| GrammarParser - Syntax parsing - type-choice | 887 |
-| GrammarParser - Syntax parsing - object | 983 |
-| GrammarParser - Syntax parsing - array | 1276 |
-| GrammarParser - Syntax parsing - group | 1530 |
-| GrammarParser - Syntax parsing - repetition | 1709 |
-| GrammarParser - Syntax parsing - annotations | 1996 |
+| GrammarParser - Syntax parsing - root rule | 855 |
+| GrammarParser - Syntax parsing - Member name | 915 |
+| GrammarParser - Syntax parsing - type-choice | 977 |
+| GrammarParser - Syntax parsing - object | 1073 |
+| GrammarParser - Syntax parsing - array | 1366 |
+| GrammarParser - Syntax parsing - group | 1620 |
+| GrammarParser - Syntax parsing - repetition | 1799 |
+| GrammarParser - Syntax parsing - annotations | 2086 |

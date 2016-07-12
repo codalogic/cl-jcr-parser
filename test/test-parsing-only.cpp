@@ -428,6 +428,16 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TTEST( ph.grammar().rules[0].max.is_set() == false );
     }
     {
+        TSETUP( ParserHarness ph( "$rule-2 = : double\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::DOUBLE );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
         TSETUP( ParserHarness ph( "$rule-2 = : 1.0..\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
@@ -563,11 +573,91 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TCRITICALTEST( ph.grammar().rules[0].type == Rule::UINTEGER );
 
         TTEST( ph.grammar().rules[0].min.is_set() == true );
-        TTEST( ph.grammar().rules[0].max.is_uint() == true );
-        TTEST( ph.grammar().rules[0].max.as_uint() == 64 );
+        TTEST( ph.grammar().rules[0].min.is_uint() == true );
+        TTEST( ph.grammar().rules[0].min.as_uint() == 64 );
         TTEST( ph.grammar().rules[0].max.is_set() == true );
         TTEST( ph.grammar().rules[0].max.is_uint() == true );
         TTEST( ph.grammar().rules[0].max.as_uint() == 64 );
+    }
+    {
+        TSETUP( ParserHarness ph( "$rule-2 = : uint8\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::UINTEGER );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.is_uint() == true );
+        TTEST( ph.grammar().rules[0].min.as_uint() == 0 );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.is_uint() == true );
+        TTEST( ph.grammar().rules[0].max.as_uint() == 255 );
+    }
+    {
+        TSETUP( ParserHarness ph( "$rule-2 = : int8\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::INTEGER );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.is_int() == true );
+        TTEST( ph.grammar().rules[0].min.as_int() == -128 );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.is_int() == true );
+        TTEST( ph.grammar().rules[0].max.as_int() == 127 );
+    }
+    {
+        TSETUP( ParserHarness ph( "$rule-2 = : uint32\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::UINTEGER );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.is_uint() == true );
+        TTEST( ph.grammar().rules[0].min.as_uint() == 0 );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.is_uint() == true );
+        TTEST( ph.grammar().rules[0].max.as_uint() == 4294967295 );
+    }
+    {
+        TSETUP( ParserHarness ph( "$rule-2 = : int32\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::INTEGER );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.is_int() == true );
+        TTEST( ph.grammar().rules[0].min.as_int() == -2147483648LL );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.is_int() == true );
+        TTEST( ph.grammar().rules[0].max.as_int() == 2147483647 );
+    }
+    {
+        TSETUP( ParserHarness ph( "$rule-2 = : uint64\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::UINTEGER );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.is_uint() == true );
+        TTEST( ph.grammar().rules[0].min.as_uint() == 0 );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.is_uint() == true );
+        TTEST( ph.grammar().rules[0].max.as_uint() == 18446744073709551615 );
+    }
+    {
+        TSETUP( ParserHarness ph( "$rule-2 = : int64\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::INTEGER );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.is_int() == true );
+        TTEST( ph.grammar().rules[0].min.as_int() == -9223372036854775808LL );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.is_int() == true );
+        TTEST( ph.grammar().rules[0].max.as_int() == 9223372036854775807 );
     }
     {
         TSETUP( ParserHarness ph( "$rule-2 = : ipv4\n" ) );

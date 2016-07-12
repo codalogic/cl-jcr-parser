@@ -364,7 +364,7 @@ bool GrammarParser::parse()
 
 bool GrammarParser::jcr()
 {
-    /* ABNF: 
+    /* ABNF:
     jcr              = *( sp-cmt / directive / root-rule / rule )
     */
     // *( sp_cmt() || directive() || root_rule() || rule() )
@@ -385,7 +385,7 @@ bool GrammarParser::jcr()
 
 bool GrammarParser::sp_cmt()
 {
-    /* ABNF: 
+    /* ABNF:
     sp-cmt           = spaces / comment
     */
     // spaces() || comment()
@@ -395,7 +395,7 @@ bool GrammarParser::sp_cmt()
 
 bool GrammarParser::spaces()
 {
-    /* ABNF: 
+    /* ABNF:
     spaces           = 1*( WSP / CR / LF )
     */
     // 1*( WSP() || CR() || LF() )
@@ -408,7 +408,7 @@ bool GrammarParser::spaces()
 
 bool GrammarParser::comment()
 {
-    /* ABNF: 
+    /* ABNF:
     comment          = ";" *( "\;" / comment-char ) comment-end-char
     */
     // ";" && *( "\;" || comment_char() ) && comment_end_char()
@@ -431,7 +431,7 @@ bool is_jcr_comment_char( char c )
 
 bool GrammarParser::comment_char()
 {
-    /* ABNF: 
+    /* ABNF:
     comment-char     = HTAB / %x20-3A / %x3C-10FFFF
     */
     // HTAB() / %x20-3A / %x3C-10FFFF
@@ -441,7 +441,7 @@ bool GrammarParser::comment_char()
 
 bool GrammarParser::comment_end_char()
 {
-    /* ABNF: 
+    /* ABNF:
     comment-end-char = CR / LF / ";"
     */
     // CR() || LF() || ";"
@@ -451,7 +451,7 @@ bool GrammarParser::comment_end_char()
 
 bool GrammarParser::directive()
 {
-    /* ABNF: 
+    /* ABNF:
     directive        = "#" (one-line-directive / multi-line-directive)
     */
     // "#" && (one_line_directive() || multi_line_directive())
@@ -470,8 +470,8 @@ bool GrammarParser::directive()
 
 bool GrammarParser::one_line_directive()
 {
-    /* ABNF: 
-    one-line-directive = [ spaces ] 
+    /* ABNF:
+    one-line-directive = [ spaces ]
                    (directive-def / one-line-tbd-directive-d) *WSP eol
     */
     // [ spaces() ] && (directive_def() || one_line_tbd_directive_d()) && *WSP() && eol()
@@ -493,7 +493,7 @@ bool GrammarParser::one_line_directive()
 
 bool GrammarParser::multi_line_directive()
 {
-    /* ABNF: 
+    /* ABNF:
     multi-line-directive = "{" *sp-cmt
                    (directive-def / multi-line-tbd-directive-d) *sp-cmt "}"
     */
@@ -511,7 +511,7 @@ bool GrammarParser::multi_line_directive()
 
 bool GrammarParser::directive_def()
 {
-    /* ABNF: 
+    /* ABNF:
     directive-def    = jcr-version-d / ruleset-id-d / import-d
     */
     // jcr_version_d() || ruleset_id_d() || import_d()
@@ -525,7 +525,7 @@ bool GrammarParser::directive_def()
 
 bool GrammarParser::jcr_version_d()
 {
-    /* ABNF: 
+    /* ABNF:
     jcr-version-d    = jcr-version-kw spaces major-version "." minor-version
     */
     // jcr_version_kw() && spaces() && major_version() && "." && minor_version()
@@ -561,7 +561,7 @@ bool GrammarParser::DSPs()  // "Directive spaces" - May later include a flag to 
 
 bool GrammarParser::major_version()
 {
-    /* ABNF: 
+    /* ABNF:
     major-version    = non-neg-integer
     */
     // non_neg_integer()
@@ -571,7 +571,7 @@ bool GrammarParser::major_version()
 
 bool GrammarParser::minor_version()
 {
-    /* ABNF: 
+    /* ABNF:
     minor-version    = non-neg-integer
     */
     // non_neg_integer()
@@ -581,7 +581,7 @@ bool GrammarParser::minor_version()
 
 bool GrammarParser::ruleset_id_d()
 {
-    /* ABNF: 
+    /* ABNF:
     ruleset-id-d     = ruleset-id-kw spaces ruleset-id
     */
     // ruleset_id_kw() && spaces() && ruleset_id()
@@ -604,7 +604,7 @@ bool GrammarParser::ruleset_id_d()
 
 bool GrammarParser::import_d()
 {
-    /* ABNF: 
+    /* ABNF:
     import-d         = import-kw spaces ruleset-id
                    [ spaces as-kw spaces ruleset-id-alias ]
     */
@@ -640,7 +640,7 @@ bool GrammarParser::import_d()
 
 bool GrammarParser::ruleset_id()
 {
-    /* ABNF: 
+    /* ABNF:
     ruleset-id       = ALPHA *not-space
     */
     // ALPHA() && *not_space()
@@ -650,7 +650,7 @@ bool GrammarParser::ruleset_id()
 
 bool GrammarParser::not_space()
 {
-    /* ABNF: 
+    /* ABNF:
     not-space        = %x21-10FFFF
     */
     // %x21-10FFFF
@@ -660,7 +660,7 @@ bool GrammarParser::not_space()
 
 bool GrammarParser::ruleset_id_alias()
 {
-    /* ABNF: 
+    /* ABNF:
     ruleset-id-alias = name
     */
     // name()
@@ -670,7 +670,7 @@ bool GrammarParser::ruleset_id_alias()
 
 bool GrammarParser::one_line_tbd_directive_d()
 {
-    /* ABNF: 
+    /* ABNF:
     one-line-tbd-directive-d = directive-name [ WSP one-line-directive-parameters ]
     */
     // directive_name() [ WSP() && one_line_directive_parameters() ]
@@ -691,7 +691,7 @@ bool GrammarParser::one_line_tbd_directive_d()
 
 bool GrammarParser::directive_name()
 {
-    /* ABNF: 
+    /* ABNF:
     directive-name   = name
     */
     // name()
@@ -701,7 +701,7 @@ bool GrammarParser::directive_name()
 
 bool GrammarParser::one_line_directive_parameters()
 {
-    /* ABNF: 
+    /* ABNF:
     one-line-directive-parameters = *not-eol
     */
     // *not_eol()
@@ -711,7 +711,7 @@ bool GrammarParser::one_line_directive_parameters()
 
 bool GrammarParser::not_eol()
 {
-    /* ABNF: 
+    /* ABNF:
     not-eol          = HTAB / %x20-10FFFF
     */
     // HTAB() / %x20-10FFFF
@@ -721,7 +721,7 @@ bool GrammarParser::not_eol()
 
 bool GrammarParser::eol()
 {
-    /* ABNF: 
+    /* ABNF:
     eol              = CR / LF
     */
     // CR() || LF()
@@ -731,7 +731,7 @@ bool GrammarParser::eol()
 
 bool GrammarParser::multi_line_tbd_directive_d()
 {
-    /* ABNF: 
+    /* ABNF:
     multi-line-tbd-directive-d = directive-name
                    [ spaces multi-line-directive-parameters ]
     */
@@ -753,7 +753,7 @@ bool GrammarParser::multi_line_tbd_directive_d()
 
 bool GrammarParser::multi_line_directive_parameters()
 {
-    /* ABNF: 
+    /* ABNF:
     multi-line-directive-parameters = multi-line-parameters
     */
     // multi_line_parameters()
@@ -763,7 +763,7 @@ bool GrammarParser::multi_line_directive_parameters()
 
 bool GrammarParser::multi_line_parameters()
 {
-    /* ABNF: 
+    /* ABNF:
     multi-line-parameters = *(comment / q-string / regex /
                    not-multi-line-special)
     */
@@ -779,7 +779,7 @@ cl::alphabet_char_class not_dquote_or_slash_or_semicolon_or_right_brace( "^\"/;}
 
 bool GrammarParser::not_multi_line_special()
 {
-    /* ABNF: 
+    /* ABNF:
     not-multi-line-special = spaces / %x21 / %x23-2E / %x30-3A / %x3C-7C /
                    %x7E-10FFFF ; not ", /, ; or }
     */
@@ -791,7 +791,7 @@ bool GrammarParser::not_multi_line_special()
 
 bool GrammarParser::root_rule()
 {
-    /* ABNF: 
+    /* ABNF:
     root-rule        = value-rule / group-rule
     */
     // value_rule() || group_rule()
@@ -815,7 +815,7 @@ bool GrammarParser::root_rule()
 
 bool GrammarParser::rule()
 {
-    /* ABNF: 
+    /* ABNF:
     rule             = annotations "$" rule-name *sp-cmt "=" *sp-cmt rule-def
     */
     // annotations() && "$" && rule_name() && *sp_cmt() && "=" && *sp_cmt() && rule_def()
@@ -844,7 +844,7 @@ bool GrammarParser::rule()
 
 bool GrammarParser::rule_name()
 {
-    /* ABNF: 
+    /* ABNF:
     rule-name        = name
     */
     // name()
@@ -854,7 +854,7 @@ bool GrammarParser::rule_name()
 
 bool GrammarParser::target_rule_name()
 {
-    /* ABNF: 
+    /* ABNF:
     target-rule-name = annotations "$" [ ruleset-id-alias "." ] rule-name
     */
     // annotations() "$" [ ruleset_id_alias() "." ] && rule_name()
@@ -903,7 +903,7 @@ bool GrammarParser::target_rule_name()
 
 bool GrammarParser::name()
 {
-    /* ABNF: 
+    /* ABNF:
     name             = ALPHA *( ALPHA / DIGIT / "-" / "-" )
     */
     // ALPHA() && *( ALPHA() || DIGIT() || "-" || "-" )
@@ -922,7 +922,7 @@ bool GrammarParser::name()
 
 bool GrammarParser::rule_def()
 {
-    /* ABNF: 
+    /* ABNF:
     rule-def         = member-rule / type-designator rule-def-type-rule /
                    array-rule / object-rule / group-rule / target-rule-name
     */
@@ -940,7 +940,7 @@ bool GrammarParser::rule_def()
 
 bool GrammarParser::type_designator()
 {
-    /* ABNF: 
+    /* ABNF:
     type-designator  = "type" 1*sp-cmt / ":" *sp-cmt
     */
     // "type" && 1*sp_cmt() || ":" && *sp_cmt()
@@ -953,7 +953,7 @@ bool GrammarParser::type_designator()
 
 bool GrammarParser::rule_def_type_rule()
 {
-    /* ABNF: 
+    /* ABNF:
     rule-def-type-rule = value-rule / type-choice-rule
     */
     // value_rule() || type_choice()
@@ -966,7 +966,7 @@ bool GrammarParser::rule_def_type_rule()
 
 bool GrammarParser::value_rule()
 {
-    /* ABNF: 
+    /* ABNF:
     value-rule       = primitive-rule / array-rule / object-rule
     */
     // primitive_rule() || array_rule() || object_rule()
@@ -980,7 +980,7 @@ bool GrammarParser::value_rule()
 
 bool GrammarParser::member_rule()
 {
-    /* ABNF: 
+    /* ABNF:
     member-rule      = annotations
                    member-name-spec *sp-cmt ":" *sp-cmt type-rule
     */
@@ -1005,7 +1005,7 @@ bool GrammarParser::member_rule()
 
 bool GrammarParser::member_name_spec()
 {
-    /* ABNF: 
+    /* ABNF:
     member-name-spec = regex / q-string
     */
     // regex() || q_string()
@@ -1031,7 +1031,7 @@ bool GrammarParser::member_name_spec()
 
 bool GrammarParser::type_rule()
 {
-    /* ABNF: 
+    /* ABNF:
     type-rule        = value-rule / type-choice-rule / target-rule-name
     */
     // value_rule() || type_choice() || target_rule_name()
@@ -1045,7 +1045,7 @@ bool GrammarParser::type_rule()
 
 bool GrammarParser::type_choice()
 {
-    /* ABNF: 
+    /* ABNF:
     type-choice      = annotations "(" type-choice-items
                    *( choice-combiner type-choice-items ) ")"
     */
@@ -1076,7 +1076,7 @@ bool GrammarParser::type_choice()
 
 bool GrammarParser::explicit_type_choice()
 {
-    /* ABNF: 
+    /* ABNF:
     explicit-type-choice = type-designator type-choice
     */
     // type_designator() && type_choice()
@@ -1088,7 +1088,7 @@ bool GrammarParser::explicit_type_choice()
 
 bool GrammarParser::type_choice_items()
 {
-    /* ABNF: 
+    /* ABNF:
     type-choice-items = *sp-cmt ( type-choice-rule / type-rule ) *sp-cmt
     */
     // *sp_cmt() && ( type_choice() || type_rule() ) && *sp_cmt()
@@ -1110,7 +1110,7 @@ bool GrammarParser::type_choice_items()
         p_parent->append_child_rule( pu_rule );
         return true;
     }
-    
+
     location_top();
 
     return false;
@@ -1118,7 +1118,7 @@ bool GrammarParser::type_choice_items()
 
 bool GrammarParser::annotations( Annotations & r_annotations )
 {
-    /* ABNF: 
+    /* ABNF:
     annotations      = *( "@{" *sp-cmt annotation-set *sp-cmt "}" *sp-cmt )
     */
     // *( "@{" && *sp_cmt() && annotation_set() && *sp_cmt() && "}" && *sp_cmt() )
@@ -1137,7 +1137,7 @@ bool GrammarParser::annotations( Annotations & r_annotations )
 
 bool GrammarParser::annotation_set( Annotations & r_annotations )
 {
-    /* ABNF: 
+    /* ABNF:
     annotation-set   = not-annotation / unordered-annotation /
                    root-annotation / tbd-annotation
     */
@@ -1154,7 +1154,7 @@ bool GrammarParser::annotation_set( Annotations & r_annotations )
 
 bool GrammarParser::not_annotation( Annotations & r_annotations )
 {
-    /* ABNF: 
+    /* ABNF:
     not-annotation   = not-kw
     */
     // not_kw()
@@ -1164,7 +1164,7 @@ bool GrammarParser::not_annotation( Annotations & r_annotations )
 
 bool GrammarParser::unordered_annotation( Annotations & r_annotations )
 {
-    /* ABNF: 
+    /* ABNF:
     unordered-annotation = unordered-kw
     */
     // unordered_kw()
@@ -1174,7 +1174,7 @@ bool GrammarParser::unordered_annotation( Annotations & r_annotations )
 
 bool GrammarParser::root_annotation( Annotations & r_annotations )
 {
-    /* ABNF: 
+    /* ABNF:
     root-annotation  = root-kw
     */
     // root_kw()
@@ -1184,7 +1184,7 @@ bool GrammarParser::root_annotation( Annotations & r_annotations )
 
 bool GrammarParser::tbd_annotation()
 {
-    /* ABNF: 
+    /* ABNF:
     tbd-annotation   = annotation-name [ spaces annotation-parameters ]
     */
     // annotation_name() [ spaces() && annotation_parameters() ]
@@ -1205,7 +1205,7 @@ bool GrammarParser::tbd_annotation()
 
 bool GrammarParser::annotation_name()
 {
-    /* ABNF: 
+    /* ABNF:
     annotation-name  = name
     */
     // name()
@@ -1215,7 +1215,7 @@ bool GrammarParser::annotation_name()
 
 bool GrammarParser::annotation_parameters()
 {
-    /* ABNF: 
+    /* ABNF:
     annotation-parameters = multi-line-parameters
     */
     // multi_line_parameters()
@@ -1225,7 +1225,7 @@ bool GrammarParser::annotation_parameters()
 
 bool GrammarParser::primitive_rule()
 {
-    /* ABNF: 
+    /* ABNF:
     primitive-rule   = annotations primitive-def
     */
     // annotations() && primitive_def()
@@ -1243,7 +1243,7 @@ bool GrammarParser::primitive_rule()
 
 bool GrammarParser::primitive_def()
 {
-    /* ABNF: 
+    /* ABNF:
     primitive-def    = string-type / string-range / string-value /
                    null-type / boolean-type / true-value / false-value /
                    double-type / float-type / float-range / float-value /
@@ -1307,7 +1307,7 @@ bool GrammarParser::primitive_def()
 
 bool GrammarParser::null_type()
 {
-    /* ABNF: 
+    /* ABNF:
     null-type        = null-kw
     */
     // null_kw()
@@ -1317,7 +1317,7 @@ bool GrammarParser::null_type()
 
 bool GrammarParser::boolean_type()
 {
-    /* ABNF: 
+    /* ABNF:
     boolean-type     = boolean-kw
     */
     // boolean_kw()
@@ -1327,7 +1327,7 @@ bool GrammarParser::boolean_type()
 
 bool GrammarParser::true_value()
 {
-    /* ABNF: 
+    /* ABNF:
     true-value       = true-kw
     */
     // true_kw()
@@ -1340,7 +1340,7 @@ bool GrammarParser::true_value()
 
 bool GrammarParser::false_value()
 {
-    /* ABNF: 
+    /* ABNF:
     false-value      = false-kw
     */
     // false_kw()
@@ -1353,7 +1353,7 @@ bool GrammarParser::false_value()
 
 bool GrammarParser::string_type()
 {
-    /* ABNF: 
+    /* ABNF:
     string-type      = string-kw
     */
     // string_kw()
@@ -1363,7 +1363,7 @@ bool GrammarParser::string_type()
 
 bool GrammarParser::string_value()
 {
-    /* ABNF: 
+    /* ABNF:
     string-value     = q-string
     */
     // q_string()
@@ -1383,7 +1383,7 @@ bool GrammarParser::string_value()
 
 bool GrammarParser::string_range()
 {
-    /* ABNF: 
+    /* ABNF:
     string-range     = regex
     */
     // regex()
@@ -1403,7 +1403,7 @@ bool GrammarParser::string_range()
 
 bool GrammarParser::double_type()
 {
-    /* ABNF: 
+    /* ABNF:
     double-type      = double-kw
     */
     // double_kw()
@@ -1413,7 +1413,7 @@ bool GrammarParser::double_type()
 
 bool GrammarParser::float_type()
 {
-    /* ABNF: 
+    /* ABNF:
     float-type       = float-kw
     */
     // float_kw()
@@ -1423,7 +1423,7 @@ bool GrammarParser::float_type()
 
 bool GrammarParser::float_range()
 {
-    /* ABNF: 
+    /* ABNF:
     float-range      = float-min ".." [ float-max ] / ".." float-max
     */
     // float_min() && ".." && [ float_max() ] || ".." && float_max()
@@ -1447,7 +1447,7 @@ bool GrammarParser::float_range()
 
 bool GrammarParser::float_min()
 {
-    /* ABNF: 
+    /* ABNF:
     float-min        = float
     */
     // float()
@@ -1457,7 +1457,7 @@ bool GrammarParser::float_min()
 
 bool GrammarParser::float_max()
 {
-    /* ABNF: 
+    /* ABNF:
     float-max        = float
     */
     // float()
@@ -1467,7 +1467,7 @@ bool GrammarParser::float_max()
 
 bool GrammarParser::float_value()
 {
-    /* ABNF: 
+    /* ABNF:
     float-value      = float
     */
     // float()
@@ -1482,7 +1482,7 @@ bool GrammarParser::float_value()
 
 bool GrammarParser::integer_type()
 {
-    /* ABNF: 
+    /* ABNF:
     integer-type     = integer-kw
     */
     // integer_kw()
@@ -1492,7 +1492,7 @@ bool GrammarParser::integer_type()
 
 bool GrammarParser::integer_range()
 {
-    /* ABNF: 
+    /* ABNF:
     integer-range    = integer-min ".." [ integer-max ] / ".." integer-max
     */
     // integer_min() ".." [ integer_max() ] || ".." && integer_max()
@@ -1501,7 +1501,7 @@ bool GrammarParser::integer_range()
     cl::accumulator_deferred integer_max_accumulator( this );
 
     // No need to record location because always part of primitive_def() rewind choice
-    
+
     if( optional_rewind( integer_min() && fixed( ".." ) && optional( integer_max_accumulator.select() && integer_max() ) ) ||
             optional_rewind( fixed( ".." ) && integer_max_accumulator.select() && integer_max() ) )
     {
@@ -1535,7 +1535,7 @@ bool GrammarParser::integer_range()
 
 bool GrammarParser::integer_min()
 {
-    /* ABNF: 
+    /* ABNF:
     integer-min      = integer
     */
     // integer()
@@ -1545,7 +1545,7 @@ bool GrammarParser::integer_min()
 
 bool GrammarParser::integer_max()
 {
-    /* ABNF: 
+    /* ABNF:
     integer-max      = integer
     */
     // integer()
@@ -1555,7 +1555,7 @@ bool GrammarParser::integer_max()
 
 bool GrammarParser::integer_value()
 {
-    /* ABNF: 
+    /* ABNF:
     integer-value    = integer
     */
     // integer()
@@ -1576,7 +1576,7 @@ bool GrammarParser::integer_value()
         }
         return true;
     }
-    
+
     return false;
 }
 
@@ -1608,7 +1608,7 @@ uint64 sized_uint_max( int bits )
 
 bool GrammarParser::sized_int_type()
 {
-    /* ABNF: 
+    /* ABNF:
     sized-int-type   = int-kw pos-integer
     */
     // int_kw() && pos_integer()
@@ -1624,14 +1624,14 @@ bool GrammarParser::sized_int_type()
 
 bool GrammarParser::sized_uint_type()
 {
-    /* ABNF: 
+    /* ABNF:
     sized-uint-type  = uint-kw pos-integer
     */
     // uint_kw() && pos_integer()
 
     cl::accumulator num_bits_accumulator( this );
 
-    return int_kw() && pos_integer() &&
+    return uint_kw() && pos_integer() &&
             ( num_bits_accumulator.to_int() <= 64 || error( "sized iint size too large") ) &&
             set( m.p_rule->type, Rule::UINTEGER ) &&
             set( m.p_rule->min, sized_uint_min( num_bits_accumulator.to_int() ) ) && // TODO_TEST_MIN_MAX_SIZED_INTS
@@ -1640,7 +1640,7 @@ bool GrammarParser::sized_uint_type()
 
 bool GrammarParser::ipv4_type()
 {
-    /* ABNF: 
+    /* ABNF:
     ipv4-type        = ipv4-kw
     */
     // ipv4_kw()
@@ -1650,7 +1650,7 @@ bool GrammarParser::ipv4_type()
 
 bool GrammarParser::ipv6_type()
 {
-    /* ABNF: 
+    /* ABNF:
     ipv6-type        = ipv6-kw
     */
     // ipv6_kw()
@@ -1660,7 +1660,7 @@ bool GrammarParser::ipv6_type()
 
 bool GrammarParser::ipaddr_type()
 {
-    /* ABNF: 
+    /* ABNF:
     ipaddr-type      = ipaddr-kw
     */
     // ipaddr_kw()
@@ -1670,7 +1670,7 @@ bool GrammarParser::ipaddr_type()
 
 bool GrammarParser::fqdn_type()
 {
-    /* ABNF: 
+    /* ABNF:
     fqdn-type        = fqdn-kw
     */
     // fqdn_kw()
@@ -1680,7 +1680,7 @@ bool GrammarParser::fqdn_type()
 
 bool GrammarParser::idn_type()
 {
-    /* ABNF: 
+    /* ABNF:
     idn-type         = idn-kw
     */
     // idn_kw()
@@ -1690,7 +1690,7 @@ bool GrammarParser::idn_type()
 
 bool GrammarParser::uri_range()
 {
-    /* ABNF: 
+    /* ABNF:
     uri-range        = uri-dotdot-kw uri-template
     */
     // uri_dotdot_kw() && uri_template()
@@ -1705,7 +1705,7 @@ bool GrammarParser::uri_range()
 
 bool GrammarParser::uri_type()
 {
-    /* ABNF: 
+    /* ABNF:
     uri-type         = uri-kw
     */
     // uri_kw()
@@ -1715,7 +1715,7 @@ bool GrammarParser::uri_type()
 
 bool GrammarParser::phone_type()
 {
-    /* ABNF: 
+    /* ABNF:
     phone-type       = phone-kw
     */
     // phone_kw()
@@ -1725,7 +1725,7 @@ bool GrammarParser::phone_type()
 
 bool GrammarParser::email_type()
 {
-    /* ABNF: 
+    /* ABNF:
     email-type       = email-kw
     */
     // email_kw()
@@ -1735,7 +1735,7 @@ bool GrammarParser::email_type()
 
 bool GrammarParser::datetime_type()
 {
-    /* ABNF: 
+    /* ABNF:
     datetime-type    = datetime-kw
     */
     // datetime_kw()
@@ -1745,7 +1745,7 @@ bool GrammarParser::datetime_type()
 
 bool GrammarParser::date_type()
 {
-    /* ABNF: 
+    /* ABNF:
     date-type        = date-kw
     */
     // date_kw()
@@ -1757,7 +1757,7 @@ bool GrammarParser::date_type()
 
 bool GrammarParser::time_type()
 {
-    /* ABNF: 
+    /* ABNF:
     time-type        = time-kw
     */
     // time_kw()
@@ -1767,7 +1767,7 @@ bool GrammarParser::time_type()
 
 bool GrammarParser::hex_type()
 {
-    /* ABNF: 
+    /* ABNF:
     hex-type         = hex-kw
     */
     // hex_kw()
@@ -1777,7 +1777,7 @@ bool GrammarParser::hex_type()
 
 bool GrammarParser::base32hex_type()
 {
-    /* ABNF: 
+    /* ABNF:
     base32hex-type   = base32hex-kw
     */
     // base32hex_kw()
@@ -1787,7 +1787,7 @@ bool GrammarParser::base32hex_type()
 
 bool GrammarParser::base32_type()
 {
-    /* ABNF: 
+    /* ABNF:
     base32-type      = base32-kw
     */
     // base32_kw()
@@ -1797,7 +1797,7 @@ bool GrammarParser::base32_type()
 
 bool GrammarParser::base64url_type()
 {
-    /* ABNF: 
+    /* ABNF:
     base64url-type   = base64url-kw
     */
     // base64url_kw()
@@ -1807,7 +1807,7 @@ bool GrammarParser::base64url_type()
 
 bool GrammarParser::base64_type()
 {
-    /* ABNF: 
+    /* ABNF:
     base64-type      = base64-kw
     */
     // base64_kw()
@@ -1817,7 +1817,7 @@ bool GrammarParser::base64_type()
 
 bool GrammarParser::any()
 {
-    /* ABNF: 
+    /* ABNF:
     any              = any-kw
     */
     // any_kw()
@@ -1827,7 +1827,7 @@ bool GrammarParser::any()
 
 bool GrammarParser::object_rule()
 {
-    /* ABNF: 
+    /* ABNF:
     object-rule      = annotations "{" *sp-cmt [ object-items *sp-cmt ] "}"
     */
     // annotations() "{" && *sp_cmt() [ object_items() && *sp_cmt() ] "}"
@@ -1853,7 +1853,7 @@ bool GrammarParser::object_rule()
 
 bool GrammarParser::object_items()
 {
-    /* ABNF: 
+    /* ABNF:
     object-items     = object-item (*( sequence-combiner object-item ) /
                    *( choice-combiner object-item ) )
     */
@@ -1903,7 +1903,7 @@ bool GrammarParser::star_choice_combiner_and_object_item()
 
 bool GrammarParser::object_item()
 {
-    /* ABNF: 
+    /* ABNF:
     object-item      = object-item-types *sp-cmt [ repetition ]
     */
     // object_item_types() && *sp_cmt() && [ repetition() ]
@@ -1925,7 +1925,7 @@ bool GrammarParser::object_item()
 
 bool GrammarParser::object_item_types()
 {
-    /* ABNF: 
+    /* ABNF:
     object-item-types = object-group / member-rule / target-rule-name
     */
     // object_group() || member_rule() || target_rule_name()
@@ -1939,7 +1939,7 @@ bool GrammarParser::object_item_types()
 
 bool GrammarParser::object_group()
 {
-    /* ABNF: 
+    /* ABNF:
     object-group     = "(" *sp-cmt [ object-items *sp-cmt ] ")"
     */
     // "(" && *sp_cmt() [ object_items() && *sp_cmt() ] ")"
@@ -1959,7 +1959,7 @@ bool GrammarParser::object_group()
 
 bool GrammarParser::array_rule()
 {
-    /* ABNF: 
+    /* ABNF:
     array-rule       = annotations "[" *sp-cmt [ array-items *sp-cmt ] "]"
     */
     // annotations() "[" && *sp_cmt() [ array_items() && *sp_cmt() ] "]"
@@ -1987,7 +1987,7 @@ bool GrammarParser::array_rule()
 
 bool GrammarParser::array_items()
 {
-    /* ABNF: 
+    /* ABNF:
     array-items      = array-item (*( sequence-combiner array-item ) /
                    *( choice-combiner array-item ) )
     */
@@ -2037,7 +2037,7 @@ bool GrammarParser::star_choice_combiner_and_array_item()
 
 bool GrammarParser::array_item()
 {
-    /* ABNF: 
+    /* ABNF:
     array-item       = array-item-types *sp-cmt [ repetition ]
     */
     // array_item_types() && *sp_cmt() [ repetition() ]
@@ -2059,7 +2059,7 @@ bool GrammarParser::array_item()
 
 bool GrammarParser::array_item_types()
 {
-    /* ABNF: 
+    /* ABNF:
     array-item-types = array-group / type-rule / explicit-type-choice
     */
     // array_group() || type_rule() || explicit_type_choice()
@@ -2073,7 +2073,7 @@ bool GrammarParser::array_item_types()
 
 bool GrammarParser::array_group()
 {
-    /* ABNF: 
+    /* ABNF:
     array-group      = "(" *sp-cmt [ array-items *sp-cmt ] ")"
     */
     // "(" && *sp_cmt() && [ array_items() && *sp_cmt() ] && ")"
@@ -2093,7 +2093,7 @@ bool GrammarParser::array_group()
 
 bool GrammarParser::group_rule()
 {
-    /* ABNF: 
+    /* ABNF:
     group-rule       = annotations "(" *sp-cmt [ group-items *sp-cmt ] ")"
     */
     // annotations() "(" && *sp_cmt() [ group_items() && *sp_cmt() ] ")"
@@ -2119,7 +2119,7 @@ bool GrammarParser::group_rule()
 
 bool GrammarParser::group_items()
 {
-    /* ABNF: 
+    /* ABNF:
     group-items      = group-item (*( sequence-combiner group-item ) /
                    *( choice-combiner group-item ) )
     */
@@ -2169,7 +2169,7 @@ bool GrammarParser::star_choice_combiner_and_group_item()
 
 bool GrammarParser::group_item()
 {
-    /* ABNF: 
+    /* ABNF:
     group-item       = group-item-types *sp-cmt [ repetition ]
     */
     // group_item_types() && *sp_cmt() [ repetition() ]
@@ -2191,7 +2191,7 @@ bool GrammarParser::group_item()
 
 bool GrammarParser::group_item_types()
 {
-    /* ABNF: 
+    /* ABNF:
     group-item-types = group-group / member-rule / type-rule / explicit-type-choice
     */
     // group_group() || member_rule() || type_rule() || explicit_type_choice()
@@ -2206,7 +2206,7 @@ bool GrammarParser::group_item_types()
 
 bool GrammarParser::group_group()
 {
-    /* ABNF: 
+    /* ABNF:
     group-group      = group-rule
     */
     // group_rule()
@@ -2216,7 +2216,7 @@ bool GrammarParser::group_group()
 
 bool GrammarParser::sequence_combiner()
 {
-    /* ABNF: 
+    /* ABNF:
     sequence-combiner = *sp-cmt "," *sp-cmt
     */
     // *sp_cmt() && "," && *sp_cmt()
@@ -2226,7 +2226,7 @@ bool GrammarParser::sequence_combiner()
 
 bool GrammarParser::choice_combiner()
 {
-    /* ABNF: 
+    /* ABNF:
     choice-combiner  = *sp-cmt "|" *sp-cmt
     */
     // *sp_cmt() && "|" && *sp_cmt()
@@ -2236,7 +2236,7 @@ bool GrammarParser::choice_combiner()
 
 bool GrammarParser::repetition()
 {
-    /* ABNF: 
+    /* ABNF:
     repetition       = "@" *sp-cmt ( optional / one-or-more / min-max-repetition /
                    min-repetition / max-repetition /
                    zero-or-more / specific-repetition )
@@ -2259,15 +2259,15 @@ bool GrammarParser::repetition()
                 optional_rewind( specific_repetition() ) )
             return true;   // if false, fall through to loc_outer recorded location
     }
-    
+
     location_top();
-    
+
     return false;
 }
 
 bool GrammarParser::optional_marker()
 {
-    /* ABNF: 
+    /* ABNF:
     optional         = "?"
     */
     // "?"
@@ -2277,7 +2277,7 @@ bool GrammarParser::optional_marker()
 
 bool GrammarParser::one_or_more()
 {
-    /* ABNF: 
+    /* ABNF:
     one-or-more      = "+" [ repetition-step ]
     */
     // "+" [ repetition_step() ]
@@ -2288,7 +2288,7 @@ bool GrammarParser::one_or_more()
 
 bool GrammarParser::zero_or_more()
 {
-    /* ABNF: 
+    /* ABNF:
     zero-or-more     = "*" [ repetition-step ]
     */
     // "*" [ repetition_step() ]
@@ -2299,7 +2299,7 @@ bool GrammarParser::zero_or_more()
 
 bool GrammarParser::min_max_repetition()
 {
-    /* ABNF: 
+    /* ABNF:
     min-max-repetition = min-repeat ".." max-repeat [ repetition-step ]
     */
     // min_repeat() && ".." && max_repeat() [ repetition_step() ]
@@ -2314,7 +2314,7 @@ bool GrammarParser::min_max_repetition()
 
 bool GrammarParser::min_repetition()
 {
-    /* ABNF: 
+    /* ABNF:
     min-repetition   = min-repeat ".." [ repetition-step ]
     */
     // min_repeat() ".." [ repetition_step() ]
@@ -2328,7 +2328,7 @@ bool GrammarParser::min_repetition()
 
 bool GrammarParser::max_repetition()
 {
-    /* ABNF: 
+    /* ABNF:
     max-repetition   = ".."  max-repeat [ repetition-step ]
     */
     // ".." && max_repeat() [ repetition_step() ]
@@ -2342,7 +2342,7 @@ bool GrammarParser::max_repetition()
 
 bool GrammarParser::min_repeat()
 {
-    /* ABNF: 
+    /* ABNF:
     min-repeat       = non-neg-integer
     */
     // non_neg_integer()
@@ -2352,7 +2352,7 @@ bool GrammarParser::min_repeat()
 
 bool GrammarParser::max_repeat()
 {
-    /* ABNF: 
+    /* ABNF:
     max-repeat       = non-neg-integer
     */
     // non_neg_integer()
@@ -2362,7 +2362,7 @@ bool GrammarParser::max_repeat()
 
 bool GrammarParser::specific_repetition()
 {
-    /* ABNF: 
+    /* ABNF:
     specific-repetition = non-neg-integer
     */
     // non_neg_integer()
@@ -2376,7 +2376,7 @@ bool GrammarParser::specific_repetition()
 
 bool GrammarParser::repetition_step()
 {
-    /* ABNF: 
+    /* ABNF:
     repetition-step  = "%" non-neg-integer
     */
     // "%" && non_neg_integer()
@@ -2384,7 +2384,7 @@ bool GrammarParser::repetition_step()
     if( is_get_char( '%' ) )
     {
         cl::accumulator repetition_accumulator( this );
-        
+
         non_neg_integer() && set( m.p_rule->repetition.step, repetition_accumulator.to_int() ) || fatal( "Expected repetition step size after '%'" );
 
         return true;
@@ -2395,7 +2395,7 @@ bool GrammarParser::repetition_step()
 
 bool GrammarParser::integer()
 {
-    /* ABNF: 
+    /* ABNF:
     integer          = "0" / ["-"] pos-integer
     */
     // "0" / ["-"] && pos_integer()
@@ -2406,7 +2406,7 @@ bool GrammarParser::integer()
 
 bool GrammarParser::non_neg_integer()
 {
-    /* ABNF: 
+    /* ABNF:
     non-neg-integer  = "0" / pos-integer
     */
     // "0" || pos_integer()
@@ -2417,7 +2417,7 @@ bool GrammarParser::non_neg_integer()
 
 bool GrammarParser::pos_integer()
 {
-    /* ABNF: 
+    /* ABNF:
     pos-integer      = digit1-9 *DIGIT
     */
     // digit1_9() && *DIGIT()
@@ -2427,7 +2427,7 @@ bool GrammarParser::pos_integer()
 
 bool GrammarParser::float_num()
 {
-    /* ABNF: 
+    /* ABNF:
     float            = [ minus ] int frac [ exp ]
     */
     // [ minus() ] && int() && frac() [ exp() ]
@@ -2439,7 +2439,7 @@ bool GrammarParser::float_num()
 
 bool GrammarParser::minus()
 {
-    /* ABNF: 
+    /* ABNF:
     minus            = %x2D                          ; -
     */
     // %x2D                          ; -
@@ -2449,7 +2449,7 @@ bool GrammarParser::minus()
 
 bool GrammarParser::plus()
 {
-    /* ABNF: 
+    /* ABNF:
     plus             = %x2B                          ; +
     */
     // %x2B                          ; +
@@ -2459,7 +2459,7 @@ bool GrammarParser::plus()
 
 bool GrammarParser::int_num()
 {
-    /* ABNF: 
+    /* ABNF:
     int              = zero / ( digit1-9 *DIGIT )
     */
     // zero() || ( digit1_9() && *DIGIT() )
@@ -2471,7 +2471,7 @@ cl::alphabet_char_class digit1_9_alphabet( "1-9" );
 
 bool GrammarParser::digit1_9()
 {
-    /* ABNF: 
+    /* ABNF:
     digit1-9         = %x31-39                       ; 1-9
     */
     // %x31-39                       ; 1-9
@@ -2481,7 +2481,7 @@ bool GrammarParser::digit1_9()
 
 bool GrammarParser::frac()
 {
-    /* ABNF: 
+    /* ABNF:
     frac             = decimal-point 1*DIGIT
     */
     // decimal_point() && 1*DIGIT()
@@ -2491,7 +2491,7 @@ bool GrammarParser::frac()
 
 bool GrammarParser::decimal_point()
 {
-    /* ABNF: 
+    /* ABNF:
     decimal-point    = %x2E                          ; .
     */
     // %x2E                          ; .
@@ -2501,7 +2501,7 @@ bool GrammarParser::decimal_point()
 
 bool GrammarParser::exp()
 {
-    /* ABNF: 
+    /* ABNF:
     exp              = e [ minus / plus ] 1*DIGIT
     */
     // e() [ minus() || plus() ] && 1*DIGIT()
@@ -2511,7 +2511,7 @@ bool GrammarParser::exp()
 
 bool GrammarParser::e()
 {
-    /* ABNF: 
+    /* ABNF:
     e                = %x65 / %x45                   ; e E
     */
     // %x65 / %x45                   ; e() && E
@@ -2521,7 +2521,7 @@ bool GrammarParser::e()
 
 bool GrammarParser::zero()
 {
-    /* ABNF: 
+    /* ABNF:
     zero             = %x30                          ; 0
     */
     // %x30                          ; 0
@@ -2544,8 +2544,8 @@ bool GrammarParser::q_string_as_utf8()
 
 bool GrammarParser::q_string()
 {
-    /* ABNF: 
-    q-string         = quotation-mark *char quotation-mark 
+    /* ABNF:
+    q-string         = quotation-mark *char quotation-mark
     */
     // quotation_mark() && *qs_char() && quotation_mark()
 
@@ -2561,7 +2561,7 @@ bool GrammarParser::q_string()
 
 bool GrammarParser::quotation_mark()
 {
-    /* ABNF: 
+    /* ABNF:
     quotation-mark   = %x22      ; "
     */
     // %x22      ; "
@@ -2571,7 +2571,7 @@ bool GrammarParser::quotation_mark()
 
 bool GrammarParser::qs_char()
 {
-    /* ABNF: 
+    /* ABNF:
     char             = unescaped /
                    escape (
                    %x22 /          ; "    quotation mark  U+0022
@@ -2607,7 +2607,7 @@ bool is_qstring_unescaped( char c )
 
 bool GrammarParser::unescaped()
 {
-    /* ABNF: 
+    /* ABNF:
     unescaped        = %x20-21 / %x23-5B / %x5D-10FFFF
     */
     // %x20-21 / %x23-5B / %x5D-10FFFF
@@ -2617,7 +2617,7 @@ bool GrammarParser::unescaped()
 
 bool GrammarParser::escape()
 {
-    /* ABNF: 
+    /* ABNF:
     escape           = %x5C              ; \
     */
     // %x5C              ; \
@@ -2647,7 +2647,7 @@ bool GrammarParser::four_HEXDIG()
 
 bool GrammarParser::regex()
 {
-    /* ABNF: 
+    /* ABNF:
     regex            = "/" *( escape "/" / not-slash ) "/" [ regex-modifiers ]
     */
     // "/" && *( escape() "/" || not_slash() ) "/" [ regex_modifiers() ]
@@ -2674,7 +2674,7 @@ bool is_not_slash( char c )
 
 bool GrammarParser::not_slash()
 {
-    /* ABNF: 
+    /* ABNF:
     not-slash        = HTAB / CR / LF / %x20-2E / %x30-10FFFF
     */
     // HTAB() || CR() || LF() / %x20-2E / %x30-10FFFF
@@ -2686,7 +2686,7 @@ cl::alphabet_char_class regex_modifiers_alphabet( "isx" );
 
 bool GrammarParser::regex_modifiers()
 {
-    /* ABNF: 
+    /* ABNF:
     regex-modifiers  = *( "i" / "s" / "x" )
     */
     // *( "i" || "s" || "x" )
@@ -2696,7 +2696,7 @@ bool GrammarParser::regex_modifiers()
 
 bool GrammarParser::uri_template()
 {
-    /* ABNF: 
+    /* ABNF:
     uri-template     = 1*ALPHA ":" 1*not-space
     */
     // 1*ALPHA() && ":" && 1*not_space()
@@ -2706,7 +2706,7 @@ bool GrammarParser::uri_template()
 
 bool GrammarParser::any_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     any-kw           = %x61.6E.79                      ; "any"
     */
     // %x61.6E.79                      ; "any"
@@ -2716,7 +2716,7 @@ bool GrammarParser::any_kw()
 
 bool GrammarParser::as_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     as-kw            = %x61.73                         ; "as"
     */
     // %x61.73                         ; "as"
@@ -2726,7 +2726,7 @@ bool GrammarParser::as_kw()
 
 bool GrammarParser::base32_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     base32-kw        = %x62.61.73.65.33.32             ; "base32"
     */
     // %x62.61.73.65.33.32             ; "base32"
@@ -2736,7 +2736,7 @@ bool GrammarParser::base32_kw()
 
 bool GrammarParser::base32hex_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     base32hex-kw     = %x62.61.73.65.33.32.68.65.78    ; "base32hex"
     */
     // %x62.61.73.65.33.32.68.65.78    ; "base32hex"
@@ -2746,7 +2746,7 @@ bool GrammarParser::base32hex_kw()
 
 bool GrammarParser::base64_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     base64-kw        = %x62.61.73.65.36.34             ; "base64"
     */
     // %x62.61.73.65.36.34             ; "base64"
@@ -2756,7 +2756,7 @@ bool GrammarParser::base64_kw()
 
 bool GrammarParser::base64url_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     base64url-kw     = %x62.61.73.65.36.34.75.72.6C    ; "base64url"
     */
     // %x62.61.73.65.36.34.75.72.6C    ; "base64url"
@@ -2766,7 +2766,7 @@ bool GrammarParser::base64url_kw()
 
 bool GrammarParser::boolean_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     boolean-kw       = %x62.6F.6F.6C.65.61.6E          ; "boolean"
     */
     // %x62.6F.6F.6C.65.61.6E          ; "boolean"
@@ -2776,7 +2776,7 @@ bool GrammarParser::boolean_kw()
 
 bool GrammarParser::date_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     date-kw          = %x64.61.74.65                   ; "date"
     */
     // %x64.61.74.65                   ; "date"
@@ -2786,7 +2786,7 @@ bool GrammarParser::date_kw()
 
 bool GrammarParser::datetime_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     datetime-kw      = %x64.61.74.65.74.69.6D.65       ; "datetime"
     */
     // %x64.61.74.65.74.69.6D.65       ; "datetime"
@@ -2796,7 +2796,7 @@ bool GrammarParser::datetime_kw()
 
 bool GrammarParser::double_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     double-kw        = %x64.6F.75.62.6C.65             ; "double"
     */
     // %x64.6F.75.62.6C.65             ; "double"
@@ -2806,7 +2806,7 @@ bool GrammarParser::double_kw()
 
 bool GrammarParser::email_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     email-kw         = %x65.6D.61.69.6C                ; "email"
     */
     // %x65.6D.61.69.6C                ; "email"
@@ -2816,7 +2816,7 @@ bool GrammarParser::email_kw()
 
 bool GrammarParser::false_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     false-kw         = %x66.61.6C.73.65                ; "false"
     */
     // %x66.61.6C.73.65                ; "false"
@@ -2826,7 +2826,7 @@ bool GrammarParser::false_kw()
 
 bool GrammarParser::float_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     float-kw         = %x66.6C.6F.61.74                ; "float"
     */
     // %x66.6C.6F.61.74                ; "float()"
@@ -2836,7 +2836,7 @@ bool GrammarParser::float_kw()
 
 bool GrammarParser::fqdn_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     fqdn-kw          = %x66.71.64.6E                   ; "fqdn"
     */
     // %x66.71.64.6E                   ; "fqdn"
@@ -2846,7 +2846,7 @@ bool GrammarParser::fqdn_kw()
 
 bool GrammarParser::hex_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     hex-kw           = %x68.65.78                      ; "hex"
     */
     // %x68.65.78                      ; "hex"
@@ -2856,7 +2856,7 @@ bool GrammarParser::hex_kw()
 
 bool GrammarParser::idn_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     idn-kw           = %x69.64.6E                      ; "idn"
     */
     // %x69.64.6E                      ; "idn"
@@ -2866,7 +2866,7 @@ bool GrammarParser::idn_kw()
 
 bool GrammarParser::import_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     import-kw        = %x69.6D.70.6F.72.74             ; "import"
     */
     // %x69.6D.70.6F.72.74             ; "import"
@@ -2876,7 +2876,7 @@ bool GrammarParser::import_kw()
 
 bool GrammarParser::int_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     int-kw           = %x69.6E.74                      ; "int"
     */
     // %x69.6E.74                      ; "int"
@@ -2886,7 +2886,7 @@ bool GrammarParser::int_kw()
 
 bool GrammarParser::integer_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     integer-kw       = %x69.6E.74.65.67.65.72          ; "integer"
     */
     // %x69.6E.74.65.67.65.72          ; "integer()"
@@ -2896,7 +2896,7 @@ bool GrammarParser::integer_kw()
 
 bool GrammarParser::ipaddr_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     ipaddr-kw        = %x69.70.61.64.64.72             ; "ipaddr"
     */
     // %x69.70.61.64.64.72             ; "ipaddr"
@@ -2906,7 +2906,7 @@ bool GrammarParser::ipaddr_kw()
 
 bool GrammarParser::ipv4_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     ipv4-kw          = %x69.70.76.34                   ; "ipv4"
     */
     // %x69.70.76.34                   ; "ipv4"
@@ -2916,7 +2916,7 @@ bool GrammarParser::ipv4_kw()
 
 bool GrammarParser::ipv6_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     ipv6-kw          = %x69.70.76.36                   ; "ipv6"
     */
     // %x69.70.76.36                   ; "ipv6"
@@ -2926,7 +2926,7 @@ bool GrammarParser::ipv6_kw()
 
 bool GrammarParser::jcr_version_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     jcr-version-kw   = %x6A.63.72.2D.76.65.72.73.69.6F.6E ; "jcr-version"
     */
     // %x6A.63.72.2D.76.65.72.73.69.6F.6E ; "jcr-version"
@@ -2936,7 +2936,7 @@ bool GrammarParser::jcr_version_kw()
 
 bool GrammarParser::not_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     not-kw           = %x6E.6F.74                      ; "not"
     */
     // %x6E.6F.74                      ; "not"
@@ -2946,7 +2946,7 @@ bool GrammarParser::not_kw()
 
 bool GrammarParser::null_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     null-kw          = %x6E.75.6C.6C                   ; "null"
     */
     // %x6E.75.6C.6C                   ; "null"
@@ -2956,7 +2956,7 @@ bool GrammarParser::null_kw()
 
 bool GrammarParser::phone_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     phone-kw         = %x70.68.6F.6E.65                ; "phone"
     */
     // %x70.68.6F.6E.65                ; "phone"
@@ -2966,7 +2966,7 @@ bool GrammarParser::phone_kw()
 
 bool GrammarParser::root_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     root-kw          = %x72.6F.6F.74                   ; "root"
     */
     // %x72.6F.6F.74                   ; "root"
@@ -2976,7 +2976,7 @@ bool GrammarParser::root_kw()
 
 bool GrammarParser::ruleset_id_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     ruleset-id-kw    = %x72.75.6C.65.73.65.74.2D.69.64 ; "ruleset-id"
     */
     // %x72.75.6C.65.73.65.74.2D.69.64 ; "ruleset_id()"
@@ -2986,7 +2986,7 @@ bool GrammarParser::ruleset_id_kw()
 
 bool GrammarParser::string_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     string-kw        = %x73.74.72.69.6E.67             ; "string"
     */
     // %x73.74.72.69.6E.67             ; "string"
@@ -2996,7 +2996,7 @@ bool GrammarParser::string_kw()
 
 bool GrammarParser::time_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     time-kw          = %x74.69.6D.65                   ; "time"
     */
     // %x74.69.6D.65                   ; "time"
@@ -3006,7 +3006,7 @@ bool GrammarParser::time_kw()
 
 bool GrammarParser::true_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     true-kw          = %x74.72.75.65                   ; "true"
     */
     // %x74.72.75.65                   ; "true"
@@ -3016,7 +3016,7 @@ bool GrammarParser::true_kw()
 
 bool GrammarParser::type_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     type-kw          = %x74.79.70.65                   ; "type"
     */
     // %x74.79.70.65                   ; "type"
@@ -3026,7 +3026,7 @@ bool GrammarParser::type_kw()
 
 bool GrammarParser::uint_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     uint-kw          = %x75.69.6E.74                   ; "uint"
     */
     // %x75.69.6E.74                   ; "uint"
@@ -3036,7 +3036,7 @@ bool GrammarParser::uint_kw()
 
 bool GrammarParser::unordered_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     unordered-kw     = %x75.6E.6F.72.64.65.72.65.64    ; "unordered"
     */
     // %x75.6E.6F.72.64.65.72.65.64    ; "unordered"
@@ -3046,7 +3046,7 @@ bool GrammarParser::unordered_kw()
 
 bool GrammarParser::uri_dotdot_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     uri-dotdot-kw    = %x75.72.69.2E.2E                ; "uri.."
     */
     // %x75.72.69.2E.2E                ; "uri.."
@@ -3056,7 +3056,7 @@ bool GrammarParser::uri_dotdot_kw()
 
 bool GrammarParser::uri_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     uri-kw           = %x75.72.69                      ; "uri"
     */
     // %x75.72.69                      ; "uri"
@@ -3066,7 +3066,7 @@ bool GrammarParser::uri_kw()
 
 bool GrammarParser::ALPHA()
 {
-    /* ABNF: 
+    /* ABNF:
     ALPHA            = %x41-5A / %x61-7A   ; A-Z / a-z
     */
     // %x41-5A / %x61-7A   ; A-Z / a-z
@@ -3076,7 +3076,7 @@ bool GrammarParser::ALPHA()
 
 bool GrammarParser::CR()
 {
-    /* ABNF: 
+    /* ABNF:
     CR               = %x0D         ; carriage return
     */
     // %x0D         ; carriage return
@@ -3086,7 +3086,7 @@ bool GrammarParser::CR()
 
 bool GrammarParser::DIGIT()
 {
-    /* ABNF: 
+    /* ABNF:
     DIGIT            = %x30-39      ; 0-9
     */
     // %x30-39      ; 0-9
@@ -3096,7 +3096,7 @@ bool GrammarParser::DIGIT()
 
 bool GrammarParser::HEXDIG()
 {
-    /* ABNF: 
+    /* ABNF:
     HEXDIG           = DIGIT / "A" / "B" / "C" / "D" / "E" / "F"
     */
     // DIGIT() || "A" || "B" || "C" || "D" || "E" || "F"
@@ -3106,7 +3106,7 @@ bool GrammarParser::HEXDIG()
 
 bool GrammarParser::HTAB()
 {
-    /* ABNF: 
+    /* ABNF:
     HTAB             = %x09         ; horizontal tab
     */
     // %x09         ; horizontal tab
@@ -3116,7 +3116,7 @@ bool GrammarParser::HTAB()
 
 bool GrammarParser::LF()
 {
-    /* ABNF: 
+    /* ABNF:
     LF               = %x0A         ; linefeed
     */
     // %x0A         ; linefeed
@@ -3126,7 +3126,7 @@ bool GrammarParser::LF()
 
 bool GrammarParser::SP()
 {
-    /* ABNF: 
+    /* ABNF:
     SP               = %x20         ; space
     */
     // %x20         ; space
@@ -3136,7 +3136,7 @@ bool GrammarParser::SP()
 
 bool GrammarParser::WSP()
 {
-    /* ABNF: 
+    /* ABNF:
     WSP              = SP / HTAB    ; white space
     */
     // SP() || HTAB()    ; white space
