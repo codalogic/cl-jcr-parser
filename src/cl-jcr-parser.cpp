@@ -1618,7 +1618,7 @@ bool GrammarParser::sized_int_type()
     return int_kw() && pos_integer() &&
             ( num_bits_accumulator.to_int() <= 64 || error( "sized int size too large") ) &&
             set( m.p_rule->type, Rule::INTEGER ) &&
-            set( m.p_rule->min, sized_int_min( num_bits_accumulator.to_int() ) ) && // TODO_TEST_MIN_MAX_SIZED_INTS
+            set( m.p_rule->min, sized_int_min( num_bits_accumulator.to_int() ) ) &&
             set( m.p_rule->max, sized_int_max( num_bits_accumulator.to_int() ) );
 }
 
@@ -1634,7 +1634,7 @@ bool GrammarParser::sized_uint_type()
     return uint_kw() && pos_integer() &&
             ( num_bits_accumulator.to_int() <= 64 || error( "sized iint size too large") ) &&
             set( m.p_rule->type, Rule::UINTEGER ) &&
-            set( m.p_rule->min, sized_uint_min( num_bits_accumulator.to_int() ) ) && // TODO_TEST_MIN_MAX_SIZED_INTS
+            set( m.p_rule->min, sized_uint_min( num_bits_accumulator.to_int() ) ) &&
             set( m.p_rule->max, sized_uint_max( num_bits_accumulator.to_int() ) );
 }
 

@@ -1,4 +1,4 @@
-Tests run on Tue Jul 12 12:57:19 2016
+Tests run on Tue Jul 12 16:17:31 2016
 
     GrammarSet TODOS [test-grammar-set.cpp:40]
     ==========================================
@@ -1918,10 +1918,9 @@ jcr-version
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
 
-TODOs (3):
+TODOs (2):
 ------------------------
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:42]
 - Test low level GrammarSet class [test-low-level-objects.cpp:230]
-- Test correct setting of min/max 'ValueConstraint's when parsing int?? and uint??.  See  TODO_TEST_MIN_MAX_SIZED_INTS [test-main.cpp:39]
 
-0 error(s), 3 todo(s), 1448 test(s)
+0 error(s), 2 todo(s), 1448 test(s)
