@@ -1,12 +1,14 @@
-uritemplate https://raw.githubusercontent.com/codalogic/dsl-pa/master/${file}
+uritemplate https://raw.githubusercontent.com/codalogic/dsl-pa/master/${path}${file}
 
 default $h_path include/dsl-pa/
-copy include/dsl-pa/dsl-pa.h          ${h_path}
-copy include/dsl-pa/dsl-pa-dsl-pa.h   ${h_path}
-copy include/dsl-pa/dsl-pa-alphabet.h ${h_path}
-copy include/dsl-pa/dsl-pa-reader.h   ${h_path}
+$path include/dsl-pa/
+copy dsl-pa.h          ${h_path}
+copy dsl-pa-dsl-pa.h   ${h_path}
+copy dsl-pa-alphabet.h ${h_path}
+copy dsl-pa-reader.h   ${h_path}
 
 default $cpp_path src/dsl-pa/
-copy src/dsl-pa-dsl-pa.cpp   ${cpp_path}
-copy src/dsl-pa-alphabet.cpp ${cpp_path}
-copy src/dsl-pa-reader.cpp   ${cpp_path}
+$path src/
+copy dsl-pa-dsl-pa.cpp   ${cpp_path}
+copy dsl-pa-alphabet.cpp ${cpp_path}
+copy dsl-pa-reader.cpp   ${cpp_path}
