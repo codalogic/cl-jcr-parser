@@ -134,9 +134,9 @@ class ProcessDeps:
                     self.versions[m.group(2)] = m.group(1)
 
     def consider_variable( self, line ):
-        m = re.match( '\$(\w+)\s+(.*)', line )
+        m = re.match( '\$(\w+)(?:\s+(.*))?$', line )
         if m != None:
-            self.vars[m.group(1)] = m.group(2)
+            self.vars[m.group(1)] = m.group(2) if m.group(2) else ''
             return True
         return False
 
