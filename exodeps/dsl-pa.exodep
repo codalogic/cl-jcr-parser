@@ -4,12 +4,12 @@ default $dsl_pa_cpp_dst_path src/dsl-pa/
 default $h_dst   ${dsl_pa_h_dst_path}
 default $cpp_dst ${dsl_pa_cpp_dst_path}
 
-$user codalogic
+$owner codalogic
 $project dsl-pa
 $strand angst
 
 hosting github
-versions    # Invoking 'versions' must happen after setting up $user/$project variables
+versions    # Invoking 'versions' must happen after setting up $owner/$project variables
 
 $path include/dsl-pa/
 copy dsl-pa.h          ${h_dst}

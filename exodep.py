@@ -36,8 +36,8 @@ import shutil
 import filecmp
 
 host_templates = {
-        'github': 'https://raw.githubusercontent.com/${user}/${project}/${strand}/${path}${file}',
-        'bitbucket': 'https://bitbucket.org/${user}/${project}/raw/${strand}/${path}${file}' }
+        'github': 'https://raw.githubusercontent.com/${owner}/${project}/${strand}/${path}${file}',
+        'bitbucket': 'https://bitbucket.org/${owner}/${project}/raw/${strand}/${path}${file}' }
 
 def main() :
     ProcessDeps( sys.argv[1] if len( sys.argv ) >= 2 else "mydeps.exodep" )
@@ -48,6 +48,8 @@ class ProcessDeps:
         self.vars = vars.copy()
         self.versions = {}  # Each entry is <string of space separated strand names> : <string to use as strand in uri template>
         if isinstance( dependencies_src, str ):
+            if self.is_already_processed( dependencies_src ):
+                return
             self.file = dependencies_src
             self.process_dependency_file()
         elif isinstance( dependencies_src, io.StringIO ):    # Primarily for testing
@@ -55,6 +57,15 @@ class ProcessDeps:
             self.process_dependency_stream( dependencies_src )
         else:
             print( "Error: Unrecognised dependencies_src type format" )
+
+    processed_dependencies = {}
+
+    def is_already_processed( self, dependencies_src ):
+        abs_dependencies_src = os.path.abspath( dependencies_src )
+        if abs_dependencies_src in ProcessDeps.processed_dependencies:
+            return True
+        ProcessDeps.processed_dependencies[abs_dependencies_src] = True
+        return False
 
     def process_dependency_file( self ):
         try:
@@ -85,9 +96,12 @@ class ProcessDeps:
     def consider_include( self, line ):
         m = re.match( 'include\s+(.*)', line )
         if m != None and m.group(1) != '':
-            ProcessDeps( m.group(1), self.vars )
+            ProcessDeps( self.script_relative_path( m.group(1) ), self.vars )
             return True
         return False
+
+    def script_relative_path( self, src ):
+        return os.path.normpath( os.path.join( os.path.dirname( self.file ), src ) ).replace( '\\', '/' )
 
     def consider_hosting( self, line ):
         m = re.match( 'hosting\s+(.*)', line )

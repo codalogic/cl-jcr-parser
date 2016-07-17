@@ -1,4 +1,1 @@
-include mydeps.dsl-pa.exodep
-include mydeps.cl-utils.exodep
-include mydeps.clunit.exodep
-include mydeps.exodep.exodep
+include exodeps/mydeps.exodep
