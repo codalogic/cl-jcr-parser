@@ -1,14 +1,23 @@
-uritemplate https://raw.githubusercontent.com/codalogic/dsl-pa/master/${path}${file}
+default $dsl_pa_h_dst_path   include/dsl-pa/
+default $dsl_pa_cpp_dst_path src/dsl-pa/
 
-default $h_path include/dsl-pa/
+default $h_dst   ${dsl_pa_h_dst_path}
+default $cpp_dst ${dsl_pa_cpp_dst_path}
+
+$user codalogic
+$project dsl-pa
+$strand angst
+
+hosting github
+versions    # Invoking 'versions' must happen after setting up $user/$project variables
+
 $path include/dsl-pa/
-copy dsl-pa.h          ${h_path}
-copy dsl-pa-dsl-pa.h   ${h_path}
-copy dsl-pa-alphabet.h ${h_path}
-copy dsl-pa-reader.h   ${h_path}
+copy dsl-pa.h          ${h_dst}
+copy dsl-pa-dsl-pa.h   ${h_dst}
+copy dsl-pa-alphabet.h ${h_dst}
+copy dsl-pa-reader.h   ${h_dst}
 
-default $cpp_path src/dsl-pa/
 $path src/
-copy dsl-pa-dsl-pa.cpp   ${cpp_path}
-copy dsl-pa-alphabet.cpp ${cpp_path}
-copy dsl-pa-reader.cpp   ${cpp_path}
+copy dsl-pa-dsl-pa.cpp   ${cpp_dst}
+copy dsl-pa-alphabet.cpp ${cpp_dst}
+copy dsl-pa-reader.cpp   ${cpp_dst}

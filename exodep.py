@@ -35,12 +35,16 @@ import tempfile
 import shutil
 import filecmp
 
+host_templates = {
+        'github': 'https://raw.githubusercontent.com/${user}/${project}/${strand}/${path}${file}',
+        'bitbucket': 'https://bitbucket.org/${user}/${project}/raw/${strand}/${path}${file}' }
+
 def main() :
     ProcessDeps( sys.argv[1] if len( sys.argv ) >= 2 else "mydeps.exodep" )
 
 class ProcessDeps:
-    def __init__( self, dependencies_src, vars = { 'strand' : 'master' } ):
-        self.uritemplate = 'https://raw.githubusercontent.com/${user}/${project}/${strand}/${file}'
+    def __init__( self, dependencies_src, vars = { 'strand': 'master', 'path': '' } ):
+        self.uritemplate = host_templates['github']
         self.vars = vars.copy()
         self.versions = {}  # Each entry is <string of space separated strand names> : <string to use as strand in uri template>
         if isinstance( dependencies_src, str ):
@@ -88,13 +92,11 @@ class ProcessDeps:
     def consider_hosting( self, line ):
         m = re.match( 'hosting\s+(.*)', line )
         if m != None and m.group(1) != '':
-            remote = m.group(1)
-            if remote == 'github':
-                self.uritemplate = 'https://raw.githubusercontent.com/${user}/${project}/${strand}/${file}'
-            elif remote == 'bitbucket':
-                self.uritemplate = 'https://bitbucket.org/${user}/${project}/raw/${strand}/${file}'
+            host = m.group(1)
+            if host in host_templates:
+                self.uritemplate = host_templates[host]
             else:
-                print( "Error: Unrecognised remote server provider:", remote )
+                print( "Error: Unrecognised hosting server provider:", host )
             return True
         return False
 
@@ -149,32 +151,16 @@ class ProcessDeps:
         return False
 
     def consider_copy( self, line ):
-        m = re.match( 'copy\s+(\S+)\s+(\S+)', line )
+        m = re.match( 'copy\s+(\S+)(?:\s+(\S+))?', line )
         if m != None:
             self.retrieve_text_file( m.group(1), m.group(2) )
-            return True
-        m = re.match( 'copy\s+(\S+)', line )
-        if m != None:
-            src_and_dst = m.group(1)
-            if re.match( 'https?://', src_and_dst ):
-                print( "Error: Explicit uri not supported with commands of the form 'copy src_and_dst'" )
-                return True    # Even though we haven't executed the command, we do know what it is
-            self.retrieve_text_file( src_and_dst, src_and_dst )
             return True
         return False
 
     def consider_bcopy( self, line ):
-        m = re.match( 'bcopy\s+(\S+)\s+(\S+)', line )
+        m = re.match( 'bcopy\s+(\S+)(?:\s+(\S+))?', line )
         if m != None:
             self.retrieve_binary_file( m.group(1), m.group(2) )
-            return True
-        m = re.match( 'bcopy\s+(\S+)', line )
-        if m != None:
-            src_and_dst = m.group(1)
-            if re.match( 'https?://', src_and_dst ):
-                print( "Error: Explicit uri not supported with commands of the form 'bcopy src_and_dst'" )
-                return True    # Even though we haven't executed the command, we do know what it is
-            self.retrieve_binary_file( src_and_dst, src_and_dst )
             return True
         return False
 
@@ -188,9 +174,20 @@ class ProcessDeps:
         self.retrieve_file( src, dst, BinaryDownloadHandler() )
 
     def retrieve_file( self, src, dst, handler ):
+        if dst == None:
+            if re.match( 'https?://', src ):
+                print( "Error: Explicit uri not supported with commands of the form 'bcopy src_and_dst'" )
+                return
+            dst = src
+            if re.search( '\$\{path\}', self.uritemplate ):
+                dst = self.vars['path'] + dst
         from_uri = self.make_uri( src )
         to_file = self.make_destination_file_name( src, dst )
-        if from_uri == '' or to_file == '':
+        if from_uri == '':
+            print( "Error: Unable to evaluate source of:", src )
+            return
+        if to_file == '':
+            print( "Error: Unable to evaluate destination of:", dst )
             return
         if re.match( 'https?://', from_uri ):
             tmp_name = handler.download_to_temp_file( from_uri )
@@ -215,7 +212,9 @@ class ProcessDeps:
             print( 'Same......', to_file )
 
     def make_master_strand_uri( self, file_name ):
+        # Override ${master} and ${path} variable
         uri = re.compile( '\$\{strand\}' ).sub( 'master', self.uritemplate )
+        uri = re.compile( '\$\{path\}' ).sub( '', uri )
         return self.make_uri( file_name, uri )
 
     def make_uri( self, file_name, uri = None ):
