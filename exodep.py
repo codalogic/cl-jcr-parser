@@ -300,11 +300,18 @@ class TextDownloadHandler:
             with urllib.request.urlopen( uri ) as fin:
                 fout = tempfile.NamedTemporaryFile( mode='wt', delete=False)
                 for line in fin:
-                    fout.write( line.decode('utf-8').rstrip() + "\n" )  # Fix up to local line ending format
+                    fout.write( self.normalise_line_ending( line.decode('utf-8') ) )
             fout.close()
             return fout.name
         except urllib.error.URLError:
             return ''
+
+    def normalise_line_ending( self, line ):
+        org_len = len( line )
+        line = line.rstrip( '\r\n' )
+        if org_len > len( line ):
+            line = line + '\n'
+        return line
 
 class BinaryDownloadHandler:
     def download_to_temp_file( self, uri ):
