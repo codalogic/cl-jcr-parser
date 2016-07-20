@@ -1,4 +1,4 @@
-Tests run on Tue Jul 12 16:17:31 2016
+Tests run on Wed Jul 20 18:01:38 2016
 
     GrammarSet TODOS [test-grammar-set.cpp:40]
     ==========================================
@@ -192,29 +192,28 @@ Tests run on Tue Jul 12 16:17:31 2016
      
   ; Let's go...
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_bad_input( "; Hello World ; Let's go...\n" ) (80)
+      Calling: test_parsing_only( "; Hello World ; Let's go...\n" ) (80)
       ; Hello World ; Let's go...
 
-    ok: status != JCRParser::S_OK
-      Calling: test_parsing_only( "; Hello World ;; Let's go...\n" ) (82)
-      ; Hello World ;; Let's go...
-
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "" ) (84)
+      Calling: test_parsing_only( "" ) (82)
       
     ok: status == JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - Syntax parsing - JCR directive [test-parsing-only.cpp:87]
+    GrammarParser - Syntax parsing - JCR directive [test-parsing-only.cpp:85]
     =========================================================================
-      Calling: test_parsing_only( "#jcr-version 0.6" ) (90)
+      Calling: test_parsing_only( "#jcr-version 0.6" ) (88)
       #jcr-version 0.6
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "#jcr-version 0.6 " ) (92)
+      Calling: test_parsing_only( "#jcr-version 0.6 " ) (90)
       #jcr-version 0.6 
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "#jcr-version 0.6 \t" ) (94)
+      Calling: test_parsing_only( "#jcr-version 0.6 \t" ) (92)
       #jcr-version 0.6 	
+    ok: status == JCRParser::S_OK
+      Calling: test_parsing_only( "#jcr-version 0.6 co-constraints-1.0" ) (94)
+      #jcr-version 0.6 co-constraints-1.0
     ok: status == JCRParser::S_OK
       Calling: test_parsing_bad_input( "#\n" "jcr-version\n" " 0.5" ) (98)
       #
@@ -227,66 +226,63 @@ jcr-version
       Calling: test_parsing_bad_input( "#jcr-version 10.5" ) (102)
       #jcr-version 10.5
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "#jcr-version 0.6 too long" ) (104)
-      #jcr-version 0.6 too long
-    ok: status != JCRParser::S_OK
-      Calling: test_parsing_only( "; Start\n" "#jcr-version 0.6" ) (107)
+      Calling: test_parsing_only( "; Start\n" "#jcr-version 0.6" ) (105)
       ; Start
 #jcr-version 0.6
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "; Start\n" "#jcr-version 0.6\n" "; End" ) (111)
+      Calling: test_parsing_only( "; Start\n" "#jcr-version 0.6\n" "; End" ) (109)
       ; Start
 #jcr-version 0.6
 ; End
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "  #jcr-version 0.6\n" "; End" ) (114)
+      Calling: test_parsing_only( "  #jcr-version 0.6\n" "; End" ) (112)
         #jcr-version 0.6
 ; End
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "; Start ; #jcr-version 0.6" ) (116)
+      Calling: test_parsing_only( "; Start ; #jcr-version 0.6" ) (114)
       ; Start ; #jcr-version 0.6
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_bad_input( "#jcr-version0.5" ) (118)
+      Calling: test_parsing_bad_input( "#jcr-version0.5" ) (116)
       #jcr-version0.5
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "#jcr-version a.5" ) (120)
+      Calling: test_parsing_bad_input( "#jcr-version a.5" ) (118)
       #jcr-version a.5
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "#jcr-version 0:5" ) (122)
+      Calling: test_parsing_bad_input( "#jcr-version 0:5" ) (120)
       #jcr-version 0:5
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "#jcr-version 0.b" ) (124)
+      Calling: test_parsing_bad_input( "#jcr-version 0.b" ) (122)
       #jcr-version 0.b
     ok: status != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - Syntax parsing - ruleset-id directive [test-parsing-only.cpp:127]
+    GrammarParser - Syntax parsing - ruleset-id directive [test-parsing-only.cpp:125]
     =================================================================================
-      Calling: test_parsing_only( "#ruleset-id http://www.example.com/jcr\n" ) (130)
+      Calling: test_parsing_only( "#ruleset-id http://www.example.com/jcr\n" ) (128)
       #ruleset-id http://www.example.com/jcr
 
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "#ruleset-id http://www.example.com/jcr \n" ) (132)
+      Calling: test_parsing_only( "#ruleset-id http://www.example.com/jcr \n" ) (130)
       #ruleset-id http://www.example.com/jcr 
 
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_bad_input( "#ruleset-id \n" ) (134)
+      Calling: test_parsing_bad_input( "#ruleset-id \n" ) (132)
       #ruleset-id 
 
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "#ruleset-id\n" ) (136)
+      Calling: test_parsing_bad_input( "#ruleset-id\n" ) (134)
       #ruleset-id
 
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_only( "; A comment ; #ruleset-id http://www.example.com/jcr\n" ) (138)
+      Calling: test_parsing_only( "; A comment ; #ruleset-id http://www.example.com/jcr\n" ) (136)
       ; A comment ; #ruleset-id http://www.example.com/jcr
 
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "#ruleset-id http://www.example.com/jcr\n" "; A comment" ) (141)
+      Calling: test_parsing_only( "#ruleset-id http://www.example.com/jcr\n" "; A comment" ) (139)
       #ruleset-id http://www.example.com/jcr
 ; A comment
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "#ruleset-id http://www.example.com/jcr\n" "; A comment\n" "; Another comment\n" "#jcr-version 0.6\n" ) (146)
+      Calling: test_parsing_only( "#ruleset-id http://www.example.com/jcr\n" "; A comment\n" "; Another comment\n" "#jcr-version 0.6\n" ) (144)
       #ruleset-id http://www.example.com/jcr
 ; A comment
 ; Another comment
@@ -298,38 +294,38 @@ jcr-version
     ok: ph.grammar().ruleset_id == "http://www.example.com/jcr"
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - Syntax parsing - import directive [test-parsing-only.cpp:154]
+    GrammarParser - Syntax parsing - import directive [test-parsing-only.cpp:152]
     =============================================================================
-      Calling: test_parsing_only( "#import http://www.example.com/jcr\n" ) (157)
+      Calling: test_parsing_only( "#import http://www.example.com/jcr\n" ) (155)
       #import http://www.example.com/jcr
 
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "#import http://www.example.com/jcr \n" ) (159)
+      Calling: test_parsing_only( "#import http://www.example.com/jcr \n" ) (157)
       #import http://www.example.com/jcr 
 
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_bad_input( "#import http://www.example.com/jcr as\n" ) (161)
+      Calling: test_parsing_bad_input( "#import http://www.example.com/jcr as\n" ) (159)
       #import http://www.example.com/jcr as
 
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "#import http://www.example.com/jcr as \n" ) (163)
+      Calling: test_parsing_bad_input( "#import http://www.example.com/jcr as \n" ) (161)
       #import http://www.example.com/jcr as 
 
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_only( "#import http://www.example.com/jcr as my_1st-alias\n" ) (165)
+      Calling: test_parsing_only( "#import http://www.example.com/jcr as my_1st-alias\n" ) (163)
       #import http://www.example.com/jcr as my_1st-alias
 
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "#import http://www.example.com/jcr as my_1st-alias \n" ) (167)
+      Calling: test_parsing_only( "#import http://www.example.com/jcr as my_1st-alias \n" ) (165)
       #import http://www.example.com/jcr as my_1st-alias 
 
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( " ; Hello\n" "#import http://www.example.com/jcr as  my_1st-alias\n" ) (170)
+      Calling: test_parsing_only( " ; Hello\n" "#import http://www.example.com/jcr as  my_1st-alias\n" ) (168)
        ; Hello
 #import http://www.example.com/jcr as  my_1st-alias
 
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( " ; Hello\n" "#jcr-version 0.6\n" "#ruleset-id http://www.example.com/jcr\n" "#import http://www.example.com/jcr as  my_1st-alias\n" "#import http://www.example.com/jcr2 as  my_2nd-alias\n" "\n" ) (177)
+      Calling: test_parsing_only( " ; Hello\n" "#jcr-version 0.6\n" "#ruleset-id http://www.example.com/jcr\n" "#import http://www.example.com/jcr as  my_1st-alias\n" "#import http://www.example.com/jcr2 as  my_2nd-alias\n" "\n" ) (175)
        ; Hello
 #jcr-version 0.6
 #ruleset-id http://www.example.com/jcr
@@ -338,7 +334,7 @@ jcr-version
 
 
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( " ; Hello\n" "#jcr-version 0.6\n" "  ; A comment\n" "#ruleset-id http://www.example.com/jcr\n" "  ; A comment\n" "  ; A comment\n" "#import http://www.example.com/jcr as  my_1st-alias\n" "  ; A comment\n" "  ; A comment\n" "  ; A comment\n" "  ; A comment\n" "#import http://www.example.com/jcr2 as  my_2nd-alias\n" "\n" ) (191)
+      Calling: test_parsing_only( " ; Hello\n" "#jcr-version 0.6\n" "  ; A comment\n" "#ruleset-id http://www.example.com/jcr\n" "  ; A comment\n" "  ; A comment\n" "#import http://www.example.com/jcr as  my_1st-alias\n" "  ; A comment\n" "  ; A comment\n" "  ; A comment\n" "  ; A comment\n" "#import http://www.example.com/jcr2 as  my_2nd-alias\n" "\n" ) (189)
        ; Hello
 #jcr-version 0.6
   ; A comment
@@ -363,9 +359,9 @@ jcr-version
     ok: ph.grammar().get_aliased_import( "jcr" ).value() == "http://www.example.com/jcr"
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - Syntax parsing - multi-line directive [test-parsing-only.cpp:205]
+    GrammarParser - Syntax parsing - multi-line directive [test-parsing-only.cpp:203]
     =================================================================================
-      Calling: test_parsing_only( "#{constraint foo \n" "  $id == 'None' }\n" ) (209)
+      Calling: test_parsing_only( "#{constraint foo \n" "  $id == 'None' }\n" ) (207)
       #{constraint foo 
   $id == 'None' }
 
@@ -376,21 +372,21 @@ jcr-version
     ok: ph.grammar().rules[0].rule_name == "my_rule"
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - Syntax parsing - TBD directive [test-parsing-only.cpp:223]
+    GrammarParser - Syntax parsing - TBD directive [test-parsing-only.cpp:221]
     ==========================================================================
-      Calling: test_parsing_only( "#TBD\n" ) (226)
+      Calling: test_parsing_only( "#TBD\n" ) (224)
       #TBD
 
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "#TBD  we\n" ) (228)
+      Calling: test_parsing_only( "#TBD  we\n" ) (226)
       #TBD  we
 
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "#TBD  we don't know\n" ) (230)
+      Calling: test_parsing_only( "#TBD  we don't know\n" ) (228)
       #TBD  we don't know
 
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "; Hello\n" "#TBD\n" "#jcr-version 0.6\n" ) (234)
+      Calling: test_parsing_only( "; Hello\n" "#TBD\n" "#jcr-version 0.6\n" ) (232)
       ; Hello
 #TBD
 #jcr-version 0.6
@@ -398,7 +394,7 @@ jcr-version
     ok: status == JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - Syntax parsing - target_rule_name [test-parsing-only.cpp:237]
+    GrammarParser - Syntax parsing - target_rule_name [test-parsing-only.cpp:235]
     =============================================================================
       : ParserHarness ph( "$my_rule = $other_rule\n" )
     ok: ph.status() == JCRParser::S_OK
@@ -413,13 +409,13 @@ jcr-version
     ok: ph.grammar().rules[0].type == Rule::TARGET_RULE
     ok: ph.grammar().rules[0].target_rule.rulesetid == "http://foo.bar"
     ok: ph.grammar().rules[0].target_rule.local_name == "other_rule"
-      Calling: test_parsing_only( "$my_rule = @{not} $other_rule\n" ) (257)
+      Calling: test_parsing_only( "$my_rule = @{not} $other_rule\n" ) (255)
       $my_rule = @{not} $other_rule
 
     ok: status == JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - Syntax parsing - Primitive rules [test-parsing-only.cpp:260]
+    GrammarParser - Syntax parsing - Primitive rules [test-parsing-only.cpp:258]
     ============================================================================
       : ParserHarness ph( "$my_rule = : flubber\n" )
     ok: ph.status() != JCRParser::S_OK
@@ -745,28 +741,28 @@ jcr-version
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].rule_name == "rule-2"
     ok: ph.grammar().rules[0].type == Rule::FQDN
-      : ParserHarness ph( "$rule-2 = : uri..http://example.com/foo#place\n" )
+      : ParserHarness ph( "$rule-2 = : uri..http\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].rule_name == "rule-2"
     ok: ph.grammar().rules[0].type == Rule::URI_RANGE
     ok: ph.grammar().rules[0].min.is_set() == true
     ok: ph.grammar().rules[0].min.is_string() == true
-    ok: ph.grammar().rules[0].min.as_string() == "http://example.com/foo#place"
+    ok: ph.grammar().rules[0].min.as_string() == "http"
     ok: ph.grammar().rules[0].max.is_set() == true
     ok: ph.grammar().rules[0].max.is_string() == true
-    ok: ph.grammar().rules[0].max.as_string() == "http://example.com/foo#place"
-      : ParserHarness ph( "$rule-2 = : uri..http://example.com/foo#place" )
+    ok: ph.grammar().rules[0].max.as_string() == "http"
+      : ParserHarness ph( "$rule-2 = : uri..sip" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].rule_name == "rule-2"
     ok: ph.grammar().rules[0].type == Rule::URI_RANGE
     ok: ph.grammar().rules[0].min.is_set() == true
     ok: ph.grammar().rules[0].min.is_string() == true
-    ok: ph.grammar().rules[0].min.as_string() == "http://example.com/foo#place"
+    ok: ph.grammar().rules[0].min.as_string() == "sip"
     ok: ph.grammar().rules[0].max.is_set() == true
     ok: ph.grammar().rules[0].max.is_string() == true
-    ok: ph.grammar().rules[0].max.as_string() == "http://example.com/foo#place"
+    ok: ph.grammar().rules[0].max.as_string() == "sip"
       : ParserHarness ph( "$rule-2 = : uri\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
@@ -859,7 +855,7 @@ jcr-version
     ok: ph.grammar().rules[0].type == Rule::TNULL
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - Syntax parsing - root rule [test-parsing-only.cpp:855]
+    GrammarParser - Syntax parsing - root rule [test-parsing-only.cpp:853]
     ======================================================================
       : ParserHarness ph( " integer" )
     ok: ph.status() == JCRParser::S_OK
@@ -900,17 +896,17 @@ jcr-version
     ok: ph.grammar().rules[0].type == Rule::ARRAY
     ok: ph.grammar().rules[0].repetition.min == 1
     ok: ph.grammar().rules[0].repetition.max == 1
-      Calling: test_parsing_bad_input( ": junk\n" ) (910)
+      Calling: test_parsing_bad_input( ": junk\n" ) (908)
       : junk
 
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "* junk\n" ) (912)
+      Calling: test_parsing_bad_input( "* junk\n" ) (910)
       * junk
 
     ok: status != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - Syntax parsing - Member name [test-parsing-only.cpp:915]
+    GrammarParser - Syntax parsing - Member name [test-parsing-only.cpp:913]
     ========================================================================
       : ParserHarness ph( "$my_rule = \"Fred\" : null\n" )
     ok: ph.status() == JCRParser::S_OK
@@ -955,13 +951,13 @@ jcr-version
     ok: ph.grammar().rules[0].member_name.is_literal() == true
     ok: ph.grammar().rules[0].member_name.name() == "abc\xF0\x92\x8D\x85=Ra"
     ok: ph.grammar().rules[0].type == Rule::TNULL
-      Calling: test_parsing_bad_input( "$my_rule = /p_ref\\d+/i * integer\n" ) (974)
+      Calling: test_parsing_bad_input( "$my_rule = /p_ref\\d+/i * integer\n" ) (972)
       $my_rule = /p_ref\d+/i * integer
 
     ok: status != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - Syntax parsing - type-choice [test-parsing-only.cpp:977]
+    GrammarParser - Syntax parsing - type-choice [test-parsing-only.cpp:975]
     ========================================================================
       : ParserHarness ph( "$my_rule = : (null)\n" )
     ok: ph.status() == JCRParser::S_OK
@@ -1027,29 +1023,29 @@ jcr-version
     ok: ph.grammar().rules[0].children[0].rule_name == ""
     ok: ph.grammar().rules[0].children[0].type == Rule::TNULL
     ok: ph.grammar().rules[0].children[1].type == Rule::INTEGER
-      Calling: test_parsing_bad_input( "$my_rule = : ( )\n" ) (1062)
+      Calling: test_parsing_bad_input( "$my_rule = : ( )\n" ) (1060)
       $my_rule = : ( )
 
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = : ( | )\n" ) (1064)
+      Calling: test_parsing_bad_input( "$my_rule = : ( | )\n" ) (1062)
       $my_rule = : ( | )
 
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = : ( integer | )\n" ) (1066)
+      Calling: test_parsing_bad_input( "$my_rule = : ( integer | )\n" ) (1064)
       $my_rule = : ( integer | )
 
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = : ( integer * )\n" ) (1068)
+      Calling: test_parsing_bad_input( "$my_rule = : ( integer * )\n" ) (1066)
       $my_rule = : ( integer * )
 
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = : ( integer : null )\n" ) (1070)
+      Calling: test_parsing_bad_input( "$my_rule = : ( integer : null )\n" ) (1068)
       $my_rule = : ( integer : null )
 
     ok: status != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - Syntax parsing - object [test-parsing-only.cpp:1073]
+    GrammarParser - Syntax parsing - object [test-parsing-only.cpp:1071]
     ====================================================================
       : ParserHarness ph( "$my_rule = { \"member\" : integer }\n" )
     ok: ph.status() == JCRParser::S_OK
@@ -1286,17 +1282,17 @@ jcr-version
     ok: ph.grammar().rules[0].type == Rule::OBJECT
     ok: ph.grammar().rules[0].children.size() == 1
     ok: ph.grammar().rules[0].children[0].type == Rule::OBJECT_GROUP
-      Calling: test_parsing_bad_input( "$my_rule = : { \"flt\":float@?, \"flt2\":float | \"str\" : string }\n" ) (1361)
+      Calling: test_parsing_bad_input( "$my_rule = : { \"flt\":float@?, \"flt2\":float | \"str\" : string }\n" ) (1359)
       $my_rule = : { "flt":float@?, "flt2":float | "str" : string }
 
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = : {\"flt\":float @?, }\n" ) (1363)
+      Calling: test_parsing_bad_input( "$my_rule = : {\"flt\":float @?, }\n" ) (1361)
       $my_rule = : {"flt":float @?, }
 
     ok: status != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - Syntax parsing - array [test-parsing-only.cpp:1366]
+    GrammarParser - Syntax parsing - array [test-parsing-only.cpp:1364]
     ===================================================================
       : ParserHarness ph( "$my_rule = [ integer ]\n" )
     ok: ph.status() == JCRParser::S_OK
@@ -1491,17 +1487,17 @@ jcr-version
     ok: ph.grammar().rules[0].children[1].children[0].children[0].type == Rule::INTEGER
     ok: ph.grammar().rules[0].children[1].children[0].children[1].type == Rule::FLOAT
     ok: ph.grammar().rules[0].children[1].children[1].type == Rule::STRING_TYPE
-      Calling: test_parsing_bad_input( "$my_rule = [ integer, float | string ]\n" ) (1615)
+      Calling: test_parsing_bad_input( "$my_rule = [ integer, float | string ]\n" ) (1613)
       $my_rule = [ integer, float | string ]
 
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = [ integer, ]\n" ) (1617)
+      Calling: test_parsing_bad_input( "$my_rule = [ integer, ]\n" ) (1615)
       $my_rule = [ integer, ]
 
     ok: status != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - Syntax parsing - group [test-parsing-only.cpp:1620]
+    GrammarParser - Syntax parsing - group [test-parsing-only.cpp:1618]
     ===================================================================
       : ParserHarness ph( "$my_rule = ( integer )\n" )
     ok: ph.status() == JCRParser::S_OK
@@ -1639,17 +1635,17 @@ jcr-version
     ok: ph.grammar().rules[0].children[1].children[2].children[1].member_name.is_absent()
     ok: ph.grammar().rules[0].children[1].children[2].children[1].min.is_string() == true
     ok: ph.grammar().rules[0].children[1].children[2].children[1].min.as_string() == "/p*/"
-      Calling: test_parsing_bad_input( "$my_rule = (integer,float|string )\n" ) (1794)
+      Calling: test_parsing_bad_input( "$my_rule = (integer,float|string )\n" ) (1792)
       $my_rule = (integer,float|string )
 
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = (integer, )\n" ) (1796)
+      Calling: test_parsing_bad_input( "$my_rule = (integer, )\n" ) (1794)
       $my_rule = (integer, )
 
     ok: status != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - Syntax parsing - repetition [test-parsing-only.cpp:1799]
+    GrammarParser - Syntax parsing - repetition [test-parsing-only.cpp:1797]
     ========================================================================
       : ParserHarness ph( "$my_rule = [ integer ]\n" )
     ok: ph.status() == JCRParser::S_OK
@@ -1851,67 +1847,68 @@ jcr-version
     ok: ph.grammar().rules[0].children[0].repetition.min == 2
     ok: ph.grammar().rules[0].children[0].repetition.max == 5
     ok: ph.grammar().rules[0].children[0].repetition.step == 4
-      Calling: test_parsing_bad_input( "$my_rule = [ integer @142.]" ) (2069)
+      Calling: test_parsing_bad_input( "$my_rule = [ integer @142.]" ) (2067)
       $my_rule = [ integer @142.]
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = [ integer @142..% ]" ) (2071)
+      Calling: test_parsing_bad_input( "$my_rule = [ integer @142..% ]" ) (2069)
       $my_rule = [ integer @142..% ]
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = [ integer @.. ]" ) (2073)
+      Calling: test_parsing_bad_input( "$my_rule = [ integer @.. ]" ) (2071)
       $my_rule = [ integer @.. ]
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = [ integer @..%24 ]" ) (2075)
+      Calling: test_parsing_bad_input( "$my_rule = [ integer @..%24 ]" ) (2073)
       $my_rule = [ integer @..%24 ]
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = [ integer @..145%-12 ]" ) (2077)
+      Calling: test_parsing_bad_input( "$my_rule = [ integer @..145%-12 ]" ) (2075)
       $my_rule = [ integer @..145%-12 ]
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = [ integer @-142..-145%24 ]" ) (2079)
+      Calling: test_parsing_bad_input( "$my_rule = [ integer @-142..-145%24 ]" ) (2077)
       $my_rule = [ integer @-142..-145%24 ]
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = [ integer @..-145 ]" ) (2081)
+      Calling: test_parsing_bad_input( "$my_rule = [ integer @..-145 ]" ) (2079)
       $my_rule = [ integer @..-145 ]
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = [ integer @-142.. ]" ) (2083)
+      Calling: test_parsing_bad_input( "$my_rule = [ integer @-142.. ]" ) (2081)
       $my_rule = [ integer @-142.. ]
     ok: status != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - Syntax parsing - annotations [test-parsing-only.cpp:2086]
+    GrammarParser - Syntax parsing - annotations [test-parsing-only.cpp:2084]
     =========================================================================
-      Calling: test_parsing_only( "$my_rule = @{not} $other_rule\n" ) (2089)
+      Calling: test_parsing_only( "$my_rule = @{not} $other_rule\n" ) (2087)
       $my_rule = @{not} $other_rule
 
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "$my_rule = [ @{id type} string, float ]\n" ) (2091)
+      Calling: test_parsing_only( "$my_rule = [ @{id type} string, float ]\n" ) (2089)
       $my_rule = [ @{id type} string, float ]
 
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "$my_rule = [ @{id type} string, @{when $type} float@? ]\n" ) (2093)
+      Calling: test_parsing_only( "$my_rule = [ @{id type} string, @{when $type} float@? ]\n" ) (2091)
       $my_rule = [ @{id type} string, @{when $type} float@? ]
 
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "$my_rule = [ @{id type} string, @{when $type}@{assert $ > 15.0} float @? ]\n" ) (2095)
+      Calling: test_parsing_only( "$my_rule = [ @{id type} string, @{when $type}@{assert $ > 15.0} float @? ]\n" ) (2093)
       $my_rule = [ @{id type} string, @{when $type}@{assert $ > 15.0} float @? ]
 
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "$my_rule = [ @{id type}@{assert $==\"in\" || $==\"out\"} string, float @? ]\n" ) (2097)
+      Calling: test_parsing_only( "$my_rule = [ @{id type}@{assert $==\"in\" || $==\"out\"} string, float @? ]\n" ) (2095)
       $my_rule = [ @{id type}@{assert $=="in" || $=="out"} string, float @? ]
 
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "$my_rule = [ @{id type}@{assert $==/^\\w{1,4}$/} string, float@? ]\n" ) (2099)
+      Calling: test_parsing_only( "$my_rule = [ @{id type}@{assert $==/^\\w{1,4}$/} string, float@? ]\n" ) (2097)
       $my_rule = [ @{id type}@{assert $==/^\w{1,4}$/} string, float@? ]
 
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "$my_rule = [ @{id type}@{assert $==/^\\w{1,4}$/ ; Must for 4 or less chars{};} string, float@? ]\n" ) (2101)
-      $my_rule = [ @{id type}@{assert $==/^\w{1,4}$/ ; Must for 4 or less chars{};} string, float@? ]
+      Calling: test_parsing_only( "$my_rule = [ @{id type}@{assert $==/^\\w{1,4}$/ ; Must for 4 or less chars{}\n} string, float@? ]\n" ) (2099)
+      $my_rule = [ @{id type}@{assert $==/^\w{1,4}$/ ; Must for 4 or less chars{}
+} string, float@? ]
 
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "$my_rule=[@{not}string,float ]\n" ) (2103)
+      Calling: test_parsing_only( "$my_rule=[@{not}string,float ]\n" ) (2101)
       $my_rule=[@{not}string,float ]
 
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule=[@{unknown}string,float ]\n" ) (2105)
+      Calling: test_parsing_bad_input( "$my_rule=[@{unknown}string,float ]\n" ) (2103)
       $my_rule=[@{unknown}string,float ]
 
     ok: status != JCRParser::S_OK
@@ -1923,4 +1920,4 @@ TODOs (2):
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:42]
 - Test low level GrammarSet class [test-low-level-objects.cpp:230]
 
-0 error(s), 2 todo(s), 1448 test(s)
+0 error(s), 2 todo(s), 1447 test(s)

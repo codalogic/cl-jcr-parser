@@ -1,4 +1,4 @@
-Tests table of contents generated on Tue Jul 12 16:17:31 2016
+Tests table of contents generated on Wed Jul 20 18:01:38 2016
 
 # test-grammar-set.cpp
 | Description | Line |
@@ -23,18 +23,18 @@ Tests table of contents generated on Tue Jul 12 16:17:31 2016
 | Description | Line |
 |-------------|------|
 | GrammarParser - Syntax parsing with no semantic interpretation - comments | 62 |
-| GrammarParser - Syntax parsing - JCR directive | 87 |
-| GrammarParser - Syntax parsing - ruleset-id directive | 127 |
-| GrammarParser - Syntax parsing - import directive | 154 |
-| GrammarParser - Syntax parsing - multi-line directive | 205 |
-| GrammarParser - Syntax parsing - TBD directive | 223 |
-| GrammarParser - Syntax parsing - target_rule_name | 237 |
-| GrammarParser - Syntax parsing - Primitive rules | 260 |
-| GrammarParser - Syntax parsing - root rule | 855 |
-| GrammarParser - Syntax parsing - Member name | 915 |
-| GrammarParser - Syntax parsing - type-choice | 977 |
-| GrammarParser - Syntax parsing - object | 1073 |
-| GrammarParser - Syntax parsing - array | 1366 |
-| GrammarParser - Syntax parsing - group | 1620 |
-| GrammarParser - Syntax parsing - repetition | 1799 |
-| GrammarParser - Syntax parsing - annotations | 2086 |
+| GrammarParser - Syntax parsing - JCR directive | 85 |
+| GrammarParser - Syntax parsing - ruleset-id directive | 125 |
+| GrammarParser - Syntax parsing - import directive | 152 |
+| GrammarParser - Syntax parsing - multi-line directive | 203 |
+| GrammarParser - Syntax parsing - TBD directive | 221 |
+| GrammarParser - Syntax parsing - target_rule_name | 235 |
+| GrammarParser - Syntax parsing - Primitive rules | 258 |
+| GrammarParser - Syntax parsing - root rule | 853 |
+| GrammarParser - Syntax parsing - Member name | 913 |
+| GrammarParser - Syntax parsing - type-choice | 975 |
+| GrammarParser - Syntax parsing - object | 1071 |
+| GrammarParser - Syntax parsing - array | 1364 |
+| GrammarParser - Syntax parsing - group | 1618 |
+| GrammarParser - Syntax parsing - repetition | 1797 |
+| GrammarParser - Syntax parsing - annotations | 2084 |

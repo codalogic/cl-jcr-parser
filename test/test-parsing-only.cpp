@@ -76,10 +76,8 @@ TFEATURE( "GrammarParser - Syntax parsing with no semantic interpretation - comm
                         "; Hello World\n"
                         "     \n"
                         "  ; Let's go..." ) );
-    TCALL( test_parsing_bad_input(
-                        "; Hello World ; Let's go...\n" ) );
     TCALL( test_parsing_only(
-                        "; Hello World ;; Let's go...\n" ) );
+                        "; Hello World ; Let's go...\n" ) );
     TCALL( test_parsing_only(
                         "" ) );
 }
@@ -92,6 +90,8 @@ TFEATURE( "GrammarParser - Syntax parsing - JCR directive" )
                         "#jcr-version 0.6 " ) );
     TCALL( test_parsing_only(
                         "#jcr-version 0.6 \t" ) );
+    TCALL( test_parsing_only(
+                        "#jcr-version 0.6 co-constraints-1.0" ) );
     TCALL( test_parsing_bad_input(
                         "#\n"
                         "jcr-version\n"
@@ -100,8 +100,6 @@ TFEATURE( "GrammarParser - Syntax parsing - JCR directive" )
                         "#jcr-version 0.12" ) );
     TCALL( test_parsing_bad_input(
                         "#jcr-version 10.5" ) );
-    TCALL( test_parsing_bad_input(
-                        "#jcr-version 0.6 too long" ) );
     TCALL( test_parsing_only(
                         "; Start\n"
                         "#jcr-version 0.6" ) );
@@ -695,7 +693,7 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TCRITICALTEST( ph.grammar().rules[0].type == Rule::FQDN );
     }
     {
-        TSETUP( ParserHarness ph( "$rule-2 = : uri..http://example.com/foo#place\n" ) );
+        TSETUP( ParserHarness ph( "$rule-2 = : uri..http\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
         TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
@@ -703,13 +701,13 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
 
         TTEST( ph.grammar().rules[0].min.is_set() == true );
         TTEST( ph.grammar().rules[0].min.is_string() == true );
-        TTEST( ph.grammar().rules[0].min.as_string() == "http://example.com/foo#place" );
+        TTEST( ph.grammar().rules[0].min.as_string() == "http" );
         TTEST( ph.grammar().rules[0].max.is_set() == true );
         TTEST( ph.grammar().rules[0].max.is_string() == true );
-        TTEST( ph.grammar().rules[0].max.as_string() == "http://example.com/foo#place" );
+        TTEST( ph.grammar().rules[0].max.as_string() == "http" );
     }
     {
-        TSETUP( ParserHarness ph( "$rule-2 = : uri..http://example.com/foo#place" ) );
+        TSETUP( ParserHarness ph( "$rule-2 = : uri..sip" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
         TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
@@ -717,10 +715,10 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
 
         TTEST( ph.grammar().rules[0].min.is_set() == true );
         TTEST( ph.grammar().rules[0].min.is_string() == true );
-        TTEST( ph.grammar().rules[0].min.as_string() == "http://example.com/foo#place" );
+        TTEST( ph.grammar().rules[0].min.as_string() == "sip" );
         TTEST( ph.grammar().rules[0].max.is_set() == true );
         TTEST( ph.grammar().rules[0].max.is_string() == true );
-        TTEST( ph.grammar().rules[0].max.as_string() == "http://example.com/foo#place" );
+        TTEST( ph.grammar().rules[0].max.as_string() == "sip" );
     }
     {
         TSETUP( ParserHarness ph( "$rule-2 = : uri\n" ) );
@@ -2098,7 +2096,7 @@ TFEATURE( "GrammarParser - Syntax parsing - annotations" )
     TCALL( test_parsing_only(
                         "$my_rule = [ @{id type}@{assert $==/^\\w{1,4}$/} string, float@? ]\n" ) );
     TCALL( test_parsing_only(
-                        "$my_rule = [ @{id type}@{assert $==/^\\w{1,4}$/ ; Must for 4 or less chars{};} string, float@? ]\n" ) );
+                        "$my_rule = [ @{id type}@{assert $==/^\\w{1,4}$/ ; Must for 4 or less chars{}\n} string, float@? ]\n" ) );
     TCALL( test_parsing_only(
                         "$my_rule=[@{not}string,float ]\n" ) );
     TCALL( test_parsing_bad_input(

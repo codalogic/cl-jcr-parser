@@ -6,7 +6,7 @@
 // this file, you can obtain one at http://opensource.org/licenses/LGPL-3.0.
 //----------------------------------------------------------------------------
 
-// Implements jcr-abnf - 2016-07-11T15-33
+// Implements jcr-abnf - 2016-07-20
 
 #include "cl-jcr-parser/cl-jcr-parser.h"
 
@@ -123,6 +123,7 @@ private:
     bool DSPs();
     bool major_version();
     bool minor_version();
+    bool extension_id();
     bool ruleset_id_d();
     bool import_d();
     bool ruleset_id();
@@ -263,7 +264,7 @@ private:
     bool regex();
     bool not_slash();
     bool regex_modifiers();
-    bool uri_template();
+    bool uri_scheme();
     bool any_kw();
     bool as_kw();
     bool base32_kw();
@@ -409,13 +410,13 @@ bool GrammarParser::spaces()
 bool GrammarParser::comment()
 {
     /* ABNF:
-    comment          = ";" *( "\;" / comment-char ) comment-end-char
+    comment          = ";" *comment-char comment-end-char
     */
-    // ";" && *( "\;" || comment_char() ) && comment_end_char()
+    // ";" && *comment_char() && comment_end_char()
 
     if( is_get_char( ';' ) )
     {
-        while( is_get_char( '\\' ) && get() || comment_char() )
+        while( comment_char() )
         {}
         return comment_end_char();
     }
@@ -424,29 +425,29 @@ bool GrammarParser::comment()
 
 bool is_jcr_comment_char( char c )
 {
-    // comment_char() = HTAB() / %x20-3A / %x3C-10FFFF
+    // comment_char() = HTAB() / %x20-10FFFF
 
-    return c == '\t' || (c >= 0x20 && c <= 0x3a) || c >= 0x3c;
+    return c == '\t' || c >= 0x20;
 }
 
 bool GrammarParser::comment_char()
 {
-    /* ABNF:
-    comment-char     = HTAB / %x20-3A / %x3C-10FFFF
+    /* ABNF: 
+    comment-char     = HTAB / %x20-10FFFF
     */
-    // HTAB() / %x20-3A / %x3C-10FFFF
+    // HTAB() / %x20-10FFFF
 
     return is_get_char_in( cl::alphabet_function( is_jcr_comment_char ) );
 }
 
 bool GrammarParser::comment_end_char()
 {
-    /* ABNF:
-    comment-end-char = CR / LF / ";"
+    /* ABNF: 
+    comment-end-char = CR / LF
     */
-    // CR() || LF() || ";"
+    // CR() || LF()
 
-    return is_get_char_in( cl::alphabet_char_class( "\r\n;" ) ) || is_peek_at_end();
+    return is_get_char_in( cl::alphabet_char_class( "\r\n" ) ) || is_peek_at_end();
 }
 
 bool GrammarParser::directive()
@@ -525,10 +526,10 @@ bool GrammarParser::directive_def()
 
 bool GrammarParser::jcr_version_d()
 {
-    /* ABNF:
-    jcr-version-d    = jcr-version-kw spaces major-version "." minor-version
+    /* ABNF: 
+    jcr-version-d    = jcr-version-kw spaces major-version "." minor-version *(spaces extension-id)
     */
-    // jcr_version_kw() && spaces() && major_version() && "." && minor_version()
+    // jcr_version_kw() && spaces() && major_version() "." && minor_version() && *(spaces() && extension_id())
 
     cl::accumulator_deferred major_version_accumulator( this );
     cl::accumulator_deferred minor_version_accumulator( this );
@@ -546,6 +547,15 @@ bool GrammarParser::jcr_version_d()
 
             if( ! is_supported_jcr_version( major_number, minor_number ) )
                 error( (std::string( "Unsupported JCR version: " ) + major_number + "." + minor_number).c_str() );
+        }
+        
+        while( DSPs() )
+        {
+            if( ! extension_id() )
+            {
+                unget( '\n' );      // one-line directives need to see a \n at the end
+                break;
+            }
         }
 
         return true;
@@ -577,6 +587,16 @@ bool GrammarParser::minor_version()
     // non_neg_integer()
 
     return non_neg_integer();
+}
+
+bool GrammarParser::extension_id()
+{
+    /* ABNF: 
+    extension-id     = ALPHA *not-space
+    */
+    // ALPHA() && *not_space()
+
+    return ALPHA() && star_not_space();
 }
 
 bool GrammarParser::ruleset_id_d()
@@ -645,7 +665,7 @@ bool GrammarParser::ruleset_id()
     */
     // ALPHA() && *not_space()
 
-    return accumulate( cl::alphabet_alpha() ) && star_not_space();
+    return ALPHA() && star_not_space();
 }
 
 bool GrammarParser::not_space()
@@ -907,8 +927,6 @@ bool GrammarParser::name()
     name             = ALPHA *( ALPHA / DIGIT / "-" / "-" )
     */
     // ALPHA() && *( ALPHA() || DIGIT() || "-" || "-" )
-
-    // ALPHA() && *( ALPHA() || DIGIT() || "_" || "-" )
 
     if( ALPHA() )
     {
@@ -1690,17 +1708,17 @@ bool GrammarParser::idn_type()
 
 bool GrammarParser::uri_range()
 {
-    /* ABNF:
-    uri-range        = uri-dotdot-kw uri-template
+    /* ABNF: 
+    uri-range        = uri-dotdot-kw uri-scheme
     */
-    // uri_dotdot_kw() && uri_template()
+    // uri_dotdot_kw() && uri_scheme()
 
-    cl::accumulator uri_accumulator( this );
+    cl::accumulator uri_scheme_accumulator( this );
 
-    return uri_dotdot_kw() && uri_template() &&
+    return uri_dotdot_kw() && uri_scheme() &&
             set( m.p_rule->type, Rule::URI_RANGE ) &&
-            set( m.p_rule->min, uri_accumulator.get() ) &&
-            set( m.p_rule->max, uri_accumulator.get() );
+            set( m.p_rule->min, uri_scheme_accumulator.get() ) &&
+            set( m.p_rule->max, uri_scheme_accumulator.get() );
 }
 
 bool GrammarParser::uri_type()
@@ -2694,14 +2712,14 @@ bool GrammarParser::regex_modifiers()
     return accumulate( regex_modifiers_alphabet );
 }
 
-bool GrammarParser::uri_template()
+bool GrammarParser::uri_scheme()
 {
-    /* ABNF:
-    uri-template     = 1*ALPHA ":" 1*not-space
+    /* ABNF: 
+    uri-scheme       = 1*ALPHA
     */
-    // 1*ALPHA() && ":" && 1*not_space()
+    // 1*ALPHA()
 
-    return one_star_ALPHA() && accumulate( ':' ) && one_star_not_space();
+    return one_star_ALPHA();
 }
 
 bool GrammarParser::any_kw()
