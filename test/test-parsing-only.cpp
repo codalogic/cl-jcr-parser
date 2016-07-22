@@ -92,10 +92,15 @@ TFEATURE( "GrammarParser - Syntax parsing - JCR directive" )
                         "#jcr-version 0.6 \t" ) );
     TCALL( test_parsing_only(
                         "#jcr-version 0.6 co-constraints-1.0" ) );
+    TCALL( test_parsing_only(
+                        "#{\n"
+                        "jcr-version\n"
+                        "0.6\n"
+                        "}" ) );
     TCALL( test_parsing_bad_input(
                         "#\n"
                         "jcr-version\n"
-                        " 0.5" ) );
+                        " 0.6" ) );
     TCALL( test_parsing_bad_input(
                         "#jcr-version 0.12" ) );
     TCALL( test_parsing_bad_input(

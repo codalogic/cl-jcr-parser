@@ -116,16 +116,17 @@ private:
     bool comment_char();
     bool comment_end_char();
     bool directive();
+    struct DirectiveForm { enum Enum { one_line, multi_line }; };
     bool one_line_directive();
     bool multi_line_directive();
-    bool directive_def();
-    bool jcr_version_d();
-    bool DSPs();
+    bool directive_def( DirectiveForm::Enum form );
+    bool jcr_version_d( DirectiveForm::Enum form );
+    bool DSPs( DirectiveForm::Enum form );
     bool major_version();
     bool minor_version();
     bool extension_id();
-    bool ruleset_id_d();
-    bool import_d();
+    bool ruleset_id_d( DirectiveForm::Enum form );
+    bool import_d( DirectiveForm::Enum form );
     bool ruleset_id();
     bool not_space();
     STAR( not_space )
@@ -432,7 +433,7 @@ bool is_jcr_comment_char( char c )
 
 bool GrammarParser::comment_char()
 {
-    /* ABNF: 
+    /* ABNF:
     comment-char     = HTAB / %x20-10FFFF
     */
     // HTAB() / %x20-10FFFF
@@ -442,7 +443,7 @@ bool GrammarParser::comment_char()
 
 bool GrammarParser::comment_end_char()
 {
-    /* ABNF: 
+    /* ABNF:
     comment-end-char = CR / LF
     */
     // CR() || LF()
@@ -479,7 +480,7 @@ bool GrammarParser::one_line_directive()
 
     cl::locator loc( this );
 
-    if( star_WSP() && (directive_def() || one_line_tbd_directive_d()) )
+    if( star_WSP() && (directive_def( DirectiveForm::one_line ) || one_line_tbd_directive_d()) )
     {
         // Use is_peek_at_end() to allow ruleset to end with a directive that doesn't have newline at end
         star_WSP() && (eol() || is_peek_at_end()) || error( "Unexpected additional material in directive" );
@@ -502,7 +503,7 @@ bool GrammarParser::multi_line_directive()
 
     if( is_get_char( '{' ) )
     {
-        star_sp_cmt() && (directive_def() || multi_line_tbd_directive_d()) &&
+        star_sp_cmt() && (directive_def( DirectiveForm::multi_line ) || multi_line_tbd_directive_d()) &&
             star_sp_cmt() && is_get_char( '}' ) || error( "Invalid multi-line #{directive} format" );
         return true;
     }
@@ -510,7 +511,7 @@ bool GrammarParser::multi_line_directive()
     return false;
 }
 
-bool GrammarParser::directive_def()
+bool GrammarParser::directive_def( DirectiveForm::Enum form )
 {
     /* ABNF:
     directive-def    = jcr-version-d / ruleset-id-d / import-d
@@ -519,14 +520,14 @@ bool GrammarParser::directive_def()
 
     cl::locator loc( this );
 
-    return optional_rewind( jcr_version_d() ) ||
-            optional_rewind( ruleset_id_d() ) ||
-            optional_rewind( import_d() );
+    return optional_rewind( jcr_version_d( form ) ) ||
+            optional_rewind( ruleset_id_d( form ) ) ||
+            optional_rewind( import_d( form ) );
 }
 
-bool GrammarParser::jcr_version_d()
+bool GrammarParser::jcr_version_d( DirectiveForm::Enum form )
 {
-    /* ABNF: 
+    /* ABNF:
     jcr-version-d    = jcr-version-kw spaces major-version "." minor-version *(spaces extension-id)
     */
     // jcr_version_kw() && spaces() && major_version() "." && minor_version() && *(spaces() && extension_id())
@@ -536,7 +537,7 @@ bool GrammarParser::jcr_version_d()
 
     if( jcr_version_kw() )
     {
-        if( (DSPs() || error( "Expected WSP tokens after 'jcr-version' keyword")) &&
+        if( (DSPs( form ) || error( "Expected WSP tokens after 'jcr-version' keyword")) &&
                 major_version_accumulator.select() && major_version() &&
                 is_get_char( '.' ) &&
                 minor_version_accumulator.select() && minor_version()
@@ -548,15 +549,9 @@ bool GrammarParser::jcr_version_d()
             if( ! is_supported_jcr_version( major_number, minor_number ) )
                 error( (std::string( "Unsupported JCR version: " ) + major_number + "." + minor_number).c_str() );
         }
-        
-        while( DSPs() )
-        {
-            if( ! extension_id() )
-            {
-                unget( '\n' );      // one-line directives need to see a \n at the end
-                break;
-            }
-        }
+
+        while( DSPs( form ) && extension_id() )
+        {}
 
         return true;
     }
@@ -564,9 +559,9 @@ bool GrammarParser::jcr_version_d()
     return false;
 }
 
-bool GrammarParser::DSPs()  // "Directive spaces" - May later include a flag to test if in one-line or multi-line directive
+bool GrammarParser::DSPs( DirectiveForm::Enum form )  // "Directive spaces" - May later include a flag to test if in one-line or multi-line directive
 {
-    return spaces();
+    return form == DirectiveForm::one_line ? one_star_WSP() : spaces();
 }
 
 bool GrammarParser::major_version()
@@ -591,7 +586,7 @@ bool GrammarParser::minor_version()
 
 bool GrammarParser::extension_id()
 {
-    /* ABNF: 
+    /* ABNF:
     extension-id     = ALPHA *not-space
     */
     // ALPHA() && *not_space()
@@ -599,7 +594,7 @@ bool GrammarParser::extension_id()
     return ALPHA() && star_not_space();
 }
 
-bool GrammarParser::ruleset_id_d()
+bool GrammarParser::ruleset_id_d( DirectiveForm::Enum form )
 {
     /* ABNF:
     ruleset-id-d     = ruleset-id-kw spaces ruleset-id
@@ -610,7 +605,7 @@ bool GrammarParser::ruleset_id_d()
     {
         cl::accumulator ruleset_id_accumulator( this );
 
-        if( (DSPs() && ruleset_id())
+        if( (DSPs( form ) && ruleset_id())
             || error( "Unable to read ruleset-id value" ) || recover_to_eol() )
         {
             m.p_grammar->ruleset_id = ruleset_id_accumulator.get();
@@ -622,7 +617,7 @@ bool GrammarParser::ruleset_id_d()
     return false;
 }
 
-bool GrammarParser::import_d()
+bool GrammarParser::import_d( DirectiveForm::Enum form )
 {
     /* ABNF:
     import-d         = import-kw spaces ruleset-id
@@ -636,12 +631,12 @@ bool GrammarParser::import_d()
         cl::accumulator_deferred ruleset_id_accumulator( this );
         cl::accumulator_deferred ruleset_id_alias_accumulator( this );
 
-        if( DSPs() &&
+        if( DSPs( form ) &&
             (ruleset_id_accumulator.select() && ruleset_id() || error( "Unable to read ruleset-id in #import" )) &&
             optional(
-                DSPs() &&
+                DSPs( form ) &&
                 as_kw() &&
-                (DSPs() || error( "Expected space after 'as' keyword" ) ) &&
+                (DSPs( form ) || error( "Expected space after 'as' keyword" ) ) &&
                 (ruleset_id_alias_accumulator.select() && ruleset_id_alias() || error( "Unable to read alias for imported ruleset-id" ) ) ) )
         {
             std::string ruleset_id = ruleset_id_accumulator.get();
@@ -699,7 +694,7 @@ bool GrammarParser::one_line_tbd_directive_d()
     cl::accumulator_deferred tbd_directive_parameters_accumulator( this );
 
     if( directive_name() &&
-        optional( DSPs() && tbd_directive_parameters_accumulator.select() && one_line_directive_parameters() ) )
+        optional( one_star_WSP() && tbd_directive_parameters_accumulator.select() && one_line_directive_parameters() ) )
     {
         warning( (std::string( "Unknown directive: " ) + tbd_directive_name_accumulator.get() +
                 ", parameters: " + tbd_directive_parameters_accumulator.get()).c_str() );
@@ -1708,7 +1703,7 @@ bool GrammarParser::idn_type()
 
 bool GrammarParser::uri_range()
 {
-    /* ABNF: 
+    /* ABNF:
     uri-range        = uri-dotdot-kw uri-scheme
     */
     // uri_dotdot_kw() && uri_scheme()
@@ -2714,7 +2709,7 @@ bool GrammarParser::regex_modifiers()
 
 bool GrammarParser::uri_scheme()
 {
-    /* ABNF: 
+    /* ABNF:
     uri-scheme       = 1*ALPHA
     */
     // 1*ALPHA()
