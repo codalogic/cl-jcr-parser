@@ -91,7 +91,11 @@ TFEATURE( "GrammarParser - Syntax parsing - JCR directive" )
     TCALL( test_parsing_only(
                         "#jcr-version 0.6 \t" ) );
     TCALL( test_parsing_only(
-                        "#jcr-version 0.6 co-constraints-1.0" ) );
+                        "#jcr-version 0.6 +co-constraints-1.0" ) );
+    TCALL( test_parsing_only(
+                        "#jcr-version 0.6 + co-constraints-1.0" ) );
+    TCALL( test_parsing_only(
+                        "#jcr-version 0.6 + co-constraints-1.0 + doc-0.9" ) );
     TCALL( test_parsing_only(
                         "#{\n"
                         "jcr-version\n"

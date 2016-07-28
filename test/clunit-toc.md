@@ -1,4 +1,4 @@
-Tests table of contents generated on Fri Jul 22 15:34:28 2016
+Tests table of contents generated on Thu Jul 28 17:26:03 2016
 
 # test-grammar-set.cpp
 | Description | Line |
@@ -24,17 +24,17 @@ Tests table of contents generated on Fri Jul 22 15:34:28 2016
 |-------------|------|
 | GrammarParser - Syntax parsing with no semantic interpretation - comments | 62 |
 | GrammarParser - Syntax parsing - JCR directive | 85 |
-| GrammarParser - Syntax parsing - ruleset-id directive | 130 |
-| GrammarParser - Syntax parsing - import directive | 157 |
-| GrammarParser - Syntax parsing - multi-line directive | 208 |
-| GrammarParser - Syntax parsing - TBD directive | 226 |
-| GrammarParser - Syntax parsing - target_rule_name | 240 |
-| GrammarParser - Syntax parsing - Primitive rules | 263 |
-| GrammarParser - Syntax parsing - root rule | 858 |
-| GrammarParser - Syntax parsing - Member name | 918 |
-| GrammarParser - Syntax parsing - type-choice | 980 |
-| GrammarParser - Syntax parsing - object | 1076 |
-| GrammarParser - Syntax parsing - array | 1369 |
-| GrammarParser - Syntax parsing - group | 1623 |
-| GrammarParser - Syntax parsing - repetition | 1802 |
-| GrammarParser - Syntax parsing - annotations | 2089 |
+| GrammarParser - Syntax parsing - ruleset-id directive | 134 |
+| GrammarParser - Syntax parsing - import directive | 161 |
+| GrammarParser - Syntax parsing - multi-line directive | 212 |
+| GrammarParser - Syntax parsing - TBD directive | 230 |
+| GrammarParser - Syntax parsing - target_rule_name | 244 |
+| GrammarParser - Syntax parsing - Primitive rules | 267 |
+| GrammarParser - Syntax parsing - root rule | 862 |
+| GrammarParser - Syntax parsing - Member name | 922 |
+| GrammarParser - Syntax parsing - type-choice | 984 |
+| GrammarParser - Syntax parsing - object | 1080 |
+| GrammarParser - Syntax parsing - array | 1373 |
+| GrammarParser - Syntax parsing - group | 1627 |
+| GrammarParser - Syntax parsing - repetition | 1806 |
+| GrammarParser - Syntax parsing - annotations | 2093 |

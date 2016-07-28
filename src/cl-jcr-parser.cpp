@@ -1,12 +1,12 @@
 //----------------------------------------------------------------------------
-// Copyright (c) 2015, Codalogic Ltd (http://www.codalogic.com)
+// Copyright (c) 2015, 2016 Codalogic Ltd (http://www.codalogic.com)
 //
 // This Source Code is subject to the terms of the GNU LESSER GENERAL PUBLIC
 // LICENSE version 3. If a copy of the LGPLv3 was not distributed with
 // this file, you can obtain one at http://opensource.org/licenses/LGPL-3.0.
 //----------------------------------------------------------------------------
 
-// Implements jcr-abnf - 2016-07-20
+// Implements jcr-abnf - 2016-07-28
 
 #include "cl-jcr-parser/cl-jcr-parser.h"
 
@@ -473,10 +473,10 @@ bool GrammarParser::directive()
 bool GrammarParser::one_line_directive()
 {
     /* ABNF:
-    one-line-directive = [ spaces ]
+    one-line-directive = *WSP()
                    (directive-def / one-line-tbd-directive-d) *WSP eol
     */
-    // [ spaces() ] && (directive_def() || one_line_tbd_directive_d()) && *WSP() && eol()
+    // *WSP() && (directive_def() || one_line_tbd_directive_d()) && *WSP() && eol()
 
     cl::locator loc( this );
 
@@ -528,9 +528,10 @@ bool GrammarParser::directive_def( DirectiveForm::Enum form )
 bool GrammarParser::jcr_version_d( DirectiveForm::Enum form )
 {
     /* ABNF:
-    jcr-version-d    = jcr-version-kw spaces major-version "." minor-version *(spaces extension-id)
+    jcr-version-d    = jcr-version-kw DSPs major-version "." minor-version
+                   *( DSPs "+" [ DSPs ] extension-id )
     */
-    // jcr_version_kw() && spaces() && major_version() "." && minor_version() && *(spaces() && extension_id())
+    // jcr_version_kw() && DSPs() && major_version() "." && minor_version() && *( DSPs() "+" [ DSPs() ] && extension_id() )
 
     cl::accumulator_deferred major_version_accumulator( this );
     cl::accumulator_deferred minor_version_accumulator( this );
@@ -550,8 +551,12 @@ bool GrammarParser::jcr_version_d( DirectiveForm::Enum form )
                 error( (std::string( "Unsupported JCR version: " ) + major_number + "." + minor_number).c_str() );
         }
 
-        while( DSPs( form ) && extension_id() )
-        {}
+        cl::accumulator extension_accumulator( this );
+        while( extension_accumulator.clear() && DSPs( form ) && is_get_char( '+' ) &&
+                optional( DSPs( form ) ) && extension_id() )
+        {
+            warning( (std::string( "Unknown jcr-version extension id: " ) + extension_accumulator.get() ).c_str() );
+        }
 
         return true;
     }
@@ -561,7 +566,7 @@ bool GrammarParser::jcr_version_d( DirectiveForm::Enum form )
 
 bool GrammarParser::DSPs( DirectiveForm::Enum form )  // "Directive spaces" - May later include a flag to test if in one-line or multi-line directive
 {
-    return form == DirectiveForm::one_line ? one_star_WSP() : spaces();
+    return form == DirectiveForm::one_line ? one_star_WSP() : one_star_sp_cmt();
 }
 
 bool GrammarParser::major_version()
@@ -597,9 +602,9 @@ bool GrammarParser::extension_id()
 bool GrammarParser::ruleset_id_d( DirectiveForm::Enum form )
 {
     /* ABNF:
-    ruleset-id-d     = ruleset-id-kw spaces ruleset-id
+    ruleset-id-d     = ruleset-id-kw DSPs ruleset-id
     */
-    // ruleset_id_kw() && spaces() && ruleset_id()
+    // ruleset_id_kw() && DSPs() && ruleset_id()
 
     if( ruleset_id_kw() )
     {
@@ -620,11 +625,11 @@ bool GrammarParser::ruleset_id_d( DirectiveForm::Enum form )
 bool GrammarParser::import_d( DirectiveForm::Enum form )
 {
     /* ABNF:
-    import-d         = import-kw spaces ruleset-id
-                   [ spaces as-kw spaces ruleset-id-alias ]
+    import-d         = import-kw DSPs ruleset-id
+                   [ DSPs as-kw DSPs ruleset-id-alias ]
     */
-    // import_kw() && spaces() && ruleset_id()
-    //                    [ spaces() && as_kw() && spaces() && ruleset_id_alias() ]
+    // import_kw() && DSPs() && ruleset_id()
+    //                    [ DSPs() && as_kw() && DSPs() && ruleset_id_alias() ]
 
     if( import_kw() )
     {
@@ -752,12 +757,18 @@ bool GrammarParser::multi_line_tbd_directive_d()
     */
     // directive_name()
     //                    [ spaces() && multi_line_directive_parameters() ]
+    /* ABNF:
+    multi-line-tbd-directive-d = directive-name
+                   [ 1*sp-cmt multi-line-directive-parameters ]
+    */
+    // directive_name()
+    //                    [ 1*sp_cmt() && multi_line_directive_parameters() ]
 
     cl::accumulator tbd_directive_name_accumulator( this );
     cl::accumulator_deferred tbd_directive_parameters_accumulator( this );
 
     if( directive_name() &&
-        optional( spaces() && tbd_directive_parameters_accumulator.select() && multi_line_directive_parameters() ) )
+        optional( one_star_sp_cmt() && tbd_directive_parameters_accumulator.select() && multi_line_directive_parameters() ) )
     {
         warning( (std::string( "Unknown directive: " ) + tbd_directive_name_accumulator.get()).c_str() );
         return true;
