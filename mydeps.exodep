@@ -1,1 +1,1 @@
-include exodeps/mydeps.exodep
+include exodep-imports/mydeps.exodep
