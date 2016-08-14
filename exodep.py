@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 # The MIT License (MIT)
 #
@@ -190,14 +190,14 @@ class ProcessDeps:
         return False
 
     def consider_copy( self, line ):
-        m = re.match( 'copy\s+(\S+)(?:\s+(\S+))?', line )
+        m = re.match( '(?:copy|get)\s+(\S+)(?:\s+(\S+))?', line )
         if m != None:
             self.retrieve_text_file( m.group(1), m.group(2) )
             return True
         return False
 
     def consider_bcopy( self, line ):
-        m = re.match( 'bcopy\s+(\S+)(?:\s+(\S+))?', line )
+        m = re.match( '(?:bcopy|bget)\s+(\S+)(?:\s+(\S+))?', line )
         if m != None:
             self.retrieve_binary_file( m.group(1), m.group(2) )
             return True
