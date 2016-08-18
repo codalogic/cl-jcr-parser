@@ -34,13 +34,23 @@ import urllib.request
 import tempfile
 import shutil
 import filecmp
+import glob
 
 host_templates = {
         'github': 'https://raw.githubusercontent.com/${owner}/${project}/${strand}/${path}${file}',
         'bitbucket': 'https://bitbucket.org/${owner}/${project}/raw/${strand}/${path}${file}' }
 
 def main() :
-    ProcessDeps( sys.argv[1] if len( sys.argv ) >= 2 else "mydeps.exodep" )
+    if len( sys.argv ) >= 2:
+        ProcessDeps( sys.argv[1] )
+    elif os.path.isfile( 'mydeps.exodep' ):
+        ProcessDeps( 'mydeps.exodep' )
+    elif os.path.isfile( 'exodep-imports/mydeps.exodep' ):
+        ProcessDeps( 'exodep-imports/mydeps.exodep' )
+    else:
+        for file in glob.glob( 'exodep-imports/*.exodep' ):
+            ProcessDeps( file )
+
 
 class ProcessDeps:
     are_any_files_changed = False
@@ -52,7 +62,7 @@ class ProcessDeps:
         self.vars = vars.copy()
         self.versions = {}  # Each entry is <string of space separated strand names> : <string to use as strand in uri template>
         if isinstance( dependencies_src, str ):
-            if self.is_already_processed( dependencies_src ):
+            if self.is_config_already_processed( dependencies_src ):
                 return
             self.file = dependencies_src
             self.process_dependency_file()
@@ -62,13 +72,13 @@ class ProcessDeps:
         else:
             self.error( "Unrecognised dependencies_src type format" )
 
-    processed_dependencies = {}
+    processed_configs = {}
 
-    def is_already_processed( self, dependencies_src ):
+    def is_config_already_processed( self, dependencies_src ):
         abs_dependencies_src = os.path.abspath( dependencies_src )
-        if abs_dependencies_src in ProcessDeps.processed_dependencies:
+        if abs_dependencies_src in ProcessDeps.processed_configs:
             return True
-        ProcessDeps.processed_dependencies[abs_dependencies_src] = True
+        ProcessDeps.processed_configs[abs_dependencies_src] = True
         return False
 
     def process_dependency_file( self ):
@@ -101,6 +111,8 @@ class ProcessDeps:
                 self.consider_exec( line ) or
                 self.consider_subst( line ) or
                 self.consider_on_conditional( line ) or
+                self.consider_ondir( line ) or
+                self.consider_onfile( line ) or
                 self.consider_onchanged( line ) or
                 self.consider_onanychanged( line ) or
                 self.consider_os_conditional( line ) ):
@@ -228,6 +240,9 @@ class ProcessDeps:
         if to_file == '':
             self.error( "Unable to evaluate destination of: " + dst )
             return
+        if self.is_file_already_downloaded( from_uri, to_file ):
+            print( 'Repeat....', to_file )
+            return
         if re.match( 'https?://', from_uri ):
             tmp_name = handler.download_to_temp_file( from_uri )
         else:
@@ -236,6 +251,15 @@ class ProcessDeps:
             self.error( "Unable to retrieve: " + from_uri )
             return
         self.conditionally_update_dst_file( tmp_name, to_file )
+
+    processed_downloads = {}
+
+    def is_file_already_downloaded( self, src, dst ):
+        key = src + "\n" + dst
+        if os.path.isfile( dst ) and key in ProcessDeps.processed_downloads:    # Allow for file being deleted between downloads for some reason
+            return True
+        ProcessDeps.processed_downloads[key] = True
+        return False
 
     def conditionally_update_dst_file( self, tmp_name, to_file ):
         if not os.path.isfile( to_file ):
@@ -353,15 +377,18 @@ class ProcessDeps:
         if m != None:
             op = m.group(1)
             src = self.expand_variables( m.group(2) )
-            dst = self.expand_variables( m.group(3) )
+            dst = self.make_destination_file_name( src, m.group(3) )
             if op == 'cp':
                 try:
-                    shutil.copy( src, dst )
+                    if self.is_copy_needed( src, dst ):
+                        shutil.copy( src, dst )
+                        print( 'cp........', dst )
                 except:
                     self.error( "Unable to 'cp' file '" + src + "' to '" + dst + "'" )
             elif op == 'mv':
                 try:
                     shutil.move( src, dst )
+                    print( 'mv........', dst )
                 except:
                     self.error( "Unable to 'mv' file '" + src + "' to '" + dst + "'" )
             return True
@@ -372,20 +399,26 @@ class ProcessDeps:
             if op == 'mkdir':
                 try:
                     os.makedirs( path, exist_ok=True )
+                    print( 'mkdir.....', path )
                 except:
                     self.error( "Unable to 'mkdir' for '" + path + "'" )
             elif op == 'rmdir':
                 try:
                     shutil.rmtree( path )
+                    print( 'rmdir.....', path )
                 except:
                     self.error( "Unable to 'rmdir' on '" + path + "'" )
             elif op == 'rm':
                 try:
                     os.unlink( path )
+                    print( 'rm........', path )
                 except:
                     self.error( "Unable to 'rm' file '" + path + "'" )
             return True
         return False
+
+    def is_copy_needed( self, src, dst ):
+        return not os.path.isfile( dst ) or not filecmp.cmp( src, dst )
 
     def consider_exec( self, line ):
         m = re.match( 'exec\s+(.+)', line )
@@ -406,6 +439,26 @@ class ProcessDeps:
             var_name = m.group(1)
             command = m.group(2)
             if var_name in self.vars and self.vars[var_name] != '':
+                self.process_line( command )
+            return True
+        return False
+
+    def consider_ondir( self, line ):
+        m = re.match( 'ondir\s+(\S+)\s+(.+)', line )
+        if m != None:
+            dir = m.group(1)
+            command = m.group(2)
+            if os.path.isdir( dir ):
+                self.process_line( command )
+            return True
+        return False
+
+    def consider_onfile( self, line ):
+        m = re.match( 'onfile\s+(\S+)\s+(.+)', line )
+        if m != None:
+            file = m.group(1)
+            command = m.group(2)
+            if os.path.isfile( file ):
                 self.process_line( command )
             return True
         return False

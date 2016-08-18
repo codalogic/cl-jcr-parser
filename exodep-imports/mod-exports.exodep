@@ -1,0 +1,3 @@
+cp exodep-imports/dsl-pa.exodep              exodep-exports/
+cp exodep-imports/cl-utils.ptr-vector.exodep exodep-exports/
+cp exodep-imports/cl-utils.str-args.exodep   exodep-exports/

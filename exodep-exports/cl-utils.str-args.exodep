@@ -1,0 +1,17 @@
+# See https://github.com/codalogic/exodep for details on use and format of
+# exodep file
+
+default $h_dst   include/cl-utils/
+default $cpp_dst src/cl-utils/
+
+default $cl_utils_h_dst   ${h_dst}
+default $cl_utils_cpp_dst ${cpp_dst}
+
+$owner codalogic
+$project cl-utils
+$strand angst
+
+versions    # Invoking 'versions' must happen after setting up $owner/$project variables
+
+copy include/cl-utils/str-args.h   ${cl_utils_h_dst}
+copy src/cl-utils/str-args.cpp     ${cl_utils_cpp_dst}
