@@ -6,7 +6,7 @@
 // this file, you can obtain one at http://opensource.org/licenses/LGPL-3.0.
 //----------------------------------------------------------------------------
 
-// Implements jcr-abnf - 2016-07-28
+// Implements jcr-abnf - 2016-08-26
 
 #include "cl-jcr-parser/cl-jcr-parser.h"
 
@@ -232,6 +232,7 @@ private:
     bool optional_marker();
     bool one_or_more();
     bool zero_or_more();
+    bool repetition_range();
     bool min_max_repetition();
     bool min_repetition();
     bool max_repetition();
@@ -239,6 +240,7 @@ private:
     bool max_repeat();
     bool specific_repetition();
     bool repetition_step();
+    bool step_size();
     bool integer();
     bool non_neg_integer();
     bool pos_integer();
@@ -2261,32 +2263,18 @@ bool GrammarParser::choice_combiner()
 bool GrammarParser::repetition()
 {
     /* ABNF:
-    repetition       = "@" *sp-cmt ( optional / one-or-more / min-max-repetition /
-                   min-repetition / max-repetition /
-                   zero-or-more / specific-repetition )
+    repetition       = optional / one-or-more /
+                   repetition-range / zero-or-more
     */
-    // "@" && *sp_cmt() && ( optional() || one_or_more() || min_max_repetition() || min_repetition() || max_repetition() || zero_or_more() || specific_repetition() )
+    // optional() || one_or_more() || repetition_range() || zero_or_more()
 
-    cl::locator loc_outer( this );
+    cl::locator loc( this );
 
-    if( is_get_char( '@' ) && star_sp_cmt() )
-    {
-        cl::locator loc_inner( this );
-
-        // The order of these routines is important
-        if( optional_rewind( optional_marker() ) ||
-                optional_rewind( one_or_more() ) ||
-                optional_rewind( min_max_repetition() ) ||
-                optional_rewind( min_repetition() ) ||
-                optional_rewind( max_repetition() ) ||
-                optional_rewind( zero_or_more() ) ||
-                optional_rewind( specific_repetition() ) )
-            return true;   // if false, fall through to loc_outer recorded location
-    }
-
-    location_top();
-
-    return false;
+    // The order of these routines is important
+    return optional_rewind( optional_marker() ) ||
+            optional_rewind( one_or_more() ) ||
+            optional_rewind( repetition_range() ) ||
+            optional_rewind( zero_or_more() );
 }
 
 bool GrammarParser::optional_marker()
@@ -2319,6 +2307,35 @@ bool GrammarParser::zero_or_more()
 
     return is_get_char( '*' ) && set( m.p_rule->repetition.min, 0 ) && set( m.p_rule->repetition.max, -1 ) &&
             optional( repetition_step() );
+}
+
+bool GrammarParser::repetition_range()
+{
+    /* ABNF:
+    repetition-range = "*" *sp-cmt (
+                   min-max-repetition / min-repetition /
+                   max-repetition / specific-repetition )
+    */
+    // "*" && *sp_cmt() && (
+    //                    min_max_repetition() || min_repetition() || max_repetition() || specific_repetition() )
+
+    cl::locator loc_outer( this );
+
+    if( is_get_char( '*' ) && star_sp_cmt() )
+    {
+        cl::locator loc_inner( this );
+
+        // The order of these routines is important
+        if( optional_rewind( min_max_repetition() ) ||
+                optional_rewind( min_repetition() ) ||
+                optional_rewind( max_repetition() ) ||
+                optional_rewind( specific_repetition() ) )
+            return true;   // if false, fall through to loc_outer recorded location
+    }
+
+    location_top();
+
+    return false;
 }
 
 bool GrammarParser::min_max_repetition()
@@ -2409,12 +2426,22 @@ bool GrammarParser::repetition_step()
     {
         cl::accumulator repetition_accumulator( this );
 
-        non_neg_integer() && set( m.p_rule->repetition.step, repetition_accumulator.to_int() ) || fatal( "Expected repetition step size after '%'" );
+        step_size() && set( m.p_rule->repetition.step, repetition_accumulator.to_int() ) || fatal( "Expected repetition step size after '%'" );
 
         return true;
     }
 
     return false;
+}
+
+bool GrammarParser::step_size()
+{
+    /* ABNF:
+    step-size        = non-neg-integer
+    */
+    // non_neg_integer()
+
+    return non_neg_integer();
 }
 
 bool GrammarParser::integer()
