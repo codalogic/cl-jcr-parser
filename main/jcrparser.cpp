@@ -1,0 +1,15 @@
+//----------------------------------------------------------------------------
+// Copyright (c) 2015, 2016 Codalogic Ltd (http://www.codalogic.com)
+//
+// This Source Code is subject to the terms of the GNU LESSER GENERAL PUBLIC
+// LICENSE version 3. If a copy of the LGPLv3 was not distributed with
+// this file, you can obtain one at http://opensource.org/licenses/LGPL-3.0.
+//----------------------------------------------------------------------------
+
+// Implements jcr-abnf - 2016-08-26
+
+#include "cl-jcr-parser/cl-jcr-parser.h"
+
+int main()
+{
+}
