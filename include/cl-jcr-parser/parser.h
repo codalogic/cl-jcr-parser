@@ -6,8 +6,8 @@
 // this file, you can obtain one at http://opensource.org/licenses/LGPL-3.0.
 //----------------------------------------------------------------------------
 
-#ifndef CL_JCR_PARSER
-#define CL_JCR_PARSER
+#ifndef CL_JCR_PARSER__PARSER
+#define CL_JCR_PARSER__PARSER
 
 #include "cl-utils/ptr-vector.h"
 
@@ -340,4 +340,4 @@ private:
 
 }   // namespace cljcr
 
-#endif  // CL_JCR_PARSER
+#endif  // CL_JCR_PARSER__PARSER

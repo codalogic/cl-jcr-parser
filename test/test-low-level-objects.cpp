@@ -33,7 +33,7 @@
 
 #include "clunit.h"
 
-#include "cl-jcr-parser/cl-jcr-parser.h"
+#include "cl-jcr-parser/parser.h"
 
 using namespace cljcr;
 

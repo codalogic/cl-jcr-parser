@@ -6,8 +6,7 @@
 // this file, you can obtain one at http://opensource.org/licenses/LGPL-3.0.
 //----------------------------------------------------------------------------
 
-#include "cl-jcr-parser/cl-jcr-parser.h"
-
+#include "cl-jcr-parser/parser.h"
 #include "cl-jcr-parser/config.h"
 
 int main()

@@ -153,10 +153,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\src\cl-jcr-parser.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\src\dsl-pa\dsl-pa-alphabet.cpp"
 				>
 			</File>
@@ -168,16 +164,16 @@
 				RelativePath="..\src\dsl-pa\dsl-pa-reader.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\src\parser.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath="..\include\cl-jcr-parser\cl-jcr-parser.h"
-				>
-			</File>
 			<File
 				RelativePath="..\include\cl-jcr-parser\config.h"
 				>
@@ -196,6 +192,10 @@
 			</File>
 			<File
 				RelativePath="..\include\dsl-pa\dsl-pa.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\cl-jcr-parser\parser.h"
 				>
 			</File>
 			<File

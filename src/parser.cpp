@@ -8,7 +8,7 @@
 
 // Implements jcr-abnf - 2016-08-26
 
-#include "cl-jcr-parser/cl-jcr-parser.h"
+#include "cl-jcr-parser/parser.h"
 
 #include "dsl-pa/dsl-pa.h"
 
