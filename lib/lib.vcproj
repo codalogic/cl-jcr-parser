@@ -179,6 +179,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\include\cl-jcr-parser\config.h"
+				>
+			</File>
+			<File
 				RelativePath="..\include\dsl-pa\dsl-pa-alphabet.h"
 				>
 			</File>

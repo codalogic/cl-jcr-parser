@@ -1,4 +1,4 @@
-Tests table of contents generated on Mon Jul 10 16:25:42 2017
+Tests table of contents generated on Wed Jul 12 12:01:19 2017
 
 # test-grammar-set.cpp
 | Description | Line |
@@ -38,3 +38,8 @@ Tests table of contents generated on Mon Jul 10 16:25:42 2017
 | GrammarParser - Syntax parsing - group | 1627 |
 | GrammarParser - Syntax parsing - repetition | 1806 |
 | GrammarParser - Syntax parsing - annotations | 2093 |
+
+# test-config.cpp
+| Description | Line |
+|-------------|------|
+| Config - Configuration | 40 |
