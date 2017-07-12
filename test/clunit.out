@@ -1,4 +1,26 @@
-Tests run on Wed Jul 12 12:08:19 2017
+Tests run on Wed Jul 12 15:22:45 2017
+
+    Config - Configuration [test-config.cpp:40]
+    ===========================================
+    ok: config.has_jcr() == false
+    ok: config.jcr_size() == 0
+    ok: config.has_json() == false
+    ok: config.has_jcr() == false
+    ok: config.jcr_size() == 0
+    ok: config.has_json() == true
+    ok: config.json() == "JSON"
+    ok: config.has_jcr() == true
+    ok: config.jcr_size() == 1
+    ok: config.jcr( 0 ) == "JCR-0"
+    ok: config.has_json() == true
+    ok: config.json() == "JSON"
+    ok: config.has_jcr() == true
+    ok: config.jcr_size() == 2
+    ok: config.jcr( 0 ) == "JCR-0"
+    ok: config.jcr( 1 ) == "JCR-1"
+    ok: config.has_json() == true
+    ok: config.json() == "JSON"
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
     GrammarSet TODOS [test-grammar-set.cpp:40]
     ==========================================
@@ -1924,28 +1946,6 @@ jcr-version
       $my_rule=[@{unknown}string,float ]
 
     ok: status != JCRParser::S_OK
-    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
-
-    Config - Configuration [test-config.cpp:40]
-    ===========================================
-    ok: config.has_jcr() == false
-    ok: config.jcr_size() == 0
-    ok: config.has_json() == false
-    ok: config.has_jcr() == false
-    ok: config.jcr_size() == 0
-    ok: config.has_json() == true
-    ok: config.json() == "JSON"
-    ok: config.has_jcr() == true
-    ok: config.jcr_size() == 1
-    ok: config.jcr( 0 ) == "JCR-0"
-    ok: config.has_json() == true
-    ok: config.json() == "JSON"
-    ok: config.has_jcr() == true
-    ok: config.jcr_size() == 2
-    ok: config.jcr( 0 ) == "JCR-0"
-    ok: config.jcr( 1 ) == "JCR-1"
-    ok: config.has_json() == true
-    ok: config.json() == "JSON"
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
 

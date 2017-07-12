@@ -165,7 +165,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\parser.cpp"
+				RelativePath="..\src\cl-jcr-parser\parser.cpp"
 				>
 			</File>
 		</Filter>
