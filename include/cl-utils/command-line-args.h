@@ -56,29 +56,45 @@ public:
         next();
     }
 
-    bool is_flag()      // Is a flag as opposed to a value etc
+    bool is_flag() const      // Is a flag as opposed to a value etc
     {
         return **argv == '-';
     }
-    bool is_flag( const char * p_option_1, int desired_extra_count = 0 )  // Is specified flag
+    bool is_flag( const char * p_option_1 ) const  // Is a specified flag
     {
-        return (argc - 1) >= desired_extra_count && strcmp( p_option_1, *argv ) == 0;
+        return strcmp( p_option_1, *argv ) == 0;
     }
-    bool is_flag( const char * p_option_1, const char * p_option_2, int desired_extra_count = 0 )
+    bool is_flag( const char * p_option_1, int desired_extra_count, const char * p_on_insufficient_message = 0 )  // Is a specified flag
     {
-        return (argc - 1) >= desired_extra_count && (strcmp( p_option_1, *argv ) == 0 || strcmp( p_option_2, *argv ) == 0);
+        if( is_flag( p_option_1 ) )
+            return ensure( desired_extra_count, p_on_insufficient_message );
+        return false;
     }
-    bool ensure( int desired_extra_count, const char * p_on_insufficient_message )
+    bool is_flag( const char * p_option_1, const char * p_option_2 ) const
+    {
+        return strcmp( p_option_1, *argv ) == 0 || strcmp( p_option_2, *argv ) == 0;
+    }
+    bool is_flag( const char * p_option_1, const char * p_option_2, int desired_extra_count, const char * p_on_insufficient_message = 0 )
+    {
+        if( is_flag( p_option_1, p_option_2 ) )
+            return ensure( desired_extra_count, p_on_insufficient_message );
+        return false;
+    }
+    bool ensure( int desired_extra_count, const char * p_on_insufficient_message = 0 )
     {
         if( (argc - 1) < desired_extra_count )
         {
-            std::cout << p_on_insufficient_message << "\n";
+            if( p_on_insufficient_message )
+                std::cout << p_on_insufficient_message << "\n";
+            else
+                std::cout << *argv << " requires " << desired_extra_count <<
+                        " additional parameter" << ((desired_extra_count == 1)?"":"s") << "\n";
             argc = 0;   // Stop trying to process remaining insufficient set of arguments
             return false;
         }
         return true;
     }
-    const char * current() { return *argv; }
+    const char * current() const { return *argv; }
     const char * next() { if( argc > 0 ) { ++argv; --argc; } return *argv; }
     void operator ++ () { next(); }
     void operator ++ (int) { next(); }
