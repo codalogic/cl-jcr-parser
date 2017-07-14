@@ -48,7 +48,10 @@ bool capture_command_line( cljcr::Config * p_config, int argc, char ** argv )
             return false;
         }
         else if( cla.is_flag( "-json", 1, "-json flag must include name of JSON file to validate" ) )
+        {
             p_config->set_json( cla.next() );
+            std::cerr << "-json: Validation of JSON files against JCR not supported yet!\n";
+        }
         else if( cla.is_flag() )
             std::cout << "Unknown flag: " << cla.current() << "\n";
         else
