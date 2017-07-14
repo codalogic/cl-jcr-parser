@@ -55,7 +55,7 @@ bool capture_command_line( cljcr::Config * p_config, int argc, char ** argv )
         else
             p_config->add_jcr( cla.current() );
     }
-    
+
     return true;
 }
 

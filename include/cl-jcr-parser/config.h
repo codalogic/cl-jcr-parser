@@ -33,7 +33,7 @@ public:
 
     void set_json( const std::string & json_file ) { m.json_to_validate = json_file; }
     bool has_json() const { return ! m.json_to_validate.empty(); }
-    const std::string & json() const { return m.json_to_validate; }    
+    const std::string & json() const { return m.json_to_validate; }
 };
 
 }   // namespace cljcr
