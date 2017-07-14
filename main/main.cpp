@@ -30,7 +30,6 @@ void help()
             ;
 }
 
-
 bool capture_command_line( cljcr::Config * p_config, int argc, char ** argv )
 {
     clutils::CommandLineArgs cla( argc, argv );
