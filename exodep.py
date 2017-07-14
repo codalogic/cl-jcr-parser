@@ -41,6 +41,11 @@ host_templates = {
         'gitlab': 'https://gitlab.com/${owner}/${project}/raw/${strand}/${path}${file}',
         'bitbucket': 'https://bitbucket.org/${owner}/${project}/raw/${strand}/${path}${file}' }
 
+init_exodep = 'exodep-imports/__init.exodep'
+end_exodep = 'exodep-imports/__end.exodep'
+
+glob_ignore = [ init_exodep, end_exodep ]
+
 def main() :
     if len( sys.argv ) >= 2:
         ProcessDeps( sys.argv[1] )
@@ -48,11 +53,14 @@ def main() :
         ProcessDeps( 'mydeps.exodep' )
     elif os.path.isfile( 'exodep-imports/mydeps.exodep' ):
         ProcessDeps( 'exodep-imports/mydeps.exodep' )
-    elif os.path.isfile( 'exodep-imports/__init.exodep' ):
-        ProcessDeps( 'exodep-imports/__init.exodep' )
+    elif os.path.isfile( init_exodep ):
+        ProcessDeps( init_exodep )
     else:
         for file in glob.glob( 'exodep-imports/*.exodep' ):
-            ProcessDeps( file )
+            if file not in glob_ignore:
+                ProcessDeps( file )
+        if os.path.isfile( end_exodep ):
+            ProcessDeps( end_exodep )
 
 
 class ProcessDeps:
@@ -90,18 +98,20 @@ class ProcessDeps:
                 self.process_dependency_stream( f )
         except FileNotFoundError:
             self.error( "Unable to open exodep file: " + self.file )
-        if self.file == 'exodep-imports/__init.exodep':
-            self.process_globbed_config_files()
+        if self.file == init_exodep:
+            self.process_globbed_config_files_after_init()
 
     def process_dependency_stream( self, f ):
         for line in f:
             self.line_num += 1
             self.process_line( line )
 
-    def process_globbed_config_files( self ):
+    def process_globbed_config_files_after_init( self ):
         for file in glob.glob( 'exodep-imports/*.exodep' ):
-            if file != 'exodep-imports/__init.exodep':
+            if file not in glob_ignore:
                 ProcessDeps( file, self.vars )
+        if os.path.isfile( end_exodep ):
+            ProcessDeps( end_exodep )
 
     def process_line( self, line ):
         line = line.strip()
@@ -125,7 +135,8 @@ class ProcessDeps:
                 self.consider_onfile( line ) or
                 self.consider_onchanged( line ) or
                 self.consider_onanychanged( line ) or
-                self.consider_os_conditional( line ) ):
+                self.consider_os_conditional( line ) or
+                self.consider_pause( line ) ):
             self.report_unrecognised_command( line )
 
     def consider_include( self, line ):
@@ -364,7 +375,7 @@ class ProcessDeps:
                 fout.close()
                 self.conditionally_update_dst_file( fout.name, dst )
             except FileNotFoundError:
-                error( "Unable to open file for 'subst' command: " + src )
+                self.error( "Unable to open file for 'subst' command: " + src )
             return True
         return False
 
@@ -503,6 +514,13 @@ class ProcessDeps:
             command = m.group(2)
             if sys.platform.startswith( ProcessDeps.os_names[os_key] ):
                 self.process_line( command )
+            return True
+        return False
+
+    def consider_pause( self, line ):
+        if line == 'pause':
+            print( "\n>>> Press <Return> to continue <<<" )
+            input()
             return True
         return False
 
