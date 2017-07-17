@@ -15,10 +15,10 @@
 void help()
 {
     std::cerr <<
-            "             cljcrparser - Codalogic JCR Parser\n"
+            "             jcrcheck - Codalogic JCR Checker\n"
             "\n"
             "Usage:\n"
-            "    cljcrparser [ flags ] <jcr-file-list>\n"
+            "    jcrcheck [ flags ] <jcr-file-list>\n"
             "\n"
             "Flags:\n"
             "    -h:\n"
