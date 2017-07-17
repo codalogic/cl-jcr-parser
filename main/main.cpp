@@ -14,17 +14,19 @@
 
 void help()
 {
-    std::cout <<
+    std::cerr <<
             "             cljcrparser - Codalogic JCR Parser\n"
             "\n"
             "Usage:\n"
             "    cljcrparser [ flags ] <jcr-file-list>\n"
             "\n"
             "Flags:\n"
-            "    -h\n"
-            "    -? : Print this help information\n"
-            "    -json <file> : Specify JSON file to be validated against specified\n"
-            "                   JCR files\n"
+            "    -h:\n"
+            "    -?:\n"
+            "        Print this help information\n"
+            "\n"
+            "    -json <file>:\n"
+            "        Specify JSON file to be validated against specified JCR files\n"
             "\n"
             "<jcr-file-list> - One or more JCR files to verify.\n"
             ;
@@ -32,30 +34,29 @@ void help()
 
 bool capture_command_line( cljcr::Config * p_config, int argc, char ** argv )
 {
-    clutils::CommandLineArgs cla( argc, argv );
-
-    if( ! cla )
+    for( clutils::CommandLineArgs cla( argc, argv, &help ); cla; ++cla )
     {
-        help();
-        return false;
-    }
-
-    for( ; cla; ++cla )
-    {
-        if( cla.is_flag( "-h", "-?" ) )
+        if( cla.is_flag( "?", "h" ) )
         {
             help();
             return false;
         }
-        else if( cla.is_flag( "-json", 1, "-json flag must include name of JSON file to validate" ) )
+        else if( cla.is_flag( "json", 1, "-json flag must include name of JSON file to validate" ) )
         {
             p_config->set_json( cla.next() );
             std::cerr << "-json: Validation of JSON files against JCR not supported yet!\n";
         }
         else if( cla.is_flag() )
-            std::cout << "Unknown flag: " << cla.current() << "\n";
+            std::cerr << "Unknown flag: " << cla.flag() << "\n";
         else
             p_config->add_jcr( cla.current() );
+    }
+
+    if( ! p_config->has_jcr() )
+    {
+        std::cerr << "Error: No JCR files specified\n";
+        help();
+        return false;
     }
 
     return true;
