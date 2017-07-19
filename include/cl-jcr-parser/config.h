@@ -29,7 +29,7 @@ public:
     void add_jcr( const std::string & jcr_file ) { m.jcr_file_list.push_back( jcr_file ); }
     bool has_jcr() const { return ! m.jcr_file_list.empty(); }
     size_t jcr_size() const { return m.jcr_file_list.size(); }
-    const std::string & jcr( size_t index ) { return m.jcr_file_list[index]; }
+    const std::string & jcr( size_t index ) const { return m.jcr_file_list[index]; }
 
     void set_json( const std::string & json_file ) { m.json_to_validate = json_file; }
     bool has_json() const { return ! m.json_to_validate.empty(); }

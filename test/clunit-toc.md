@@ -1,4 +1,4 @@
-Tests table of contents generated on Wed Jul 12 15:22:45 2017
+Tests table of contents generated on Wed Jul 19 22:21:35 2017
 
 # test-config.cpp
 | Description | Line |
@@ -36,10 +36,10 @@ Tests table of contents generated on Wed Jul 12 15:22:45 2017
 | GrammarParser - Syntax parsing - target_rule_name | 244 |
 | GrammarParser - Syntax parsing - Primitive rules | 267 |
 | GrammarParser - Syntax parsing - root rule | 862 |
-| GrammarParser - Syntax parsing - Member name | 922 |
-| GrammarParser - Syntax parsing - type-choice | 984 |
-| GrammarParser - Syntax parsing - object | 1080 |
-| GrammarParser - Syntax parsing - array | 1373 |
-| GrammarParser - Syntax parsing - group | 1627 |
-| GrammarParser - Syntax parsing - repetition | 1806 |
-| GrammarParser - Syntax parsing - annotations | 2093 |
+| GrammarParser - Syntax parsing - Member name | 933 |
+| GrammarParser - Syntax parsing - type-choice | 995 |
+| GrammarParser - Syntax parsing - object | 1091 |
+| GrammarParser - Syntax parsing - array | 1384 |
+| GrammarParser - Syntax parsing - group | 1638 |
+| GrammarParser - Syntax parsing - repetition | 1817 |
+| GrammarParser - Syntax parsing - annotations | 2104 |

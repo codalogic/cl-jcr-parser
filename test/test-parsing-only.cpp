@@ -903,6 +903,17 @@ TFEATURE( "GrammarParser - Syntax parsing - root rule" )
         TTEST( ph.grammar().rules[0].repetition.max == 1 );
     }
     {
+        TSETUP( ParserHarness ph( "{ \"an-int\" : integer }" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "" );
+        TCRITICALTEST( ph.grammar().rules[0].annotations.is_root == true );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::OBJECT );
+
+        TTEST( ph.grammar().rules[0].repetition.min == 1 );
+        TTEST( ph.grammar().rules[0].repetition.max == 1 );
+    }
+    {
         TSETUP( ParserHarness ph( " [   ]" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );

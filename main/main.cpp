@@ -73,10 +73,30 @@ bool capture_command_line( cljcr::Config * p_config, int argc, char ** argv )
     return true;
 }
 
+bool parse_config_jcrs( cljcr::GrammarSet * p_grammar_set, const cljcr::Config & r_config )
+{
+    cljcr::JCRParser jcr_parser( p_grammar_set );
+    
+    for( size_t i = 0; i < r_config.jcr_size(); ++i )
+    {
+        if( jcr_parser.add_grammar( r_config.jcr( i ).c_str() ) != cljcr::JCRParser::S_OK )
+            return false;
+    }
+    
+    return true;
+}
+
 int main( int argc, char * argv[] )
 {
     cljcr::Config config;
+
     if( ! capture_command_line( &config, argc, argv ) )
         return -1;
-    // return process_config( config );
+        
+    cljcr::GrammarSet grammar_set;
+
+    if( ! parse_config_jcrs( &grammar_set, config ) )
+        return -1;
+
+    return 0;
 }
