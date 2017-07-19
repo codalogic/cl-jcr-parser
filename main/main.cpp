@@ -34,20 +34,31 @@ void help()
 
 bool capture_command_line( cljcr::Config * p_config, int argc, char ** argv )
 {
-    for( clutils::CommandLineArgs cla( argc, argv, &help ); cla; ++cla )
+    clutils::CommandLineArgs cla( argc, argv );
+
+    if( ! cla )
+    {
+        help();
+        return false;
+    }
+
+    for( ; cla; ++cla )
     {
         if( cla.is_flag( "?", "h" ) )
         {
             help();
             return false;
         }
+
         else if( cla.is_flag( "json", 1, "-json flag must include name of JSON file to validate" ) )
         {
             p_config->set_json( cla.next() );
             std::cerr << "-json: Validation of JSON files against JCR not supported yet!\n";
         }
+
         else if( cla.is_flag() )
             std::cerr << "Unknown flag: " << cla.flag() << "\n";
+
         else
             p_config->add_jcr( cla.current() );
     }
