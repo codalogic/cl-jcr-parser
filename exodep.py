@@ -43,37 +43,48 @@ host_templates = {
 
 init_exodep = 'exodep-imports/__init.exodep'
 end_exodep = 'exodep-imports/__end.exodep'
+onstop_exodep = 'exodep-imports/__onstop.exodep'
 
-glob_ignore = [ init_exodep, end_exodep ]
+glob_ignore = [ init_exodep, end_exodep, onstop_exodep ]
 
 default_vars = { 'strand': 'master', 'path': '' }
 
-def main() :
-    if len( sys.argv ) >= 2:
-        ProcessDeps( sys.argv[1] )
-    elif os.path.isfile( 'mydeps.exodep' ):
-        ProcessDeps( 'mydeps.exodep' )
-    elif os.path.isfile( 'exodep-imports/mydeps.exodep' ):
-        ProcessDeps( 'exodep-imports/mydeps.exodep' )
-    else:
-        process_globbed_exodep_imports()
+class StopException( Exception ):
+    pass
+
+def main():
+    try:
+        if len( sys.argv ) >= 2:
+            ProcessDeps( sys.argv[1] )
+        elif os.path.isfile( 'mydeps.exodep' ):
+            ProcessDeps( 'mydeps.exodep' )
+        elif os.path.isfile( 'exodep-imports/mydeps.exodep' ):
+            ProcessDeps( 'exodep-imports/mydeps.exodep' )
+        else:
+            process_globbed_exodep_imports()
+
+    except StopException:
+        pass
 
 def process_globbed_exodep_imports():
-        vars = default_vars
-        if os.path.isfile( init_exodep ):
-            pd = ProcessDeps( init_exodep, vars )
-            vars = pd.get_vars()
-        for file in glob.glob( 'exodep-imports/*.exodep' ):
-            file = file.replace( '\\', '/' )
-            if file not in glob_ignore:
-                ProcessDeps( file, vars )
-        if os.path.isfile( end_exodep ):
-            ProcessDeps( end_exodep, vars )
+    vars = default_vars
+    if os.path.isfile( init_exodep ):
+        pd = ProcessDeps( init_exodep, vars )
+        vars = pd.get_vars()
+    for file in glob.glob( 'exodep-imports/*.exodep' ):
+        file = file.replace( '\\', '/' )
+        if file not in glob_ignore:
+            ProcessDeps( file, vars )
+    if os.path.isfile( end_exodep ):
+        ProcessDeps( end_exodep, vars )
 
 
 class ProcessDeps:
     are_any_files_changed = False
     alert_messages = ""
+    shown_alert_messages = ""
+
+    processed_configs = {}
 
     def __init__( self, dependencies_src, vars = default_vars ):
         self.is_last_file_changed = self.are_files_changed = False
@@ -91,8 +102,6 @@ class ProcessDeps:
             self.process_dependency_stream( dependencies_src )
         else:
             self.error( "Unrecognised dependencies_src type format" )
-
-    processed_configs = {}
 
     def get_vars():
         return self.vars
@@ -139,10 +148,14 @@ class ProcessDeps:
                 self.consider_onlastchanged( line ) or
                 self.consider_onchanged( line ) or
                 self.consider_onanychanged( line ) or
+                self.consider_onalerts( line ) or
                 self.consider_os_conditional( line ) or
+                self.consider_echo( line ) or
                 self.consider_pause( line ) or
                 self.consider_alert( line ) or
-                self.consider_showalerts( line ) ):
+                self.consider_showalerts( line ) or
+                self.consider_alertstofile( line ) or
+                self.consider_stop( line ) ):
             self.report_unrecognised_command( line )
 
     def consider_include( self, line ):
@@ -443,6 +456,11 @@ class ProcessDeps:
                 except:
                     self.error( "Unable to 'rm' file '" + path + "'" )
             return True
+        m = re.match( '^touch\s+(\S+)', line )
+        if m != None:
+            file = self.expand_variables( m.group(1) )
+            open( file, 'a' ).close()
+            return True
         return False
 
     def is_copy_needed( self, src, dst ):
@@ -521,6 +539,15 @@ class ProcessDeps:
             return True
         return False
 
+    def consider_onalerts( self, line ):
+        m = re.match( '^onalerts\s+(.+)', line )
+        if m != None:
+            command = m.group(1)
+            if ProcessDeps.shown_alert_messages != "" or ProcessDeps.alert_messages != "":
+                self.process_line( command )
+            return True
+        return False
+
     os_names = { 'windows': 'win32', 'linux': 'linux', 'osx': 'darwin' }
 
     def consider_os_conditional( self, line ):
@@ -530,6 +557,17 @@ class ProcessDeps:
             command = m.group(2)
             if sys.platform.startswith( ProcessDeps.os_names[os_key] ):
                 self.process_line( command )
+            return True
+        return False
+
+    def consider_echo( self, line ):
+        m = re.match( '^echo(?:\s+(.*))?', line )
+        if m != None:
+            message = m.group(1)
+            if message:
+                print( self.expand_variables( message ) )
+            else:
+                print( "" )
             return True
         return False
 
@@ -549,10 +587,10 @@ class ProcessDeps:
         m = re.match( '^alert\s+(.*)', line )
         if m != None:
             message = self.expand_variables( m.group(1) )
-            if ProcessDeps.alert_messages != "":
-                ProcessDeps.alert_messages += "\n"
             alert = "ALERT: " + self.file + " (" + str(self.line_num) + "):\n" + "       " + message
             print( alert )
+            if ProcessDeps.alert_messages != "":
+                ProcessDeps.alert_messages += "\n"
             ProcessDeps.alert_messages += alert
             return True
         return False
@@ -562,8 +600,39 @@ class ProcessDeps:
             if ProcessDeps.alert_messages != "":
                 print( "RECORDED ALERTS:" )
                 print( ProcessDeps.alert_messages )
+                if ProcessDeps.shown_alert_messages != "":
+                    ProcessDeps.shown_alert_messages += "\n"
+                ProcessDeps.shown_alert_messages = ProcessDeps.alert_messages
                 ProcessDeps.alert_messages = ""
             return True
+        return False
+
+    def consider_alertstofile( self, line ):
+        m = re.match( '^alertstofile\s+(.*)', line )
+        if m != None:
+            file = m.group(1)
+            if os.path.isfile( file ):
+                shutil.move( file, file + ".old" )
+            if ProcessDeps.shown_alert_messages != "" or ProcessDeps.alert_messages != "":
+                with open( file, 'w') as fout:
+                    if ProcessDeps.shown_alert_messages != "":
+                        fout.write( ProcessDeps.shown_alert_messages + "\n" )
+                    if ProcessDeps.alert_messages != "":
+                        fout.write( ProcessDeps.alert_messages + "\n" )
+            return True
+        return False
+
+    def consider_stop( self, line ):
+        m = re.match( '^stop(?:\s+(.*))?', line )
+        if m != None:
+            message = m.group(1)
+            print( "STOPPED: " + self.file + " (" + str(self.line_num) + "):" )
+            if message:
+                print( "      " + self.expand_variables( message ) )
+            if self.file != onstop_exodep and os.path.isfile( onstop_exodep ):
+                ProcessDeps( onstop_exodep, self.vars )
+            # return True
+            raise StopException
         return False
 
     def error( self, what ):

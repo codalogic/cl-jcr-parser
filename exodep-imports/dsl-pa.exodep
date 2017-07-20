@@ -17,7 +17,7 @@ copy dsl-pa-dsl-pa.h   ${h_dst}
 copy dsl-pa-alphabet.h ${h_dst}
 copy dsl-pa-reader.h   ${h_dst}
 
-$path src/
+$path src/dsl-pa/
 copy dsl-pa-dsl-pa.cpp   ${cpp_dst}
 copy dsl-pa-alphabet.cpp ${cpp_dst}
 copy dsl-pa-reader.cpp   ${cpp_dst}
