@@ -3308,7 +3308,7 @@ std::string MemberName::pattern() const
     size_t first = m.name.find_first_of( '/' );
     size_t last = m.name.find_last_of( '/' );
     if( first == std::string::npos || last == std::string::npos )
-        return "";
+        return m.name;
     return m.name.substr( first + 1, last - 1 );
 }
 
