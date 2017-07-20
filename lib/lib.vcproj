@@ -168,6 +168,10 @@
 				RelativePath="..\src\cl-jcr-parser\parser.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\src\cl-utils\str-args.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -204,6 +208,10 @@
 			</File>
 			<File
 				RelativePath="..\include\cl-utils\ptr-vector.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\cl-utils\str-args.h"
 				>
 			</File>
 		</Filter>

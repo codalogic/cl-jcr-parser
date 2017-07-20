@@ -16,6 +16,7 @@
 #include <map>
 #include <string>
 #include <cstdlib>
+#include <iostream>
 
 #if __cplusplus >= 201103L
     #include <cstdint>
@@ -313,7 +314,7 @@ public:
 class JCRParser : private detail::NonCopyable
 {
 public:
-    enum Status { S_OK, S_UNABLE_TO_OPEN_FILE, S_INTERNAL_ERROR };
+    enum Status { S_OK, S_UNABLE_TO_OPEN_FILE, S_ERROR, S_INTERNAL_ERROR };
 
 private:
     struct Members {
@@ -332,10 +333,44 @@ public:
     Status add_grammar( const char * p_rules, size_t size );
     Status link();
 
-    virtual void error( size_t line, size_t column, Status code, const char * p_message ) {}  // Inherit this class to get error message fed back to you
+    virtual void report( size_t line, size_t column, const char * p_severity, const char * p_message ) {}  // Inherit this class to get error message fed back to you
 
 private:
     Status parse_grammar( cl::reader & reader );
+};
+
+class JCRParserWithReporter : public JCRParser
+{
+public:
+    JCRParserWithReporter( GrammarSet * p_grammar_set ) : JCRParser( p_grammar_set ) {}
+    virtual void report( size_t line, size_t column, const char * p_severity, const char * p_message )
+    {
+        std::cout <<
+                p_severity << ": (" << line << ":" << column << "):\n" <<
+                "      " << p_message << "\n";
+    }
+};
+
+class JCRFileParserWithReporter : public JCRParser
+{
+private:
+    struct Members {
+        std::string file;
+    } m;
+
+public:
+    JCRFileParserWithReporter( GrammarSet * p_grammar_set ) : JCRParser( p_grammar_set ) {}
+    JCRParser::Status add_grammar( const std::string & r_file )
+    {
+        m.file = r_file;
+        return JCRParser::add_grammar( m.file.c_str() );
+    }
+    virtual void report( size_t line, size_t column, const char * p_severity, const char * p_message )
+    {
+        std::cout <<
+                p_severity << ": " << m.file << " (" << line << ":" << column << "):\n" <<
+                "      " << p_message << "\n";
+    }
 };
 
 }   // namespace cljcr

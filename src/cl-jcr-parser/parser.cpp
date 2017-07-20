@@ -11,6 +11,7 @@
 #include "cl-jcr-parser/parser.h"
 
 #include "dsl-pa/dsl-pa.h"
+#include "cl-utils/str-args.h"
 
 #if defined(_MSC_VER)
 // Require error when nonstandard extension used :
@@ -318,25 +319,44 @@ private:
     STAR( WSP )
     ONE_STAR( WSP )
 
-    // These are temporary place holders
     bool warning( const char * p_message )
     {
-        std::cout << p_message << "\n";
+        report( "Warning", p_message );
         return true;
+    }
+    bool warning( const char * p_format, const clutils::str_args & r_arg1 )
+    {
+        return warning( expand( p_format, r_arg1 ).c_str() );
     }
     bool error( const char * p_message )
     {
-        std::cout << p_message << "\n";
+        report( "Error", p_message );
         m.is_errored = true;
         return false;
     }
+    bool error( const char * p_format, const clutils::str_args & r_arg1 )
+    {
+        return error( expand( p_format, r_arg1 ).c_str() );
+    }
     bool fatal( const char * p_message )
     {
-        std::cout << p_message << "\n";
+        report( "Fatal", p_message );
         m.is_errored = true;
         throw GrammarParserFatalError();
         return false;
     }
+    bool fatal( const char * p_format, const clutils::str_args & r_arg1 )
+    {
+        return fatal( expand( p_format, r_arg1 ).c_str() );
+    }
+
+    std::string error_token();
+
+    void report( const char * p_severity, const char * p_message )
+    {
+        m.p_parent->report( m.r_reader.get_line_number(), m.r_reader.get_column_number(), p_severity, p_message );
+    }
+
     bool recover_to_eol( bool ret = true )
     {
         while( is_get_char_in( cl::alphabet_not( cl::alphabet_eol() ) ) )
@@ -362,7 +382,7 @@ class TopLevelRetreat : public UnspecifiedRetreat {};
 bool GrammarParser::parse()
 {
     if( ! jcr() || m.is_errored )
-        m.status = JCRParser::S_INTERNAL_ERROR;
+        m.status = JCRParser::S_ERROR;
     return m.status == JCRParser::S_OK;
 }
 
@@ -377,7 +397,7 @@ bool GrammarParser::jcr()
     {
         while( sp_cmt() || directive() || root_rule() || rule() )
         {}
-        return is_peek_at_end() || fatal( "Unexpected input" );
+        return is_peek_at_end() || fatal( "Unexpected input: '%0'", error_token() );
     }
     catch( const GrammarParserFatalError & )
     {
@@ -1019,7 +1039,7 @@ bool GrammarParser::member_rule()
     if( annotations( member_rule_annotations ) && member_name_spec() )
     {
         star_sp_cmt() && (is_get_char( ':' ) || fatal( "Expected ':' after name of member rule" )) &&
-            star_sp_cmt() && type_rule() || fatal( "Expected type-rule after member-name" );
+            star_sp_cmt() && type_rule() || fatal( "Expected type-rule after member-name. Got '%0'", error_token() );
 
         m.p_rule->annotations.merge( member_rule_annotations );
 
@@ -3193,6 +3213,43 @@ bool GrammarParser::WSP()
     // SP() || HTAB()    ; white space
 
     return SP() || HTAB();
+}
+
+std::string GrammarParser::error_token()    // Attempts to extract the token that led to an error, and then re-winds
+{
+    using namespace cl::alphabet_helpers;
+
+    std::string token;
+
+    cl::locator loc( this );
+
+    get();
+
+    if( is_current_at_end() )
+        return token;
+
+    token += current();
+
+    if( is_digit( current() ) || current() == '.' || current() == '-' )
+    {
+        while( is_digit( get() ) || current() == '.' || current() == '-' )
+            token += current();
+    }
+
+    else if( current() == '$' || is_alpha( current() ) || current() == '_' )
+    {
+        while( is_digit( get() ) || is_alpha( current() ) || current() == '_' )
+            token += current();
+    }
+
+    else
+    {
+        // Was probably some form of punctuation - already added to 'token' return value
+    }
+
+    location_top();
+
+    return token;
 }
 
 } // End of Anonymous namespace

@@ -75,15 +75,29 @@ bool capture_command_line( cljcr::Config * p_config, int argc, char ** argv )
 
 bool parse_config_jcrs( cljcr::GrammarSet * p_grammar_set, const cljcr::Config & r_config )
 {
-    cljcr::JCRParser jcr_parser( p_grammar_set );
-    
+    cljcr::JCRFileParserWithReporter jcr_parser( p_grammar_set );
+    bool is_errored = false;
+
     for( size_t i = 0; i < r_config.jcr_size(); ++i )
     {
-        if( jcr_parser.add_grammar( r_config.jcr( i ).c_str() ) != cljcr::JCRParser::S_OK )
-            return false;
+        cljcr::JCRParser::Status result = jcr_parser.add_grammar( r_config.jcr( i ).c_str() );
+
+        if( result != cljcr::JCRParser::S_OK )
+        {
+            is_errored = true;
+
+            if( result == cljcr::JCRParser::S_UNABLE_TO_OPEN_FILE )
+                std::cout << "Unable to open JCR file: " << r_config.jcr( i ) << "\n";
+
+            else if( result == cljcr::JCRParser::S_INTERNAL_ERROR )
+                std::cout << "An internal error occurred while processing JCR file: " << r_config.jcr( i ) << "\n";
+        }
     }
-    
-    return true;
+
+    if( ! is_errored )
+        std::cout << "Success!!!\n";
+
+    return ! is_errored;
 }
 
 int main( int argc, char * argv[] )
@@ -92,7 +106,7 @@ int main( int argc, char * argv[] )
 
     if( ! capture_command_line( &config, argc, argv ) )
         return -1;
-        
+
     cljcr::GrammarSet grammar_set;
 
     if( ! parse_config_jcrs( &grammar_set, config ) )
