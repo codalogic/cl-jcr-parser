@@ -101,8 +101,12 @@ public:
     bool is_absent() const { return m.form == Absent; }
     bool is_literal() const { return m.form == Literal; }
     bool is_regex() const { return m.form == Regex; }
-    const std::string & name() const { return m.name; }
+    const std::string & name() const { return m.name; } // For regex form, name() will include full pattern, e.g. /p\d+/i
+    std::string pattern() const;
+    std::string modifiers() const;
 };
+
+std::ostream & operator << ( std::ostream & r_os, const MemberName & r_mn );
 
 class ValueConstraint
 {

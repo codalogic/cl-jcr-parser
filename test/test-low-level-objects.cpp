@@ -146,6 +146,12 @@ TFEATURE( "MemberName" )
     TTEST( mn.is_literal() == false );
     TTEST( mn.is_regex() == true );
     TTEST( mn.name() == "/name*/i" );
+    TTEST( mn.pattern() == "name*" );
+    TTEST( mn.modifiers() == "i" );
+
+    TSETUP( mn.set_regex( "//" ) );
+    TTEST( mn.pattern() == "" );
+    TTEST( mn.modifiers() == "" );
 
     TSETUP( mn.set_absent() );
     TTEST( mn.is_absent() == true );
