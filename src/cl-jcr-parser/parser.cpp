@@ -321,6 +321,7 @@ private:
 
     bool warning( const char * p_message )
     {
+        m.p_grammar_set->inc_warning_count();
         report( "Warning", p_message );
         return true;
     }
@@ -330,6 +331,7 @@ private:
     }
     bool error( const char * p_message )
     {
+        m.p_grammar_set->inc_error_count();
         report( "Error", p_message );
         m.is_errored = true;
         return false;
@@ -340,6 +342,7 @@ private:
     }
     bool fatal( const char * p_message )
     {
+        m.p_grammar_set->inc_error_count();
         report( "Fatal", p_message );
         m.is_errored = true;
         throw GrammarParserFatalError();
@@ -3266,7 +3269,10 @@ JCRParser::Status JCRParser::add_grammar( const char * p_file_name )
 {
     cl::reader_file reader( p_file_name );
     if( ! reader.is_open() )
+    {
+        m.p_grammar_set->inc_error_count();
         return S_UNABLE_TO_OPEN_FILE;
+    }
 
     return parse_grammar( reader );
 }

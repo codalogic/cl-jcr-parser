@@ -94,8 +94,7 @@ bool parse_config_jcrs( cljcr::GrammarSet * p_grammar_set, const cljcr::Config &
         }
     }
 
-    if( ! is_errored )
-        std::cout << "Success!!!\n";
+    std::cout << p_grammar_set->error_count() << " error(s), " << p_grammar_set->warning_count() << " warning(s)\n";
 
     return ! is_errored;
 }

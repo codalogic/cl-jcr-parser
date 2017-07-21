@@ -283,6 +283,9 @@ private:
     typedef clutils::ptr_vector< Grammar > container_t;
     struct Members {
         container_t grammars;
+        size_t error_count;
+        size_t warning_count;
+        Members() : error_count( 0 ), warning_count( 0 ) {}
     } m;
 
 public:
@@ -302,6 +305,11 @@ public:
         append( new Grammar() );
         return m.grammars.back();
     }
+
+    void inc_error_count() { ++m.error_count; }
+    void inc_warning_count() { ++m.warning_count; }
+    size_t error_count() const { return m.error_count; }
+    size_t warning_count() const { return m.warning_count; }
 
     typedef container_t::const_iterator const_iterator;
     typedef container_t::iterator iterator;
