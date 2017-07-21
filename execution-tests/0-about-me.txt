@@ -1,7 +1,7 @@
 This directory contains test material consisting of JCR samples, and records
 of the results of running jcrcheck.exe on the samples.
 
-The tests are run by 1-test-runner.rb.
+The tests are run by 0-test-runner.rb.
 
-Tests are arranged in order of complexity.  Tests starting 2-*.jcr are the
+Tests are arranged in order of complexity.  Tests starting 1-*.jcr are the
 simplest, with higher numbered tests being harder.

@@ -1,0 +1,2 @@
+Fatal: 1-simple-object-w-literal-mname-bad-type.jcr (1:4294967295):
+      Expected type-rule after member-name "an-int". Got 'pinteger'
