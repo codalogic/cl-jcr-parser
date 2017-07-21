@@ -1,6 +1,7 @@
 # For each sample JCR file, jcrcheck.exe is run, and the output
-# recorded.  This is then compared against a 'gold' standard
-# if one is present.
+# recorded.  This is then compared against a 'zinc' standard.
+# if one is present.  (Using 'zinc' instead of 'gold' so that
+# files sort better in Explorer view!)
 
 jcrcheck_exe = ''
 jcrcheck_exe_linux = '../bin/jcrcheck'
@@ -18,20 +19,20 @@ error_count = 0
 
 Dir.glob( '*.jcr' ) do |jcr|
     output = jcr.sub( /\.jcr$/, '.txt' )
-    gold = jcr.sub( /\.jcr$/, '.gold.txt' )
+    zinc = jcr.sub( /\.jcr$/, '.zinc.txt' )
     File.unlink output if File.exists? output
     `#{jcrcheck_exe} #{jcr} > #{output}`
     test_count += 1
     if File.exists? output
-        if File.exists? gold
-            if File.read( output ) != File.read( gold )
-                puts "Error: Gold mis-match for #{jcr}"
+        if File.exists? zinc
+            if File.read( output ) != File.read( zinc )
+                puts "Error: Zinc mis-match for #{jcr}"
                 error_count += 1
             else
                 puts "OK: for #{jcr}"
             end
         else
-            puts "Warning: No Gold file for #{jcr}"
+            puts "Warning: No Zinc file for #{jcr}"
             warning_count += 1
         end
     else
