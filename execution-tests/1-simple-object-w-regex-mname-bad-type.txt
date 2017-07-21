@@ -1,2 +1,2 @@
-Fatal: 1-simple-object-w-regex-mname-bad-type.jcr (1:4294967295):
+Fatal: 1-simple-object-w-regex-mname-bad-type.jcr (1):
       Expected type-rule after member-name /p\d+/. Got 'pinteger'

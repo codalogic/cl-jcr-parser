@@ -371,8 +371,11 @@ public:
     }
     virtual void report( size_t line, size_t column, const char * p_severity, const char * p_message )
     {
+        std::cout << p_severity << ": " << m.file << " (" << line;
+        if( column != ~0 )
+            std::cout << ":" << column;
         std::cout <<
-                p_severity << ": " << m.file << " (" << line << ":" << column << "):\n" <<
+                "):\n" <<
                 "      " << p_message << "\n";
     }
 };
