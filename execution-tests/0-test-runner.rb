@@ -2,9 +2,15 @@
 # recorded.  This is then compared against a 'gold' standard
 # if one is present.
 
+jcrcheck_exe = ''
 jcrcheck_exe_linux = '../bin/jcrcheck'
 jcrcheck_exe_win = '..\\Debug\\jcrcheck.exe'
-jcrcheck_exe = jcrcheck_exe_win     # Do something better here when we have the Internet!
+jcrcheck_exe = jcrcheck_exe_linux if File.exists? jcrcheck_exe_linux    # Necessary, but not sufficient for running on Linux
+jcrcheck_exe = jcrcheck_exe_win if File.exists?( jcrcheck_exe_win ) && `#{jcrcheck_exe_win} 2>&1` =~ /jcrcheck/
+if jcrcheck_exe.empty?
+    puts "Error: No jcrcheck program found.  This will need to be built before these tests can be run"
+    exit
+end
 
 test_count = 0
 warning_count = 0
