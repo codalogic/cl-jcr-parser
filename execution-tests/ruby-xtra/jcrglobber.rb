@@ -22,16 +22,20 @@ class JCRGlobber
         Dir.glob( '*' ).select { |name| File.directory? name }.each do |dir|
             Dir.glob( "#{dir}/*.jcr" ) do |jcr|
                 @file_count += 1
+                is_zinc_match = is_zinc_present = is_output_present = false
                 output = jcr.sub( /\.jcr$/, '.txt' )
                 zinc = jcr.sub( /\.jcr$/, '.zinc.txt' )
                 on_process_jcr jcr, output, zinc
                 if File.exists? output
+                    is_output_present = true
                     if File.exists? zinc
-                        if File.read( output ) != File.read( zinc )
+                        is_zinc_present = true
+                        if File.read( output ) == File.read( zinc )
+                            on_zinc_match jcr, output, zinc
+                            is_zinc_match = true
+                        else
                             @error_count += 1
                             on_zinc_mismatch jcr, output, zinc
-                        else
-                            on_zinc_match jcr, output, zinc
                         end
                     else
                         @warning_count += 1
@@ -41,6 +45,10 @@ class JCRGlobber
                     @error_count += 1
                     on_no_output jcr, output, zinc
                 end
+                on_result( { jcr: jcr, output: output, zinc: zinc,
+                            is_zinc_match: is_zinc_match,
+                            is_zinc_present: is_zinc_present,
+                            is_output_present: is_output_present } )
             end
         end
         report
@@ -59,6 +67,9 @@ class JCRGlobber
     end
 
     def on_no_output jcr, output, zinc
+    end
+
+    def on_result state
     end
 
     def report
