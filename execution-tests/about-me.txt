@@ -1,0 +1,8 @@
+This directory and its sub-directories contain test material consisting of
+JCR samples, and records of the results of running jcrcheck.exe on the samples.
+
+The tests are run by test-runner.rb.
+
+Tests are arranged in order of complexity.  Tests in directory names starting
+with 1-* are the simplest, with higher numbered directories having harder
+tests.
