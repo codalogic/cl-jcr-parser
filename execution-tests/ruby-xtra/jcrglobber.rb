@@ -25,6 +25,7 @@ class JCRGlobber
     def initialize( &process_block )
         @file_count = @warning_count = @error_count = 0
         @process_block = block_given? ? process_block : nil
+        @all_results = []
     end
 
     def run
@@ -61,9 +62,11 @@ class JCRGlobber
                             is_output_present: is_output_present }
                 on_result result
                 yield result if block_given?
+                @all_results << result
             end
         end
         report
+        @all_results
     end
 
     def on_process_jcr jcr, output, zinc
