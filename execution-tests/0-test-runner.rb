@@ -5,38 +5,95 @@
 
 require 'os'    # May need to do 'gem install os' (If your gems installation is old, you may need to re-install gems to get latest certificates)
 
-jcrcheck_exe = OS.windows? ? '..\\Debug\\jcrcheck.exe' : '../bin/jcrcheck'
-if not File.exists? jcrcheck_exe
+$jcrcheck_exe = OS.windows? ? '..\\Debug\\jcrcheck.exe' : '../bin/jcrcheck'
+if not File.exists? $jcrcheck_exe
     puts "Error: No jcrcheck program found.  This will need to be built before these tests can be run"
     exit
 end
 
-test_count = 0
-warning_count = 0
-error_count = 0
+class JCRGlobber
+    attr_reader :file_count, :warning_count, :error_count
 
-Dir.glob( '*.jcr' ) do |jcr|
-    output = jcr.sub( /\.jcr$/, '.txt' )
-    zinc = jcr.sub( /\.jcr$/, '.zinc.txt' )
-    File.unlink output if File.exists? output
-    `#{jcrcheck_exe} #{jcr} > #{output}`
-    test_count += 1
-    if File.exists? output
-        if File.exists? zinc
-            if File.read( output ) != File.read( zinc )
-                puts "Error: Zinc mis-match for #{jcr}"
-                error_count += 1
-            else
-                puts "OK: for #{jcr}"
+    def initialize
+        @file_count = @warning_count = @error_count = 0
+    end
+
+    def run
+        Dir.glob( '*' ).select { |name| File.directory? name }.each do |dir|
+            Dir.glob( "#{dir}/*.jcr" ) do |jcr|
+                @file_count += 1
+                output = jcr.sub( /\.jcr$/, '.txt' )
+                zinc = jcr.sub( /\.jcr$/, '.zinc.txt' )
+                on_process_jcr jcr, output, zinc
+                if File.exists? output
+                    if File.exists? zinc
+                        if File.read( output ) != File.read( zinc )
+                            @error_count += 1
+                            on_zinc_mismatch jcr, output, zinc
+                        else
+                            on_zinc_match jcr, output, zinc
+                        end
+                    else
+                        @warning_count += 1
+                        on_no_zinc jcr, output, zinc
+                    end
+                else
+                    @error_count += 1
+                    on_no_output jcr, output, zinc
+                end
             end
-        else
-            puts "Warning: No Zinc file for #{jcr}"
-            warning_count += 1
         end
-    else
-        puts "Fault: #{output} not generated"
-        error_count += 1
+        report
+    end
+
+    def on_process_jcr jcr, output, zinc
+    end
+
+    def on_zinc_match jcr, output, zinc
+    end
+
+    def on_zinc_mismatch jcr, output, zinc
+    end
+
+    def on_no_zinc jcr, output, zinc
+    end
+
+    def on_no_output jcr, output, zinc
+    end
+
+    def report
     end
 end
 
-puts "#{error_count} error(s), #{warning_count} warning(s) in #{test_count} tests"
+class TestRunner < JCRGlobber
+    def on_process_jcr jcr, output, zinc
+        File.unlink output if File.exists? output
+        `#{$jcrcheck_exe} #{jcr} > #{output}`
+    end
+
+    def on_zinc_match jcr, output, zinc
+        puts "OK: for #{jcr}"
+    end
+
+    def on_zinc_mismatch jcr, output, zinc
+        puts "Error: Zinc mis-match for #{jcr}"
+    end
+
+    def on_no_zinc jcr, output, zinc
+        puts "Warning: No Zinc file for #{jcr}"
+    end
+
+    def on_no_output jcr, output, zinc
+        puts "Fault: #{output} not generated"
+    end
+
+    def report
+        puts "#{error_count} error(s), #{warning_count} warning(s) in #{file_count} tests"
+    end
+end
+
+def test_report
+    TestRunner.new.run
+end
+
+test_report
