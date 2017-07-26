@@ -3,6 +3,14 @@
 # if one is present.  (Using 'zinc' instead of 'gold' so that
 # files sort better in Explorer view!)
 
+# The Ruby blocks allow code like:
+#
+#   JCRGlobber.new { |jcr, output, zinc| puts "Running: #{jcr}" }.run { |result| puts "is_zinc_match: #{result[:is_zinc_match]}" }
+#
+# The first block is run for each JCR file, and the second block is run once
+# the class has had a chance to look at which files were generated, and
+# whether a zinc file matched.
+
 require 'os'    # May need to do 'gem install os' (If your gems installation is old, you may need to re-install gems to get latest certificates)
 
 $jcrcheck_exe = OS.windows? ? '..\\Debug\\jcrcheck.exe' : '../bin/jcrcheck'
@@ -14,8 +22,9 @@ end
 class JCRGlobber
     attr_reader :file_count, :warning_count, :error_count
 
-    def initialize
+    def initialize( &process_block )
         @file_count = @warning_count = @error_count = 0
+        @process_block = block_given? ? process_block : nil
     end
 
     def run
@@ -26,6 +35,7 @@ class JCRGlobber
                 output = jcr.sub( /\.jcr$/, '.txt' )
                 zinc = jcr.sub( /\.jcr$/, '.zinc.txt' )
                 on_process_jcr jcr, output, zinc
+                @process_block.call( jcr, output, zinc ) if @process_block
                 if File.exists? output
                     is_output_present = true
                     if File.exists? zinc
@@ -45,10 +55,12 @@ class JCRGlobber
                     @error_count += 1
                     on_no_output jcr, output, zinc
                 end
-                on_result( { jcr: jcr, output: output, zinc: zinc,
+                result = { jcr: jcr, output: output, zinc: zinc,
                             is_zinc_match: is_zinc_match,
                             is_zinc_present: is_zinc_present,
-                            is_output_present: is_output_present } )
+                            is_output_present: is_output_present }
+                on_result result
+                yield result if block_given?
             end
         end
         report
@@ -69,7 +81,7 @@ class JCRGlobber
     def on_no_output jcr, output, zinc
     end
 
-    def on_result state
+    def on_result result
     end
 
     def report
