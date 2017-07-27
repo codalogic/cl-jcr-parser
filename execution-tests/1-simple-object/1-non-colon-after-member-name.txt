@@ -1,0 +1,3 @@
+Fatal: 1-simple-object/1-non-colon-after-member-name.jcr (1):
+      Expected ':' after member-name "an_int". Got '-'
+1 error(s), 0 warning(s)

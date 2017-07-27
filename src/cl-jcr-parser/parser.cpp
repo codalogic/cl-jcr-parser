@@ -1048,7 +1048,7 @@ bool GrammarParser::member_rule()
 
     if( annotations( member_rule_annotations ) && member_name_spec() )
     {
-        star_sp_cmt() && (is_get_char( ':' ) || fatal( "Expected ':' after name of member rule" )) &&
+        star_sp_cmt() && (is_get_char( ':' ) || fatal( "Expected ':' after member-name %0. Got '%1'", m.p_rule->member_name, error_token() )) &&
             star_sp_cmt() && type_rule() || fatal( "Expected type-rule after member-name %0. Got '%1'", m.p_rule->member_name, error_token() );
 
         m.p_rule->annotations.merge( member_rule_annotations );
