@@ -31,8 +31,8 @@ class ZincReviewer
         @show_all_var = TkVariable.new
         @show_all_var.value = 1
         @show_all_checkbutton = Tk::Tile::CheckButton.new( @button_content ) {text 'Show All'; }.variable( @show_all_var ).grid( :row => 1, :column => 1, :sticky => 'w' )
-        Tk::Tile::Button.new(@button_content) {text '<<<'; command {zrself.prev}}.grid( :row => 2, :column => 1, :sticky => 'w' )
-        Tk::Tile::Button.new(@button_content) {text '>>>'; command {zrself.next}}.grid( :row => 2, :column => 2, :sticky => 'w' )
+        @prev_button = Tk::Tile::Button.new(@button_content) {text '<<<'; command {zrself.prev}}.grid( :row => 2, :column => 1, :sticky => 'w' )
+        @next_button = Tk::Tile::Button.new(@button_content) {text '>>>'; command {zrself.next}}.grid( :row => 2, :column => 2, :sticky => 'w' )
         Tk::Tile::Button.new(@button_content) {text 'Accept'; command {zrself.accept}}.grid( :row => 3, :column => 1, :sticky => 'w' )
         Tk::Tile::Button.new(@button_content) {text 'Reject'; command {zrself.reject}}.grid( :row => 3, :column => 2, :sticky => 'w' )
 
@@ -40,11 +40,11 @@ class ZincReviewer
     end
 
     def prev
-        move +1
+        move -1
     end
 
     def next
-        move -1
+        move +1
     end
 
     def move dir
@@ -74,10 +74,12 @@ class ZincReviewer
     end
     
     def load_view n
-        @file_label.text "File: #{@test_status[n][:jcr]}"
+        @file_label.text "File #{n+1}: #{@test_status[n][:jcr]}"
         @jcr_text.clear.insert 1.0, File.read( @test_status[n][:jcr] )
-        @output_text.clear.insert 1.0, File.exists?( @test_status[n][:output] ) ? File.read( @test_status[n][:output] ) : ''
-        @zinc_text.clear.insert 1.0, File.exists?( @test_status[n][:zinc] ) ? File.read( @test_status[n][:zinc] ) : ''
+        @output_text.clear.insert 1.0, File.exists?( @test_status[n][:output] ) ? File.read( @test_status[n][:output] ) : '<No File>'
+        @zinc_text.clear.insert 1.0, File.exists?( @test_status[n][:zinc] ) ? File.read( @test_status[n][:zinc] ) : '<No File>'
+        @prev_button.state ((n==0) ? "disabled" : "normal")
+        @next_button.state ((n>=@test_status.size-1) ? "disabled" : "normal")
     end
 end
 
