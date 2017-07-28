@@ -37,7 +37,7 @@ class JCRGlobber
                 zinc = jcr.sub( /\.jcr$/, '.zinc.txt' )
                 on_process_jcr jcr, output, zinc
                 @process_block.call( jcr, output, zinc ) if @process_block
-                if File.exists? output
+                if File.exists? output and File.size( output ) > 0
                     is_output_present = true
                     if File.exists? zinc
                         is_zinc_present = true
