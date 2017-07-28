@@ -33,14 +33,14 @@ class ZincReviewer
                                     grid( :row => 6, :column => 1, :sticky => 'we' )
         @zinc_text = TkText.new(@main_content) {width 80; height 10}.
                                     grid( :row => 7, :column => 1, :sticky => 'we' )
+        @show_only_tests_failing_zinc_var = TkVariable.new
+        @show_only_tests_failing_zinc_var.value = 0
+        @show_all_checkbutton = Tk::Tile::CheckButton.new( @main_content ) {text 'Show Only Tests Failing Zinc Reference'; }.
+                                    variable( @show_only_tests_failing_zinc_var ).
+                                    grid( :row => 8, :column => 1, :sticky => 'nw' )
 
         @button_content = Tk::Tile::Frame.new(@main_content).
                                     grid( :row => 8, :column => 1, :sticky => 'ne')
-        @show_all_var = TkVariable.new
-        @show_all_var.value = 1
-        @show_all_checkbutton = Tk::Tile::CheckButton.new( @button_content ) {text 'Show All'; }.
-                                    variable( @show_all_var ).
-                                    grid( :row => 1, :column => 1, :sticky => 'w' )
         @prev_button = Tk::Tile::Button.new(@button_content) {text '<<<'; command {zrself.prev}}.
                                     grid( :row => 2, :column => 1, :sticky => 'w' )
         @next_button = Tk::Tile::Button.new(@button_content) {text '>>>'; command {zrself.next}}.
@@ -62,12 +62,32 @@ class ZincReviewer
     end
 
     def move dir
-        @index = (@index + dir) % @test_status.size
-        load_view @index
+        limit = dir < 0 ? 0 : @test_status.size - 1
+        if limit == @index
+            Tk::messageBox :message => 'At end of test selection', :title => 'Select Results'
+
+        elsif @show_only_tests_failing_zinc_var.value.to_i == 0
+            @index = (@index + dir) % @test_status.size
+            load_view @index
+
+        else
+            i = @index
+            loop do
+                i = (i + dir) % @test_status.size
+                if ! @test_status[i][:is_zinc_present] or ! @test_status[i][:is_zinc_match]
+                    @index = i
+                    load_view @index
+                    break
+                end
+                if i == limit
+                    Tk::messageBox :message => 'No more failed tests for review', :title => 'Select Results'
+                    break
+                end
+            end
+        end
     end
 
     def accept
-        @show_all_var.value = 1
         if File.exists? @test_status[@index][:output]
             FileUtils.copy( @test_status[@index][:output], @test_status[@index][:zinc] )
             @test_status[@index][:is_zinc_match] = @test_status[@index][:is_zinc_present] = true
@@ -76,7 +96,6 @@ class ZincReviewer
     end
 
     def reject
-        @show_all_var.value = 0
         File.unlink( @test_status[@index][:zinc] )
         @test_status[@index][:is_zinc_match] = @test_status[@index][:is_zinc_present] = false
         load_view @index
