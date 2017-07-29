@@ -103,7 +103,7 @@ class ProcessDeps:
         else:
             self.error( "Unrecognised dependencies_src type format" )
 
-    def get_vars():
+    def get_vars( self ):
         return self.vars
 
     def is_config_already_processed( self, dependencies_src ):

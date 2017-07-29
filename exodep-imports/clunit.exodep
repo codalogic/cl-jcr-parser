@@ -1,1 +1,20 @@
-copy https://raw.githubusercontent.com/codalogic/clunit/master/clunit.h test/
+# See https://github.com/codalogic/exodep for details on use and format of
+# exodep file
+
+# clunit.command-line-args documentation at:
+#
+#    https://github.com/codalogic/clunit
+
+default $h_dst   include/clunit/
+default $cpp_dst src/clunit/
+
+default $clunit_h_dst   ${h_dst}
+default $clunit_cpp_dst ${cpp_dst}
+
+$owner codalogic
+$project clunit
+$strand angst
+
+versions    # Invoking 'versions' must happen after setting up $owner/$project variables
+
+get clunit.h   ${clunit_h_dst}
