@@ -142,6 +142,7 @@ class ProcessDeps:
                 self.consider_file_ops( line ) or
                 self.consider_exec( line ) or
                 self.consider_subst( line ) or
+                self.consider_authority( line ) or
                 self.consider_on_conditional( line ) or
                 self.consider_ondir( line ) or
                 self.consider_onfile( line ) or
@@ -476,6 +477,17 @@ class ProcessDeps:
                 os.chdir( file_dirname )
             os.system( self.expand_variables( command ) )
             os.chdir( org_cwd )
+            return True
+        return False
+
+    def consider_authority( self, line ):
+        m = re.match( '^authority\s+(.+)', line )
+        if m != None:
+            src = m.group(1)
+            from_uri = self.make_uri( src )
+            self.vars['__authority'] = from_uri
+            # Currently ignored.  Treated as a human readable documentation feature
+            # TODO - See https://github.com/codalogic/exodep/issues/26
             return True
         return False
 

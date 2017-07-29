@@ -1,1 +1,17 @@
-copy https://raw.githubusercontent.com/codalogic/exodep/master/exodep.py ./
+# See https://github.com/codalogic/exodep for details on use and format of
+# exodep file
+
+# cl-utils.command-line-args documentation at:
+#
+#    https://github.com/codalogic/exodep
+
+default $exodep_dst ./
+
+$owner codalogic
+$project exodep
+$strand apple
+
+versions
+authority exodep-exports/exodep.exodep
+
+get exodep.py ${exodep_dst}
