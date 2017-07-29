@@ -101,6 +101,11 @@ public:
         else
             return m.buffer[m.pos - 1];
     }
+    void clear()
+    {
+        m.buffer.clear();
+        m.bottom = m.pos = m.top = 0;
+    }
 };
 
 } // namespace clutils
