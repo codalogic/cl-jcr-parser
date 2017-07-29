@@ -273,7 +273,7 @@ private:
         }
         void tdoc( const char * what )
         {
-            tout() << "      " << what << "\n";
+            tout() << "      #### " << what << " ####\n";
         }
         void tsetup_log( const char * what )
         {
