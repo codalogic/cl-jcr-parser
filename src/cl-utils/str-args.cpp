@@ -34,6 +34,7 @@
 #include "cl-utils/str-args.h"
 
 #include <cassert>
+#include <cstring>
 #include <algorithm>
 
 namespace clutils {
@@ -79,7 +80,10 @@ public:
     {
         ++i;
         if( format[i] == '\0' )     // Malformed case, but be tolerant
+        {
             p_result->append( 1, '%' );
+            --i;    // Make '\0' visible to calling function
+        }
         else if( format[i] == '%' )  // %% -> %
             p_result->append( 1, '%' );
         else if( is_numerical_parameter() )
@@ -98,7 +102,9 @@ public:
     void process_long_form_parameter_decl()
     {
         ++i;
-        if( format[i] != '\0' )
+        if( format[i] == '\0' )
+            --i;    // Make '\0' visible to calling function
+        else
         {
             if( is_numerical_parameter() )
                 process_numbered_long_form_parameter_decl();
@@ -127,6 +133,9 @@ public:
     {
         for( ; format[i] != '\0' && format[i] != '}'; ++i )
         {}  // Skip over rest of characters in format specifier
+
+        if( format[i] == '\0' )     // Malformed case, but be tolerant
+            --i;    // Make '\0' visible to calling function
     }
 
     void process_named_long_form_parameter_decl()
@@ -144,6 +153,10 @@ public:
         std::string name;
         for( ; format[i] != '\0' && format[i] != '}'; ++i )
             name.append( 1, format[i] );
+
+        if( format[i] == '\0' )     // Malformed case, but be tolerant
+            --i;    // Make '\0' visible to calling function
+
         return name;
     }
 
