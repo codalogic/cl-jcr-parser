@@ -1,3 +1,4 @@
 # windows onanychanged pause
 showalerts
+not onanychanged echo *** There were no changes ***
 windows pause
