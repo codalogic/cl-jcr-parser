@@ -59,7 +59,7 @@ public:
         try
         {
             p_result->reserve( p_result->size() + strlen( format ) );
-            for( i=0; format[i] != '\0'; ++i )
+            for( i=0; format[i] != '\0'; safe_advance() )
             {
                 if( format[i] != '%' )
                     p_result->append( 1, format[i] );
@@ -76,14 +76,17 @@ public:
         }
     }
 
+    void safe_advance()
+    {
+        if( format[i] != '\0' )
+            ++i;
+    }
+
     void process_parameter_decl()
     {
-        ++i;
+        safe_advance();
         if( format[i] == '\0' )     // Malformed case, but be tolerant
-        {
             p_result->append( 1, '%' );
-            --i;    // Make '\0' visible to calling function
-        }
         else if( format[i] == '%' )  // %% -> %
             p_result->append( 1, '%' );
         else if( is_numerical_parameter() )
@@ -101,10 +104,8 @@ public:
 
     void process_long_form_parameter_decl()
     {
-        ++i;
-        if( format[i] == '\0' )
-            --i;    // Make '\0' visible to calling function
-        else
+        safe_advance();
+        if( format[i] != '\0' )
         {
             if( is_numerical_parameter() )
                 process_numbered_long_form_parameter_decl();
@@ -131,11 +132,8 @@ public:
 
     void skip_remainder_of_parameter_decl()
     {
-        for( ; format[i] != '\0' && format[i] != '}'; ++i )
+        for( ; format[i] != '\0' && format[i] != '}'; safe_advance() )
         {}  // Skip over rest of characters in format specifier
-
-        if( format[i] == '\0' )     // Malformed case, but be tolerant
-            --i;    // Make '\0' visible to calling function
     }
 
     void process_named_long_form_parameter_decl()
@@ -151,12 +149,8 @@ public:
     std::string read_parameter_name()
     {
         std::string name;
-        for( ; format[i] != '\0' && format[i] != '}'; ++i )
+        for( ; format[i] != '\0' && format[i] != '}'; safe_advance() )
             name.append( 1, format[i] );
-
-        if( format[i] == '\0' )     // Malformed case, but be tolerant
-            --i;    // Make '\0' visible to calling function
-
         return name;
     }
 

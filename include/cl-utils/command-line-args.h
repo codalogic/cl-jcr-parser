@@ -49,16 +49,16 @@ class CommandLineArgs
 {
 private:
     int argc;
-    char ** argv;
+    const char * const * argv;
     std::ostream & r_os;
 
 public:
-    CommandLineArgs( int argc, char ** argv, std::ostream & r_os = std::cerr )
+    CommandLineArgs( int argc, const char * const * argv, std::ostream & r_os = std::cerr )
         : argc( argc ), argv( argv ), r_os( r_os )
     {
         next();
     }
-    CommandLineArgs( int argc, char ** argv, void (*p_help_function)(), std::ostream & r_os = std::cerr )
+    CommandLineArgs( int argc, const char * const * argv, void (*p_help_function)(), std::ostream & r_os = std::cerr )
         : argc( argc ), argv( argv ), r_os( r_os )
     {
         next();
