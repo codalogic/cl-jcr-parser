@@ -6,7 +6,7 @@
 // this file, you can obtain one at http://opensource.org/licenses/LGPL-3.0.
 //----------------------------------------------------------------------------
 
-// Implements jcr-abnf - 2016-08-26
+// Implements jcr-abnf - 2017-08-24
 
 #include "cl-jcr-parser/parser.h"
 
@@ -1996,13 +1996,18 @@ bool GrammarParser::object_item_types()
 bool GrammarParser::object_group()
 {
     /* ABNF:
-    object-group     = "(" *sp-cmt [ object-items *sp-cmt ] ")"
+    object-group     = annotations "(" *sp-cmt [ object-items *sp-cmt ] ")"
     */
-    // "(" && *sp_cmt() [ object_items() && *sp_cmt() ] ")"
+    // annotations() && "(" && *sp_cmt() [ object_items() && *sp_cmt() ] ")"
 
-    if( is_get_char( '(' ) )
+    cl::locator loc( this );
+
+    Annotations object_group_annotations;
+
+    if( annotations( object_group_annotations ) && is_get_char( '(' ) )
     {
         m.p_rule->type = Rule::OBJECT_GROUP;
+        m.p_rule->annotations.merge( object_group_annotations );
 
         star_sp_cmt() && optional( object_items() ) && star_sp_cmt();
         is_get_char( ')' ) || fatal( "Expected ')' at end of object-group" );
@@ -2018,8 +2023,6 @@ bool GrammarParser::array_rule()
     /* ABNF:
     array-rule       = annotations "[" *sp-cmt [ array-items *sp-cmt ] "]"
     */
-    // annotations() "[" && *sp_cmt() [ array_items() && *sp_cmt() ] "]"
-
     // annotations() "[" && *sp_cmt() [ array_items() && *sp_cmt() ] "]"
 
     // No need to record location because array_rule() is always part of a rewound choice
@@ -2130,13 +2133,18 @@ bool GrammarParser::array_item_types()
 bool GrammarParser::array_group()
 {
     /* ABNF:
-    array-group      = "(" *sp-cmt [ array-items *sp-cmt ] ")"
+    array-group      = annotations "(" *sp-cmt [ array-items *sp-cmt ] ")"
     */
-    // "(" && *sp_cmt() && [ array_items() && *sp_cmt() ] && ")"
+    // annotations() && "(" && *sp_cmt() && [ array_items() && *sp_cmt() ] && ")"
 
-    if( is_get_char( '(' ) )
+    cl::locator loc( this );
+
+    Annotations array_group_annotations;
+
+    if( annotations( array_group_annotations ) && is_get_char( '(' ) )
     {
         m.p_rule->type = Rule::ARRAY_GROUP;
+        m.p_rule->annotations.merge( array_group_annotations );
 
         star_sp_cmt() && optional( array_items() ) && star_sp_cmt();
         is_get_char( ')' ) || fatal( "Expected ')' at end of array-group" );

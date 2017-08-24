@@ -1283,6 +1283,32 @@ TFEATURE( "GrammarParser - Syntax parsing - object" )
         TCRITICALTEST( ph.grammar().rules[0].children[0].children[1].repetition.max == 1 );
     }
     {
+        TSETUP( ParserHarness ph( "$my_rule = { @{not} ( \"int-member\" : integer , \"string-member\" : string )? }\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "my_rule" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::OBJECT );
+        TCRITICALTEST( ph.grammar().rules[0].child_combiner == Rule::None );
+        TCRITICALTEST( ph.grammar().rules[0].children.size() == 1 );
+
+        TCRITICALTEST( ph.grammar().rules[0].children[0].type == Rule::OBJECT_GROUP );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].annotations.is_not == true );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].repetition.min == 0 );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].repetition.max == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].children.size() == 2 );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].child_combiner == Rule::Sequence );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].children[0].member_name.is_literal() );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].children[0].member_name.name() == "int-member" );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].children[0].type == Rule::INTEGER );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].children[0].repetition.min == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].children[0].repetition.max == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].children[1].member_name.is_literal() );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].children[1].member_name.name() == "string-member" );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].children[1].type == Rule::STRING_TYPE );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].children[1].repetition.min == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].children[1].repetition.max == 1 );
+    }
+    {
         TSETUP( ParserHarness ph( "$my_rule = { \"flt\":float ?, ((\"int\": integer, \"flt2\":float) | \"str\" : string) }\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
@@ -1512,6 +1538,25 @@ TFEATURE( "GrammarParser - Syntax parsing - array" )
         TCRITICALTEST( ph.grammar().rules[0].child_combiner == Rule::None );
 
         TCRITICALTEST( ph.grammar().rules[0].children[0].type == Rule::ARRAY_GROUP );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].annotations.is_not == false );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].repetition.min == 5 );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].repetition.max == 5 );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].children.size() == 2 );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].child_combiner == Rule::Sequence );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].children[0].type == Rule::INTEGER );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].children[1].type == Rule::STRING_TYPE );
+    }
+    {
+        TSETUP( ParserHarness ph( "$my_rule = [ @{not}(integer , string)*5 ]\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "my_rule" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::ARRAY );
+        TCRITICALTEST( ph.grammar().rules[0].children.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].child_combiner == Rule::None );
+
+        TCRITICALTEST( ph.grammar().rules[0].children[0].type == Rule::ARRAY_GROUP );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].annotations.is_not == true );
         TCRITICALTEST( ph.grammar().rules[0].children[0].repetition.min == 5 );
         TCRITICALTEST( ph.grammar().rules[0].children[0].repetition.max == 5 );
         TCRITICALTEST( ph.grammar().rules[0].children[0].children.size() == 2 );
