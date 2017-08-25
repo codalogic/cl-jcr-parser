@@ -29,26 +29,29 @@ class ZincReviewer
                                     grid( :row => 4, :column => 1, :sticky => 'we' )
         @output_text = TkText.new(@main_content) {width 80; height 10}.
                                     grid( :row => 5, :column => 1, :sticky => 'we' )
-        Tk::Tile::Label.new(@main_content) {text 'Zinc:'}.
-                                    grid( :row => 6, :column => 1, :sticky => 'we' )
-        @zinc_text = TkText.new(@main_content) {width 80; height 10}.
-                                    grid( :row => 7, :column => 1, :sticky => 'we' )
+
+
+        @button_content = Tk::Tile::Frame.new(@main_content).
+                                    grid( :row => 6, :column => 1, :sticky => 'nw')
+            @prev_button = Tk::Tile::Button.new(@button_content) {text '<<<'; command {zrself.prev}}.
+                                        grid( :row => 1, :column => 1, :sticky => 'w' )
+            @next_button = Tk::Tile::Button.new(@button_content) {text '>>>'; command {zrself.next}}.
+                                        grid( :row => 1, :column => 2, :sticky => 'w' )
+            @accept_button = Tk::Tile::Button.new(@button_content) {text 'Accept'; command {zrself.accept}}.
+                                        grid( :row => 2, :column => 1, :sticky => 'w' )
+            @reject_button = Tk::Tile::Button.new(@button_content) {text 'Reject'; command {zrself.reject}}.
+                                        grid( :row => 2, :column => 2, :sticky => 'w' )
+
         @show_only_tests_failing_zinc_var = TkVariable.new
         @show_only_tests_failing_zinc_var.value = 0
         @show_all_checkbutton = Tk::Tile::CheckButton.new( @main_content ) {text 'Show Only Tests Failing Zinc Reference'; }.
                                     variable( @show_only_tests_failing_zinc_var ).
-                                    grid( :row => 8, :column => 1, :sticky => 'nw' )
+                                    grid( :row => 6, :column => 1, :sticky => 'ne' )
 
-        @button_content = Tk::Tile::Frame.new(@main_content).
-                                    grid( :row => 8, :column => 1, :sticky => 'ne')
-        @prev_button = Tk::Tile::Button.new(@button_content) {text '<<<'; command {zrself.prev}}.
-                                    grid( :row => 2, :column => 1, :sticky => 'w' )
-        @next_button = Tk::Tile::Button.new(@button_content) {text '>>>'; command {zrself.next}}.
-                                    grid( :row => 2, :column => 2, :sticky => 'w' )
-        @accept_button = Tk::Tile::Button.new(@button_content) {text 'Accept'; command {zrself.accept}}.
-                                    grid( :row => 3, :column => 1, :sticky => 'w' )
-        @reject_button = Tk::Tile::Button.new(@button_content) {text 'Reject'; command {zrself.reject}}.
-                                    grid( :row => 3, :column => 2, :sticky => 'w' )
+        Tk::Tile::Label.new(@main_content) {text 'Zinc:'}.
+                                    grid( :row => 7, :column => 1, :sticky => 'we' )
+        @zinc_text = TkText.new(@main_content) {width 80; height 10}.
+                                    grid( :row => 8, :column => 1, :sticky => 'we' )
 
         TkWinfo.children(@main_content).each {|w| TkGrid.configure w, :padx => 5, :pady => 5}
     end
@@ -117,7 +120,7 @@ class ZincReviewer
         @zinc_text.clear.insert 1.0, File.exists?( @test_status[n][:zinc] ) ? File.read( @test_status[n][:zinc] ) : '<No File>'
         @prev_button.state (n==0) ? "disabled" : "normal"
         @next_button.state (n>=@test_status.size-1) ? "disabled" : "normal"
-        @accept_button.state (File.exists? @test_status[@index][:output]) ? "normal" : "disabled"
+        @accept_button.state (File.exists?( @test_status[@index][:output] ) && ! @test_status[@index][:is_zinc_match] ) ? "normal" : "disabled"
         @reject_button.state (File.exists? @test_status[@index][:zinc]) ? "normal" : "disabled"
     end
 end
