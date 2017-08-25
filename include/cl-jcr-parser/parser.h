@@ -357,8 +357,11 @@ public:
     JCRParserWithReporter( GrammarSet * p_grammar_set ) : JCRParser( p_grammar_set ) {}
     virtual void report( size_t line, size_t column, const char * p_severity, const char * p_message )
     {
+        std::cout << p_severity << ": " << " (line: " << line;
+        if( column != ~0 )
+            std::cout << ", char: " << column;
         std::cout <<
-                p_severity << ": (" << line << ":" << column << "):\n" <<
+                "):\n" <<
                 "      " << p_message << "\n";
     }
 };
@@ -379,9 +382,9 @@ public:
     }
     virtual void report( size_t line, size_t column, const char * p_severity, const char * p_message )
     {
-        std::cout << p_severity << ": " << m.file << " (" << line;
+        std::cout << p_severity << ": " << m.file << " (line: " << line;
         if( column != ~0 )
-            std::cout << ":" << column;
+            std::cout << ", char: " << column;
         std::cout <<
                 "):\n" <<
                 "      " << p_message << "\n";
