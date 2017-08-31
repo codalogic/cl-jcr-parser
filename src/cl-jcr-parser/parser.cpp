@@ -6,7 +6,7 @@
 // this file, you can obtain one at http://opensource.org/licenses/LGPL-3.0.
 //----------------------------------------------------------------------------
 
-// Implements jcr-abnf - 2017-08-24
+// Implements jcr-abnf - 2017-08-31
 
 #include "cl-jcr-parser/parser.h"
 
@@ -195,7 +195,6 @@ private:
     bool ipaddr_type();
     bool fqdn_type();
     bool idn_type();
-    bool uri_range();
     bool uri_type();
     bool phone_type();
     bool email_type();
@@ -210,22 +209,22 @@ private:
     bool any();
     bool object_rule();
     bool object_items();
-    bool star_sequence_combiner_and_object_item();
-    bool star_choice_combiner_and_object_item();
+    bool one_star_sequence_combiner_and_object_item();
+    bool one_star_choice_combiner_and_object_item();
     bool object_item();
     bool object_item_types();
     bool object_group();
     bool array_rule();
     bool array_items();
-    bool star_sequence_combiner_and_array_item();
-    bool star_choice_combiner_and_array_item();
+    bool one_star_sequence_combiner_and_array_item();
+    bool one_star_choice_combiner_and_array_item();
     bool array_item();
     bool array_item_types();
     bool array_group();
     bool group_rule();
     bool group_items();
-    bool star_sequence_combiner_and_group_item();
-    bool star_choice_combiner_and_group_item();
+    bool one_star_sequence_combiner_and_group_item();
+    bool one_star_choice_combiner_and_group_item();
     bool group_item();
     bool group_item_types();
     bool group_group();
@@ -305,7 +304,6 @@ private:
     bool type_kw();
     bool uint_kw();
     bool unordered_kw();
-    bool uri_dotdot_kw();
     bool uri_kw();
     bool ALPHA();
     ONE_STAR( ALPHA )
@@ -1306,7 +1304,7 @@ bool GrammarParser::primitive_def()
                    integer-type / integer-range / integer-value /
                    sized-int-type / sized-uint-type /
                    ipv4-type / ipv6-type / ipaddr-type / fqdn-type / idn-type /
-                   uri-range / uri-type / phone-type / email-type /
+                   uri-type / phone-type / email-type /
                    datetime-type / date-type / time-type /
                    hex-type / base32hex-type / base32-type / base64url-type / base64-type /
                    any
@@ -1317,8 +1315,7 @@ bool GrammarParser::primitive_def()
     //      double_type() || float_type() || float_range() || float_value() ||
     //      integer_type() || integer_range() || integer_value() || sized_int_type() || sized_uint_type() ||
     //      ipv4_type() || ipv6_type() || ipaddr_type() || fqdn_type() || idn_type() ||
-    //      uri_range() || uri_type() ||
-    //      phone_type() || email_type() ||
+    //      uri_type() || phone_type() || email_type() ||
     //      datetime_type() || date_type() || time_type() ||
     //      hex_type() || base32hex_type() || base32_type() || base64url_type() || base64_type() ||
     //      any()
@@ -1346,7 +1343,6 @@ bool GrammarParser::primitive_def()
             optional_rewind( ipaddr_type() ) ||
             optional_rewind( fqdn_type() ) ||
             optional_rewind( idn_type() ) ||
-            optional_rewind( uri_range() ) ||
             optional_rewind( uri_type() ) ||
             optional_rewind( phone_type() ) ||
             optional_rewind( email_type() ) ||
@@ -1744,29 +1740,35 @@ bool GrammarParser::idn_type()
     return idn_kw() &&  set( m.p_rule->type, Rule::IDN );
 }
 
-bool GrammarParser::uri_range()
-{
-    /* ABNF:
-    uri-range        = uri-dotdot-kw uri-scheme
-    */
-    // uri_dotdot_kw() && uri_scheme()
-
-    cl::accumulator uri_scheme_accumulator( this );
-
-    return uri_dotdot_kw() && uri_scheme() &&
-            set( m.p_rule->type, Rule::URI_RANGE ) &&
-            set( m.p_rule->min, uri_scheme_accumulator.get() ) &&
-            set( m.p_rule->max, uri_scheme_accumulator.get() );
-}
-
 bool GrammarParser::uri_type()
 {
     /* ABNF:
-    uri-type         = uri-kw
+    uri-type         = uri-kw [ ".." uri-scheme ]
     */
-    // uri_kw()
+    // uri_kw() [ ".." && uri_scheme() ]
 
-    return uri_kw() && set( m.p_rule->type, Rule::URI_TYPE );
+    bool is_uri_rule = false;
+
+    if( uri_kw() )
+    {
+        is_uri_rule = true;
+
+        m.p_rule->type = Rule::URI_TYPE;
+        if( fixed( ".." ) )
+        {
+            is_uri_rule = false;
+
+            cl::accumulator uri_scheme_accumulator( this );
+            if( uri_scheme() )
+            {
+                m.p_rule->type = Rule::URI_RANGE;
+                m.p_rule->min = m.p_rule->max = uri_scheme_accumulator.get();
+                is_uri_rule = true;
+            }
+        }
+    }
+
+    return is_uri_rule;
 }
 
 bool GrammarParser::phone_type()
@@ -1910,22 +1912,22 @@ bool GrammarParser::object_rule()
 bool GrammarParser::object_items()
 {
     /* ABNF:
-    object-items     = object-item (*( sequence-combiner object-item ) /
-                   *( choice-combiner object-item ) )
+    object-items     = object-item [ 1*( sequence-combiner object-item ) /
+                   1*( choice-combiner object-item ) ]
     */
-    // object_item() && (*( sequence_combiner() && object_item() ) || *( choice_combiner() && object_item() ) )
+    // object_item() && [ 1*( sequence_combiner() && object_item() ) || 1*( choice_combiner() && object_item() ) ]
 
     if( object_item() )
     {
-        star_sequence_combiner_and_object_item() && set( m.p_rule->child_combiner, Rule::Sequence ) ||
-            star_choice_combiner_and_object_item() && set( m.p_rule->child_combiner, Rule::Choice );
+        one_star_sequence_combiner_and_object_item() && set( m.p_rule->child_combiner, Rule::Sequence ) ||
+            one_star_choice_combiner_and_object_item() && set( m.p_rule->child_combiner, Rule::Choice );
         return true;
     }
 
     return false;
 }
 
-bool GrammarParser::star_sequence_combiner_and_object_item()
+bool GrammarParser::one_star_sequence_combiner_and_object_item()
 {
     bool is_used = false;
 
@@ -1941,7 +1943,7 @@ bool GrammarParser::star_sequence_combiner_and_object_item()
     return is_used;
 }
 
-bool GrammarParser::star_choice_combiner_and_object_item()
+bool GrammarParser::one_star_choice_combiner_and_object_item()
 {
     bool is_used = false;
 
@@ -1960,16 +1962,16 @@ bool GrammarParser::star_choice_combiner_and_object_item()
 bool GrammarParser::object_item()
 {
     /* ABNF:
-    object-item      = object-item-types *sp-cmt [ repetition ]
+    object-item      = object-item-types *sp-cmt [ repetition *sp-cmt ]
     */
-    // object_item_types() && *sp_cmt() && [ repetition() ]
+    // object_item_types() && *sp_cmt() && [ repetition() && *sp_cmt() ]
 
     Rule * p_parent = m.p_rule;
 
     Rule::uniq_ptr pu_rule( new Rule );
     RuleStackLogger rule_stack_logger( this, pu_rule );
 
-    if( object_item_types() && star_sp_cmt() && optional( repetition() ) )
+    if( object_item_types() && star_sp_cmt() && optional( repetition() && star_sp_cmt() ) )
     {
         p_parent->append_child_rule( pu_rule );
 
@@ -2047,22 +2049,22 @@ bool GrammarParser::array_rule()
 bool GrammarParser::array_items()
 {
     /* ABNF:
-    array-items      = array-item (*( sequence-combiner array-item ) /
-                   *( choice-combiner array-item ) )
+    array-items      = array-item [ 1*( sequence-combiner array-item ) /
+                   1*( choice-combiner array-item ) ]
     */
-    // array_item() && (*( sequence_combiner() && array_item() ) || *( choice_combiner() && array_item() ) )
+    // array_item() && [ 1*( sequence_combiner() && array_item() ) || 1*( choice_combiner() && array_item() ) ]
 
     if( array_item() )
     {
-        star_sequence_combiner_and_array_item() && set( m.p_rule->child_combiner, Rule::Sequence ) ||
-            star_choice_combiner_and_array_item() && set( m.p_rule->child_combiner, Rule::Choice );
+        one_star_sequence_combiner_and_array_item() && set( m.p_rule->child_combiner, Rule::Sequence ) ||
+            one_star_choice_combiner_and_array_item() && set( m.p_rule->child_combiner, Rule::Choice );
         return true;
     }
 
     return false;
 }
 
-bool GrammarParser::star_sequence_combiner_and_array_item()
+bool GrammarParser::one_star_sequence_combiner_and_array_item()
 {
     bool is_used = false;
 
@@ -2078,7 +2080,7 @@ bool GrammarParser::star_sequence_combiner_and_array_item()
     return is_used;
 }
 
-bool GrammarParser::star_choice_combiner_and_array_item()
+bool GrammarParser::one_star_choice_combiner_and_array_item()
 {
     bool is_used = false;
 
@@ -2097,16 +2099,16 @@ bool GrammarParser::star_choice_combiner_and_array_item()
 bool GrammarParser::array_item()
 {
     /* ABNF:
-    array-item       = array-item-types *sp-cmt [ repetition ]
+    array-item       = array-item-types *sp-cmt [ repetition *sp-cmt ]
     */
-    // array_item_types() && *sp_cmt() [ repetition() ]
+    // array_item_types() && *sp_cmt() [ repetition() && *sp_cmt() ]
 
     Rule * p_parent = m.p_rule;
 
     Rule::uniq_ptr pu_rule( new Rule );
     RuleStackLogger rule_stack_logger( this, pu_rule );
 
-    if( array_item_types() && star_sp_cmt() && optional( repetition() ) )
+    if( array_item_types() && star_sp_cmt() && optional( repetition() && star_sp_cmt() ) )
     {
         p_parent->append_child_rule( pu_rule );
 
@@ -2184,22 +2186,22 @@ bool GrammarParser::group_rule()
 bool GrammarParser::group_items()
 {
     /* ABNF:
-    group-items      = group-item (*( sequence-combiner group-item ) /
-                   *( choice-combiner group-item ) )
+    group-items      = group-item [ 1*( sequence-combiner group-item ) /
+                   1*( choice-combiner group-item ) ]
     */
-    // group_item() && (*( sequence_combiner() && group_item() ) || *( choice_combiner() && group_item() ) )
+    // group_item() && [ 1*( sequence_combiner() && group_item() ) || 1*( choice_combiner() && group_item() ) ]
 
     if( group_item() )
     {
-        star_sequence_combiner_and_group_item() && set( m.p_rule->child_combiner, Rule::Sequence ) ||
-            star_choice_combiner_and_group_item() && set( m.p_rule->child_combiner, Rule::Choice );
+        one_star_sequence_combiner_and_group_item() && set( m.p_rule->child_combiner, Rule::Sequence ) ||
+            one_star_choice_combiner_and_group_item() && set( m.p_rule->child_combiner, Rule::Choice );
         return true;
     }
 
     return false;
 }
 
-bool GrammarParser::star_sequence_combiner_and_group_item()
+bool GrammarParser::one_star_sequence_combiner_and_group_item()
 {
     bool is_used = false;
 
@@ -2215,7 +2217,7 @@ bool GrammarParser::star_sequence_combiner_and_group_item()
     return is_used;
 }
 
-bool GrammarParser::star_choice_combiner_and_group_item()
+bool GrammarParser::one_star_choice_combiner_and_group_item()
 {
     bool is_used = false;
 
@@ -2234,16 +2236,16 @@ bool GrammarParser::star_choice_combiner_and_group_item()
 bool GrammarParser::group_item()
 {
     /* ABNF:
-    group-item       = group-item-types *sp-cmt [ repetition ]
+    group-item       = group-item-types *sp-cmt [ repetition *sp-cmt ]
     */
-    // group_item_types() && *sp_cmt() [ repetition() ]
+    // group_item_types() && *sp_cmt() [ repetition() && *sp_cmt() ]
 
     Rule * p_parent = m.p_rule;
 
     Rule::uniq_ptr pu_rule( new Rule );
     RuleStackLogger rule_stack_logger( this, pu_rule );
 
-    if( group_item_types() && star_sp_cmt() && optional( repetition() ) )
+    if( group_item_types() && star_sp_cmt() && optional( repetition() && star_sp_cmt() ) )
     {
         p_parent->append_child_rule( pu_rule );
 
@@ -2281,21 +2283,21 @@ bool GrammarParser::group_group()
 bool GrammarParser::sequence_combiner()
 {
     /* ABNF:
-    sequence-combiner = *sp-cmt "," *sp-cmt
+    sequence-combiner = "," *sp-cmt
     */
-    // *sp_cmt() && "," && *sp_cmt()
+    // "," && *sp_cmt()
 
-    return star_sp_cmt() && is_get_char( ',' ) && star_sp_cmt();
+    return is_get_char( ',' ) && star_sp_cmt();
 }
 
 bool GrammarParser::choice_combiner()
 {
     /* ABNF:
-    choice-combiner  = *sp-cmt "|" *sp-cmt
+    choice-combiner  = "|" *sp-cmt
     */
-    // *sp_cmt() && "|" && *sp_cmt()
+    // "|" && *sp_cmt()
 
-    return star_sp_cmt() && is_get_char( '|' ) && star_sp_cmt();
+    return is_get_char( '|' ) && star_sp_cmt();
 }
 
 bool GrammarParser::repetition()
@@ -3131,16 +3133,6 @@ bool GrammarParser::unordered_kw()
     // %x75.6E.6F.72.64.65.72.65.64    ; "unordered"
 
     return fixed( "unordered" );
-}
-
-bool GrammarParser::uri_dotdot_kw()
-{
-    /* ABNF:
-    uri-dotdot-kw    = %x75.72.69.2E.2E                ; "uri.."
-    */
-    // %x75.72.69.2E.2E                ; "uri.."
-
-    return fixed( "uri.." );
 }
 
 bool GrammarParser::uri_kw()
