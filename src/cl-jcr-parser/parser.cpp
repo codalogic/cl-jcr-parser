@@ -550,9 +550,9 @@ bool GrammarParser::directive_def( DirectiveForm::Enum form )
 
     cl::locator loc( this );
 
-    return optional_rewind( jcr_version_d( form ) ) ||
-            optional_rewind( ruleset_id_d( form ) ) ||
-            optional_rewind( import_d( form ) );
+    return rewind_on_reject( jcr_version_d( form ) ) ||
+            rewind_on_reject( ruleset_id_d( form ) ) ||
+            rewind_on_reject( import_d( form ) );
 }
 
 bool GrammarParser::jcr_version_d( DirectiveForm::Enum form )
@@ -857,7 +857,7 @@ bool GrammarParser::root_rule()
     Rule::uniq_ptr pu_rule( new Rule );
     RuleStackLogger rule_stack_logger( this, pu_rule );
 
-    if( optional_rewind( value_rule() ) || optional_rewind( group_rule() ) )
+    if( rewind_on_reject( value_rule() ) || rewind_on_reject( group_rule() ) )
     {
         m.p_rule->annotations.is_root = true;
 
@@ -984,12 +984,12 @@ bool GrammarParser::rule_def()
 
     cl::locator loc( this );
 
-    return optional_rewind( member_rule() ) ||
-            optional_rewind( type_designator() && rule_def_type_rule() ) ||
-            optional_rewind( array_rule() ) ||
-            optional_rewind( object_rule() ) ||
-            optional_rewind( group_rule() ) ||
-            optional_rewind( target_rule_name() );
+    return rewind_on_reject( member_rule() ) ||
+            rewind_on_reject( type_designator() && rule_def_type_rule() ) ||
+            rewind_on_reject( array_rule() ) ||
+            rewind_on_reject( object_rule() ) ||
+            rewind_on_reject( group_rule() ) ||
+            rewind_on_reject( target_rule_name() );
 }
 
 bool GrammarParser::type_designator()
@@ -1001,8 +1001,8 @@ bool GrammarParser::type_designator()
 
     cl::locator loc( this );
 
-    return optional_rewind( type_kw() && one_star_sp_cmt() ) ||
-            optional_rewind( is_get_char( ':' ) && star_sp_cmt() );
+    return rewind_on_reject( type_kw() && one_star_sp_cmt() ) ||
+            rewind_on_reject( is_get_char( ':' ) && star_sp_cmt() );
 }
 
 bool GrammarParser::rule_def_type_rule()
@@ -1014,8 +1014,8 @@ bool GrammarParser::rule_def_type_rule()
 
     cl::locator loc( this );
 
-    return optional_rewind( value_rule() ) ||
-            optional_rewind( type_choice() );
+    return rewind_on_reject( value_rule() ) ||
+            rewind_on_reject( type_choice() );
 }
 
 bool GrammarParser::value_rule()
@@ -1027,9 +1027,9 @@ bool GrammarParser::value_rule()
 
     cl::locator loc( this );
 
-    return optional_rewind( primitive_rule() ) ||
-            optional_rewind( array_rule() ) ||
-            optional_rewind( object_rule() );
+    return rewind_on_reject( primitive_rule() ) ||
+            rewind_on_reject( array_rule() ) ||
+            rewind_on_reject( object_rule() );
 }
 
 bool GrammarParser::member_rule()
@@ -1092,9 +1092,9 @@ bool GrammarParser::type_rule()
 
     cl::locator loc( this );
 
-    return optional_rewind( value_rule() ) ||
-            optional_rewind( type_choice() ) ||
-            optional_rewind( target_rule_name() );
+    return rewind_on_reject( value_rule() ) ||
+            rewind_on_reject( type_choice() ) ||
+            rewind_on_reject( target_rule_name() );
 }
 
 bool GrammarParser::type_choice()
@@ -1158,7 +1158,7 @@ bool GrammarParser::type_choice_items()
     Rule::uniq_ptr pu_rule( new Rule );
     RuleStackLogger rule_stack_logger( this, pu_rule );
 
-    if( ( optional_rewind( type_choice() ) || optional_rewind( type_rule() ) ) &&
+    if( ( rewind_on_reject( type_choice() ) || rewind_on_reject( type_rule() ) ) &&
             star_sp_cmt() )
     {
         p_parent->append_child_rule( pu_rule );
@@ -1197,12 +1197,12 @@ bool GrammarParser::annotation_set( Annotations & r_annotations )
     */
     // not_annotation() || unordered_annotation() || root_annotation() || tbd_annotation()
 
-    cl::locator loc( this );    // Current annotations don't benefit from optional_rewind(), but maintain the pattern for consistency and possible future proofing
+    cl::locator loc( this );    // Current annotations don't benefit from rewind_on_reject(), but maintain the pattern for consistency and possible future proofing
 
-    return optional_rewind( not_annotation( r_annotations ) ) ||
-            optional_rewind( unordered_annotation( r_annotations ) ) ||
-            optional_rewind( root_annotation( r_annotations ) ) ||
-            optional_rewind( tbd_annotation() ) ||
+    return rewind_on_reject( not_annotation( r_annotations ) ) ||
+            rewind_on_reject( unordered_annotation( r_annotations ) ) ||
+            rewind_on_reject( root_annotation( r_annotations ) ) ||
+            rewind_on_reject( tbd_annotation() ) ||
             fatal( "Unrecognised annotation format" );     // Getting to fatal() will throw an exception
 }
 
@@ -1322,39 +1322,39 @@ bool GrammarParser::primitive_def()
 
     cl::locator loc( this );
 
-     return optional_rewind( null_type() ) ||
-            optional_rewind( boolean_type() ) ||
-            optional_rewind( true_value() ) ||
-            optional_rewind( false_value() ) ||
-            optional_rewind( string_type() ) ||
-            optional_rewind( string_range() ) ||
-            optional_rewind( string_value() ) ||
-            optional_rewind( double_type() ) ||
-            optional_rewind( float_type() ) ||
-            optional_rewind( float_range() ) ||
-            optional_rewind( float_value() ) ||
-            optional_rewind( integer_type() ) ||
-            optional_rewind( integer_range() ) ||
-            optional_rewind( integer_value() ) ||
-            optional_rewind( sized_int_type() ) ||
-            optional_rewind( sized_uint_type() ) ||
-            optional_rewind( ipv4_type() ) ||
-            optional_rewind( ipv6_type() ) ||
-            optional_rewind( ipaddr_type() ) ||
-            optional_rewind( fqdn_type() ) ||
-            optional_rewind( idn_type() ) ||
-            optional_rewind( uri_type() ) ||
-            optional_rewind( phone_type() ) ||
-            optional_rewind( email_type() ) ||
-            optional_rewind( datetime_type() ) ||
-            optional_rewind( date_type() ) ||
-            optional_rewind( time_type() ) ||
-            optional_rewind( hex_type() ) ||
-            optional_rewind( base32hex_type() ) ||
-            optional_rewind( base32_type() ) ||
-            optional_rewind( base64url_type() ) ||
-            optional_rewind( base64_type() ) ||
-            optional_rewind( any() );
+     return rewind_on_reject( null_type() ) ||
+            rewind_on_reject( boolean_type() ) ||
+            rewind_on_reject( true_value() ) ||
+            rewind_on_reject( false_value() ) ||
+            rewind_on_reject( string_type() ) ||
+            rewind_on_reject( string_range() ) ||
+            rewind_on_reject( string_value() ) ||
+            rewind_on_reject( double_type() ) ||
+            rewind_on_reject( float_type() ) ||
+            rewind_on_reject( float_range() ) ||
+            rewind_on_reject( float_value() ) ||
+            rewind_on_reject( integer_type() ) ||
+            rewind_on_reject( integer_range() ) ||
+            rewind_on_reject( integer_value() ) ||
+            rewind_on_reject( sized_int_type() ) ||
+            rewind_on_reject( sized_uint_type() ) ||
+            rewind_on_reject( ipv4_type() ) ||
+            rewind_on_reject( ipv6_type() ) ||
+            rewind_on_reject( ipaddr_type() ) ||
+            rewind_on_reject( fqdn_type() ) ||
+            rewind_on_reject( idn_type() ) ||
+            rewind_on_reject( uri_type() ) ||
+            rewind_on_reject( phone_type() ) ||
+            rewind_on_reject( email_type() ) ||
+            rewind_on_reject( datetime_type() ) ||
+            rewind_on_reject( date_type() ) ||
+            rewind_on_reject( time_type() ) ||
+            rewind_on_reject( hex_type() ) ||
+            rewind_on_reject( base32hex_type() ) ||
+            rewind_on_reject( base32_type() ) ||
+            rewind_on_reject( base64url_type() ) ||
+            rewind_on_reject( base64_type() ) ||
+            rewind_on_reject( any() );
 }
 
 bool GrammarParser::null_type()
@@ -1487,12 +1487,12 @@ bool GrammarParser::float_range()
 
     // No need to record location because always part of primitive_def() rewind choice
 
-    return optional_rewind( float_min() && fixed( ".." ) &&
+    return rewind_on_reject( float_min() && fixed( ".." ) &&
                     set( m.p_rule->type, Rule::DOUBLE ) &&
                     set( m.p_rule->min, float_min_accumulator.to_float() ) &&
                 optional( float_max_accumulator.select() && float_max() &&
                         set( m.p_rule->max, float_max_accumulator.to_float() ) ) ) ||
-            optional_rewind( fixed( ".." ) && float_max_accumulator.select() && float_max() &&
+            rewind_on_reject( fixed( ".." ) && float_max_accumulator.select() && float_max() &&
                     set( m.p_rule->type, Rule::DOUBLE ) &&
                     set( m.p_rule->max, float_max_accumulator.to_float() ) );
 }
@@ -1554,8 +1554,8 @@ bool GrammarParser::integer_range()
 
     // No need to record location because always part of primitive_def() rewind choice
 
-    if( optional_rewind( integer_min() && fixed( ".." ) && optional( integer_max_accumulator.select() && integer_max() ) ) ||
-            optional_rewind( fixed( ".." ) && integer_max_accumulator.select() && integer_max() ) )
+    if( rewind_on_reject( integer_min() && fixed( ".." ) && optional( integer_max_accumulator.select() && integer_max() ) ) ||
+            rewind_on_reject( fixed( ".." ) && integer_max_accumulator.select() && integer_max() ) )
     {
         if( (integer_min_accumulator.get().empty() || integer_min_accumulator.get()[0] == '-') ||       // Assume signed if 'min' is absent
                 (! integer_max_accumulator.get().empty() && integer_max_accumulator.get()[0] == '-') )  // If 'max' is absent, assume min case will decide if signed
@@ -1990,9 +1990,9 @@ bool GrammarParser::object_item_types()
 
     cl::locator loc( this );
 
-    return optional_rewind( object_group() ) ||
-            optional_rewind( member_rule() ) ||
-            optional_rewind( target_rule_name() );
+    return rewind_on_reject( object_group() ) ||
+            rewind_on_reject( member_rule() ) ||
+            rewind_on_reject( target_rule_name() );
 }
 
 bool GrammarParser::object_group()
@@ -2127,9 +2127,9 @@ bool GrammarParser::array_item_types()
 
     cl::locator loc( this );
 
-    return optional_rewind( array_group() ) ||
-            optional_rewind( type_rule() ) ||
-            optional_rewind( explicit_type_choice() );
+    return rewind_on_reject( array_group() ) ||
+            rewind_on_reject( type_rule() ) ||
+            rewind_on_reject( explicit_type_choice() );
 }
 
 bool GrammarParser::array_group()
@@ -2264,10 +2264,10 @@ bool GrammarParser::group_item_types()
 
     cl::locator loc( this );
 
-    return optional_rewind( group_group() ) ||
-            optional_rewind( member_rule() ) ||
-            optional_rewind( type_rule() ) ||
-            optional_rewind( explicit_type_choice() );
+    return rewind_on_reject( group_group() ) ||
+            rewind_on_reject( member_rule() ) ||
+            rewind_on_reject( type_rule() ) ||
+            rewind_on_reject( explicit_type_choice() );
 }
 
 bool GrammarParser::group_group()
@@ -2311,10 +2311,10 @@ bool GrammarParser::repetition()
     cl::locator loc( this );
 
     // The order of these routines is important
-    return optional_rewind( optional_marker() ) ||
-            optional_rewind( one_or_more() ) ||
-            optional_rewind( repetition_range() ) ||
-            optional_rewind( zero_or_more() );
+    return rewind_on_reject( optional_marker() ) ||
+            rewind_on_reject( one_or_more() ) ||
+            rewind_on_reject( repetition_range() ) ||
+            rewind_on_reject( zero_or_more() );
 }
 
 bool GrammarParser::optional_marker()
@@ -2366,10 +2366,10 @@ bool GrammarParser::repetition_range()
         cl::locator loc_inner( this );
 
         // The order of these routines is important
-        if( optional_rewind( min_max_repetition() ) ||
-                optional_rewind( min_repetition() ) ||
-                optional_rewind( max_repetition() ) ||
-                optional_rewind( specific_repetition() ) )
+        if( rewind_on_reject( min_max_repetition() ) ||
+                rewind_on_reject( min_repetition() ) ||
+                rewind_on_reject( max_repetition() ) ||
+                rewind_on_reject( specific_repetition() ) )
             return true;   // if false, fall through to loc_outer recorded location
     }
 
