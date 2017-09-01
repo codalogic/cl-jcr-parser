@@ -492,9 +492,9 @@ bool GrammarParser::directive()
     {
         cl::locator loc( this );
 
-        (one_line_directive() || multi_line_directive() || error( "Invalid #directive format" ) );
-
-        return true;
+        return rewind_on_reject( one_line_directive() ) ||
+                rewind_on_reject( multi_line_directive() ) ||
+                error( "Invalid #directive format" );
     }
 
     return false;
@@ -508,8 +508,6 @@ bool GrammarParser::one_line_directive()
     */
     // *WSP() && (directive_def() || one_line_tbd_directive_d()) && *WSP() && eol()
 
-    cl::locator loc( this );
-
     if( star_WSP() && (directive_def( DirectiveForm::one_line ) || one_line_tbd_directive_d()) )
     {
         // Use is_peek_at_end() to allow ruleset to end with a directive that doesn't have newline at end
@@ -517,8 +515,6 @@ bool GrammarParser::one_line_directive()
 
         return true;
     }
-
-    location_top();
 
     return false;
 }
@@ -2002,8 +1998,6 @@ bool GrammarParser::object_group()
     */
     // annotations() && "(" && *sp_cmt() [ object_items() && *sp_cmt() ] ")"
 
-    cl::locator loc( this );
-
     Annotations object_group_annotations;
 
     if( annotations( object_group_annotations ) && is_get_char( '(' ) )
@@ -2138,8 +2132,6 @@ bool GrammarParser::array_group()
     array-group      = annotations "(" *sp-cmt [ array-items *sp-cmt ] ")"
     */
     // annotations() && "(" && *sp_cmt() && [ array_items() && *sp_cmt() ] && ")"
-
-    cl::locator loc( this );
 
     Annotations array_group_annotations;
 
