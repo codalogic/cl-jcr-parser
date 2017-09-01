@@ -1890,7 +1890,7 @@ bool GrammarParser::object_rule()
     */
     // annotations() "{" && *sp_cmt() [ object_items() && *sp_cmt() ] "}"
 
-    // No need to record location because array_rule() is always part of a rewound choice
+    // No need to record location because object_rule() is always part of a rewound choice
 
     Annotations object_annotations;
 
@@ -2164,7 +2164,7 @@ bool GrammarParser::group_rule()
     */
     // annotations() "(" && *sp_cmt() [ group_items() && *sp_cmt() ] ")"
 
-    // No need to record location because array_rule() is always part of a rewound choice
+    // No need to record location because group_rule() is always part of a rewound choice
 
     Annotations group_annotations;
 
