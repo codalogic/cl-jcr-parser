@@ -38,7 +38,8 @@ namespace { // Anonymous namespace for detail
 
 bool is_supported_jcr_version( const std::string & major, const std::string & minor )
 {
-    return major == "0" && minor == "6";
+    return major == "0" &&
+            (minor == "6" || minor == "7" || minor == "8");
 }
 
 //----------------------------------------------------------------------------
