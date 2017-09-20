@@ -329,6 +329,7 @@ private:
     {
         return warning( expand( p_format, r_arg_1 ).c_str() );
     }
+    #define error_todo error    // DEGUG - TODO - Review and replace allow messages in error_todo comments
     bool error( const char * p_message )
     {
         m.p_grammar_set->inc_error_count();
@@ -340,6 +341,7 @@ private:
     {
         return error( expand( p_format, r_arg_1 ).c_str() );
     }
+    #define fatal_todo fatal    // DEGUG - TODO - Review and replace allow messages in fatal_todo comments
     bool fatal( const char * p_message )
     {
         m.p_grammar_set->inc_error_count();
@@ -511,7 +513,7 @@ bool GrammarParser::one_line_directive()
     if( star_WSP() && (directive_def( DirectiveForm::one_line ) || one_line_tbd_directive_d()) )
     {
         // Use is_peek_at_end() to allow ruleset to end with a directive that doesn't have newline at end
-        star_WSP() && (eol() || is_peek_at_end()) || error( "Unexpected additional material in directive" );
+        star_WSP() && (eol() || is_peek_at_end()) || error_todo( "Unexpected additional material in directive" );
 
         return true;
     }
@@ -530,7 +532,7 @@ bool GrammarParser::multi_line_directive()
     if( is_get_char( '{' ) )
     {
         star_sp_cmt() && (directive_def( DirectiveForm::multi_line ) || multi_line_tbd_directive_d()) &&
-            star_sp_cmt() && is_get_char( '}' ) || error( "Invalid multi-line #{directive} format" );
+            star_sp_cmt() && is_get_char( '}' ) || error_todo( "Invalid multi-line #{directive} format" );
         return true;
     }
 
@@ -564,17 +566,17 @@ bool GrammarParser::jcr_version_d( DirectiveForm::Enum form )
 
     if( jcr_version_kw() )
     {
-        if( (DSPs( form ) || error( "Expected WSP tokens after 'jcr-version' keyword")) &&
+        if( (DSPs( form ) || error_todo( "Expected WSP tokens after 'jcr-version' keyword")) &&
                 major_version_accumulator.select() && major_version() &&
                 is_get_char( '.' ) &&
                 minor_version_accumulator.select() && minor_version()
-                || error( "Bad #jcr-version directive format" ) || recover_to_eol( false ) )
+                || error_todo( "Bad #jcr-version directive format" ) || recover_to_eol( false ) )
         {
             std::string major_number = major_version_accumulator.get();
             std::string minor_number = minor_version_accumulator.get();
 
             if( ! is_supported_jcr_version( major_number, minor_number ) )
-                error( (std::string( "Unsupported JCR version: " ) + major_number + "." + minor_number).c_str() );
+                error_todo( (std::string( "Unsupported JCR version: " ) + major_number + "." + minor_number).c_str() );
         }
 
         cl::accumulator extension_accumulator( this );
@@ -637,7 +639,7 @@ bool GrammarParser::ruleset_id_d( DirectiveForm::Enum form )
         cl::accumulator ruleset_id_accumulator( this );
 
         if( (DSPs( form ) && ruleset_id())
-            || error( "Unable to read ruleset-id value" ) || recover_to_eol() )
+            || error_todo( "Unable to read ruleset-id value" ) || recover_to_eol() )
         {
             m.p_grammar->ruleset_id = ruleset_id_accumulator.get();
         }
@@ -663,12 +665,12 @@ bool GrammarParser::import_d( DirectiveForm::Enum form )
         cl::accumulator_deferred ruleset_id_alias_accumulator( this );
 
         if( DSPs( form ) &&
-            (ruleset_id_accumulator.select() && ruleset_id() || error( "Unable to read ruleset-id in #import" )) &&
+            (ruleset_id_accumulator.select() && ruleset_id() || error_todo( "Unable to read ruleset-id in #import" )) &&
             optional(
                 DSPs( form ) &&
                 as_kw() &&
-                (DSPs( form ) || error( "Expected space after 'as' keyword" ) ) &&
-                (ruleset_id_alias_accumulator.select() && ruleset_id_alias() || error( "Unable to read alias for imported ruleset-id" ) ) ) )
+                (DSPs( form ) || error_todo( "Expected space after 'as' keyword" ) ) &&
+                (ruleset_id_alias_accumulator.select() && ruleset_id_alias() || error_todo( "Unable to read alias for imported ruleset-id" ) ) ) )
         {
             std::string ruleset_id = ruleset_id_accumulator.get();
             std::string ruleset_id_alias = ruleset_id_alias_accumulator.get();
@@ -922,7 +924,7 @@ bool GrammarParser::target_rule_name()
         cl::accumulator first_accumulator( this );
         cl::accumulator_deferred second_accumulator( this );
 
-        ruleset_id_alias() || error( "Expected 'target_rule_name' after '$'" );
+        ruleset_id_alias() || error_todo( "Expected 'target_rule_name' after '$'" );
 
         if( is_get_char( '.' ) )
         {
@@ -937,7 +939,7 @@ bool GrammarParser::target_rule_name()
                 m.p_rule->target_rule.local_name = second_accumulator.get();
             }
             else
-                return error( "Expected 'rule_name' after 'rulesetid_alias'" );
+                return error_todo( "Expected 'rule_name' after 'rulesetid_alias'" );
         }
         else
         {
@@ -1109,14 +1111,14 @@ bool GrammarParser::type_choice()
         m.p_rule->child_combiner = Rule::Choice;
         m.p_rule->annotations.merge( type_choice_annotations );
 
-        type_choice_items() || fatal( "Must be at least one type specified within a type-choice" );
+        type_choice_items() || fatal_todo( "Must be at least one type specified within a type-choice" );
 
         while( choice_combiner() )
         {
-            type_choice_items() || fatal( "Expected type-choice-item after choice-combiner in type-choice" );
+            type_choice_items() || fatal_todo( "Expected type-choice-item after choice-combiner in type-choice" );
         }
 
-        is_get_char( ')' ) || fatal( "Expected ')' at end of type-choice" );
+        is_get_char( ')' ) || fatal_todo( "Expected ')' at end of type-choice" );
 
         return true;
     }
@@ -1178,7 +1180,7 @@ bool GrammarParser::annotations( Annotations & r_annotations )
     while( fixed( "@{" ) )
     {
         star_sp_cmt() && annotation_set( r_annotations ) && star_sp_cmt() &&
-            (fixed( "}" ) || fatal( "Expected ')' at end of annotation" )) &&
+            (fixed( "}" ) || fatal_todo( "Expected ')' at end of annotation" )) &&
             star_sp_cmt();
     }
 
@@ -1199,7 +1201,7 @@ bool GrammarParser::annotation_set( Annotations & r_annotations )
             rewind_on_reject( unordered_annotation( r_annotations ) ) ||
             rewind_on_reject( root_annotation( r_annotations ) ) ||
             rewind_on_reject( tbd_annotation() ) ||
-            fatal( "Unrecognised annotation format" );     // Getting to fatal() will throw an exception
+            fatal_todo( "Unrecognised annotation format" );     // Getting to fatal() will throw an exception
 }
 
 bool GrammarParser::not_annotation( Annotations & r_annotations )
@@ -1558,7 +1560,7 @@ bool GrammarParser::integer_range()
         {
             m.p_rule->type = Rule::INTEGER;
             if( ! integer_min_accumulator.get().empty() && ! integer_max_accumulator.get().empty() )
-                (integer_min_accumulator.to_int64() <= integer_max_accumulator.to_int64()) || error( "integer range minimum greater than maximum" );
+                (integer_min_accumulator.to_int64() <= integer_max_accumulator.to_int64()) || error_todo( "integer range minimum greater than maximum" );
             if( ! integer_min_accumulator.get().empty() )
                 m.p_rule->min = integer_min_accumulator.to_int64();
             if( ! integer_max_accumulator.get().empty() )
@@ -1568,7 +1570,7 @@ bool GrammarParser::integer_range()
         {
             m.p_rule->type = Rule::UINTEGER;
             if( ! integer_min_accumulator.get().empty() && ! integer_max_accumulator.get().empty() )
-                (integer_min_accumulator.to_uint64() <= integer_max_accumulator.to_uint64()) || error( "integer range minimum greater than maximum" );
+                (integer_min_accumulator.to_uint64() <= integer_max_accumulator.to_uint64()) || error_todo( "integer range minimum greater than maximum" );
             if( ! integer_min_accumulator.get().empty() )
                 m.p_rule->min = integer_min_accumulator.to_uint64();
             if( ! integer_max_accumulator.get().empty() )
@@ -1664,7 +1666,7 @@ bool GrammarParser::sized_int_type()
     cl::accumulator num_bits_accumulator( this );
 
     return int_kw() && pos_integer() &&
-            ( num_bits_accumulator.to_int() <= 64 || error( "sized int size too large") ) &&
+            ( num_bits_accumulator.to_int() <= 64 || error_todo( "sized int size too large") ) &&
             set( m.p_rule->type, Rule::INTEGER ) &&
             set( m.p_rule->min, sized_int_min( num_bits_accumulator.to_int() ) ) &&
             set( m.p_rule->max, sized_int_max( num_bits_accumulator.to_int() ) );
@@ -1680,7 +1682,7 @@ bool GrammarParser::sized_uint_type()
     cl::accumulator num_bits_accumulator( this );
 
     return uint_kw() && pos_integer() &&
-            ( num_bits_accumulator.to_int() <= 64 || error( "sized iint size too large") ) &&
+            ( num_bits_accumulator.to_int() <= 64 || error_todo( "sized iint size too large") ) &&
             set( m.p_rule->type, Rule::UINTEGER ) &&
             set( m.p_rule->min, sized_uint_min( num_bits_accumulator.to_int() ) ) &&
             set( m.p_rule->max, sized_uint_max( num_bits_accumulator.to_int() ) );
@@ -1897,7 +1899,7 @@ bool GrammarParser::object_rule()
 
         star_sp_cmt() && optional( object_items() ) && star_sp_cmt();
 
-        is_get_char( '}' ) || fatal( "Expected '}' at end of object rule" );
+        is_get_char( '}' ) || fatal_todo( "Expected '}' at end of object rule" );
 
         return true;
     }
@@ -1930,11 +1932,11 @@ bool GrammarParser::one_star_sequence_combiner_and_object_item()
     while( sequence_combiner() )
     {
         is_used = true;
-        object_item() || fatal( "Expected object-item after sequence-combiner in object definition" );
+        object_item() || fatal_todo( "Expected object-item after sequence-combiner in object definition" );
     }
 
     if( is_used && choice_combiner() )
-        fatal( "choice-combiner can not be used with sequence-combiner without Parentheses" );
+        fatal_todo( "choice-combiner can not be used with sequence-combiner without Parentheses" );
 
     return is_used;
 }
@@ -1946,11 +1948,11 @@ bool GrammarParser::one_star_choice_combiner_and_object_item()
     while( choice_combiner() )
     {
         is_used = true;
-        object_item() || fatal( "Expected object-item after choice-combiner in object definition" );
+        object_item() || fatal_todo( "Expected object-item after choice-combiner in object definition" );
     }
 
     if( is_used && sequence_combiner() )
-        fatal( "sequence-combiner can not be used with choice-combiner without Parentheses" );
+        fatal_todo( "sequence-combiner can not be used with choice-combiner without Parentheses" );
 
     return is_used;
 }
@@ -2006,7 +2008,7 @@ bool GrammarParser::object_group()
         m.p_rule->annotations.merge( object_group_annotations );
 
         star_sp_cmt() && optional( object_items() ) && star_sp_cmt();
-        is_get_char( ')' ) || fatal( "Expected ')' at end of object-group" );
+        is_get_char( ')' ) || fatal_todo( "Expected ')' at end of object-group" );
 
         return true;
     }
@@ -2032,7 +2034,7 @@ bool GrammarParser::array_rule()
 
         star_sp_cmt() && optional( array_items() ) && star_sp_cmt();
 
-        is_get_char( ']' ) || fatal( "Expected ']' at end of array rule" );
+        is_get_char( ']' ) || fatal_todo( "Expected ']' at end of array rule" );
 
         return true;
     }
@@ -2065,11 +2067,11 @@ bool GrammarParser::one_star_sequence_combiner_and_array_item()
     while( sequence_combiner() )
     {
         is_used = true;
-        array_item() || fatal( "Expected array-item after sequence-combiner in array definition" );
+        array_item() || fatal_todo( "Expected array-item after sequence-combiner in array definition" );
     }
 
     if( is_used && choice_combiner() )
-        fatal( "choice-combiner can not be used with sequence-combiner without Parentheses" );
+        fatal_todo( "choice-combiner can not be used with sequence-combiner without Parentheses" );
 
     return is_used;
 }
@@ -2081,11 +2083,11 @@ bool GrammarParser::one_star_choice_combiner_and_array_item()
     while( choice_combiner() )
     {
         is_used = true;
-        array_item() || fatal( "Expected array-item after choice-combiner in array definition" );
+        array_item() || fatal_todo( "Expected array-item after choice-combiner in array definition" );
     }
 
     if( is_used && sequence_combiner() )
-        fatal( "sequence-combiner can not be used with choice-combiner without Parentheses" );
+        fatal_todo( "sequence-combiner can not be used with choice-combiner without Parentheses" );
 
     return is_used;
 }
@@ -2141,7 +2143,7 @@ bool GrammarParser::array_group()
         m.p_rule->annotations.merge( array_group_annotations );
 
         star_sp_cmt() && optional( array_items() ) && star_sp_cmt();
-        is_get_char( ')' ) || fatal( "Expected ')' at end of array-group" );
+        is_get_char( ')' ) || fatal_todo( "Expected ')' at end of array-group" );
 
         return true;
     }
@@ -2167,7 +2169,7 @@ bool GrammarParser::group_rule()
 
         star_sp_cmt() && optional( group_items() ) && star_sp_cmt();
 
-        is_get_char( ')' ) || fatal( "Expected ')' at end of group rule" );
+        is_get_char( ')' ) || fatal_todo( "Expected ')' at end of group rule" );
 
         return true;
     }
@@ -2200,11 +2202,11 @@ bool GrammarParser::one_star_sequence_combiner_and_group_item()
     while( sequence_combiner() )
     {
         is_used = true;
-        group_item() || fatal( "Expected group-item after sequence-combiner in group definition" );
+        group_item() || fatal_todo( "Expected group-item after sequence-combiner in group definition" );
     }
 
     if( is_used && choice_combiner() )
-        fatal( "choice-combiner can not be used with sequence-combiner without Parentheses" );
+        fatal_todo( "choice-combiner can not be used with sequence-combiner without Parentheses" );
 
     return is_used;
 }
@@ -2216,11 +2218,11 @@ bool GrammarParser::one_star_choice_combiner_and_group_item()
     while( choice_combiner() )
     {
         is_used = true;
-        group_item() || fatal( "Expected group-item after choice-combiner in group definition" );
+        group_item() || fatal_todo( "Expected group-item after choice-combiner in group definition" );
     }
 
     if( is_used && sequence_combiner() )
-        fatal( "sequence-combiner can not be used with choice-combiner without Parentheses" );
+        fatal_todo( "sequence-combiner can not be used with choice-combiner without Parentheses" );
 
     return is_used;
 }
@@ -2458,7 +2460,7 @@ bool GrammarParser::repetition_step()
     {
         cl::accumulator repetition_accumulator( this );
 
-        step_size() && set( m.p_rule->repetition.step, repetition_accumulator.to_int() ) || fatal( "Expected repetition step size after '%'" );
+        step_size() && set( m.p_rule->repetition.step, repetition_accumulator.to_int() ) || fatal_todo( "Expected repetition step size after '%'" );
 
         return true;
     }
@@ -2483,7 +2485,7 @@ bool GrammarParser::integer()
     */
     // "0" / ["-"] && pos_integer()
 
-    return (zero() && (peek_is_in( cl::alphabet_not( cl::alphabet_digit() ) ) || error( "Leading zeros not allow on integers" ) ) ) ||
+    return (zero() && (peek_is_in( cl::alphabet_not( cl::alphabet_digit() ) ) || error_todo( "Leading zeros not allow on integers" ) ) ) ||
             optional( minus() ) && pos_integer();
 }
 
@@ -2494,7 +2496,7 @@ bool GrammarParser::non_neg_integer()
     */
     // "0" || pos_integer()
 
-    return (zero() && (peek_is_in( cl::alphabet_not( cl::alphabet_digit() ) ) || error( "Leading zeros not allow on integers" ) ) ) ||
+    return (zero() && (peek_is_in( cl::alphabet_not( cl::alphabet_digit() ) ) || error_todo( "Leading zeros not allow on integers" ) ) ) ||
             pos_integer();
 }
 
@@ -2619,7 +2621,7 @@ bool GrammarParser::q_string_as_utf8()
         std::string utf8_string;
 
         return get_qstring_contents( &utf8_string ) && is_get_char( '"' ) &&
-                accumulator_append( utf8_string ) || fatal( "Badly formed QString" );
+                accumulator_append( utf8_string ) || fatal_todo( "Badly formed QString" );
     }
 
     return false;
@@ -2634,7 +2636,7 @@ bool GrammarParser::q_string()
 
     if( quotation_mark() )
     {
-        star_qs_char() && quotation_mark() || fatal( "Badly formed QString" );
+        star_qs_char() && quotation_mark() || fatal_todo( "Badly formed QString" );
 
         return true;
     }
@@ -2739,7 +2741,7 @@ bool GrammarParser::regex()
     {
         while( (escape() && accumulate( '/' )) || not_slash() )
         {}
-        accumulate( '/' ) && optional( regex_modifiers() ) || fatal( "Error reading regular expression" );
+        accumulate( '/' ) && optional( regex_modifiers() ) || fatal_todo( "Error reading regular expression" );
 
         return true;
     }
