@@ -1,0 +1,5 @@
+Error: 2-directives/import-directive-extra-content.jcr (line: 1, char: 41):
+      Unexpected additional material in directive
+Fatal: 2-directives/import-directive-extra-content.jcr (line: 1, char: 41):
+      Unexpected input: 'extra'
+2 error(s), 0 warning(s)

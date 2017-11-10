@@ -514,7 +514,7 @@ bool GrammarParser::one_line_directive()
     if( star_WSP() && (directive_def( DirectiveForm::one_line ) || one_line_tbd_directive_d()) )
     {
         // Use is_peek_at_end() to allow ruleset to end with a directive that doesn't have newline at end
-        star_WSP() && (eol() || is_peek_at_end()) || error_todo( "Unexpected additional material in directive" );
+        star_WSP() && (eol() || is_peek_at_end()) || error( "Unexpected additional material in directive" );
 
         return true;
     }
