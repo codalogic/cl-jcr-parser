@@ -320,6 +320,8 @@ private:
     STAR( WSP )
     ONE_STAR( WSP )
 
+    std::string error_token();
+
     bool warning( const char * p_message )
     {
         m.p_grammar_set->inc_warning_count();
@@ -336,7 +338,7 @@ private:
         m.p_grammar_set->inc_error_count();
         report( "Error", p_message );
         m.is_errored = true;
-        return false;
+        return true;    // Return 'true', because if we are throwing an error it suggests we're on the right parse path, but have an invalid token.  And we'd usually want to recover from this with an && clause.
     }
     bool error( const char * p_format, const clutils::str_args & r_arg_1 )
     {
@@ -360,8 +362,6 @@ private:
         return fatal( expand( p_format, r_arg_1, r_arg_2 ).c_str() );
     }
 
-    std::string error_token();
-
     void report( const char * p_severity, const char * p_message )
     {
         m.p_parent->report( m.r_reader.get_line_number(), m.r_reader.get_column_number(), p_severity, p_message );
@@ -373,6 +373,10 @@ private:
         {}
         get();  // Get the end of line character
         return ret;
+    }
+    bool abandon_path()
+    {
+        return false;
     }
 };
 
@@ -514,7 +518,9 @@ bool GrammarParser::one_line_directive()
     if( star_WSP() && (directive_def( DirectiveForm::one_line ) || one_line_tbd_directive_d()) )
     {
         // Use is_peek_at_end() to allow ruleset to end with a directive that doesn't have newline at end
-        star_WSP() && (eol() || is_peek_at_end()) || error( "Unexpected additional material in directive" );
+        star_WSP() &&
+            (eol() || is_peek_at_end() ||
+                error( "Unexpected additional material in directive: '%0'", error_token() ) && recover_to_eol());
 
         return true;
     }
@@ -567,24 +573,24 @@ bool GrammarParser::jcr_version_d( DirectiveForm::Enum form )
 
     if( jcr_version_kw() )
     {
-        if( (DSPs( form ) || error_todo( "Expected WSP tokens after 'jcr-version' keyword")) &&
+        if( (DSPs( form ) || error_todo( "Expected WSP tokens after 'jcr-version' keyword") && abandon_path()) &&
                 major_version_accumulator.select() && major_version() &&
                 is_get_char( '.' ) &&
                 minor_version_accumulator.select() && minor_version()
-                || error_todo( "Bad #jcr-version directive format" ) || recover_to_eol( false ) )
+                || error_todo( "Bad #jcr-version directive format" ) && abandon_path() )
         {
             std::string major_number = major_version_accumulator.get();
             std::string minor_number = minor_version_accumulator.get();
 
             if( ! is_supported_jcr_version( major_number, minor_number ) )
-                error_todo( (std::string( "Unsupported JCR version: " ) + major_number + "." + minor_number).c_str() );
-        }
+                error_todo( "Unsupported JCR version: %0", major_number + "." + minor_number );
 
-        cl::accumulator extension_accumulator( this );
-        while( extension_accumulator.clear() && DSPs( form ) && is_get_char( '+' ) &&
-                optional( DSPs( form ) ) && extension_id() )
-        {
-            warning( (std::string( "Unknown jcr-version extension id: " ) + extension_accumulator.get() ).c_str() );
+            cl::accumulator extension_accumulator( this );
+            while( extension_accumulator.clear() && DSPs( form ) && is_get_char( '+' ) &&
+                    optional( DSPs( form ) ) && extension_id() )
+            {
+                warning( "Unknown #jcr-version extension id: %0", extension_accumulator.get() );
+            }
         }
 
         return true;
@@ -640,7 +646,7 @@ bool GrammarParser::ruleset_id_d( DirectiveForm::Enum form )
         cl::accumulator ruleset_id_accumulator( this );
 
         if( (DSPs( form ) && ruleset_id())
-            || error_todo( "Unable to read ruleset-id value" ) || recover_to_eol() )
+            || error_todo( "Unable to read ruleset-id value in #ruleset-id directive" ) && abandon_path() )
         {
             m.p_grammar->ruleset_id = ruleset_id_accumulator.get();
         }
@@ -665,13 +671,13 @@ bool GrammarParser::import_d( DirectiveForm::Enum form )
         cl::accumulator_deferred ruleset_id_accumulator( this );
         cl::accumulator_deferred ruleset_id_alias_accumulator( this );
 
-        if( DSPs( form ) &&
-            (ruleset_id_accumulator.select() && ruleset_id() || error_todo( "Unable to read ruleset-id in #import" )) &&
+        if( (DSPs( form ) || error_todo( "Expected space after #import directive keyword" ) && abandon_path()) &&
+            (ruleset_id_accumulator.select() && ruleset_id() || error_todo( "Unable to read ruleset-id in #import directive" ) && abandon_path()) &&
             optional(
                 DSPs( form ) &&
                 as_kw() &&
-                (DSPs( form ) || error_todo( "Expected space after 'as' keyword" ) ) &&
-                (ruleset_id_alias_accumulator.select() && ruleset_id_alias() || error_todo( "Unable to read alias for imported ruleset-id" ) ) ) )
+                (DSPs( form ) || error_todo( "Expected space after 'as' keyword in #import directive" ) && abandon_path()) &&
+                (ruleset_id_alias_accumulator.select() && ruleset_id_alias() || error_todo( "Unable to read alias for ruleset-id in #import directive" ) && abandon_path()) ) )
         {
             std::string ruleset_id = ruleset_id_accumulator.get();
             std::string ruleset_id_alias = ruleset_id_alias_accumulator.get();
@@ -1667,7 +1673,7 @@ bool GrammarParser::sized_int_type()
     cl::accumulator num_bits_accumulator( this );
 
     return int_kw() && pos_integer() &&
-            ( num_bits_accumulator.to_int() <= 64 || error_todo( "sized int size too large") ) &&
+            ( num_bits_accumulator.to_int() <= 64 || error_todo( "sized int size too large" ) && abandon_path() ) &&
             set( m.p_rule->type, Rule::INTEGER ) &&
             set( m.p_rule->min, sized_int_min( num_bits_accumulator.to_int() ) ) &&
             set( m.p_rule->max, sized_int_max( num_bits_accumulator.to_int() ) );
@@ -1683,7 +1689,7 @@ bool GrammarParser::sized_uint_type()
     cl::accumulator num_bits_accumulator( this );
 
     return uint_kw() && pos_integer() &&
-            ( num_bits_accumulator.to_int() <= 64 || error_todo( "sized iint size too large") ) &&
+            ( num_bits_accumulator.to_int() <= 64 || error_todo( "sized iint size too large" ) && abandon_path() ) &&
             set( m.p_rule->type, Rule::UINTEGER ) &&
             set( m.p_rule->min, sized_uint_min( num_bits_accumulator.to_int() ) ) &&
             set( m.p_rule->max, sized_uint_max( num_bits_accumulator.to_int() ) );
@@ -2486,7 +2492,7 @@ bool GrammarParser::integer()
     */
     // "0" / ["-"] && pos_integer()
 
-    return (zero() && (peek_is_in( cl::alphabet_not( cl::alphabet_digit() ) ) || error_todo( "Leading zeros not allow on integers" ) ) ) ||
+    return (zero() && (peek_is_in( cl::alphabet_not( cl::alphabet_digit() ) ) || error_todo( "Leading zeros not allow on integers" ) && abandon_path() ) ) ||
             optional( minus() ) && pos_integer();
 }
 
@@ -2497,7 +2503,7 @@ bool GrammarParser::non_neg_integer()
     */
     // "0" || pos_integer()
 
-    return (zero() && (peek_is_in( cl::alphabet_not( cl::alphabet_digit() ) ) || error_todo( "Leading zeros not allow on integers" ) ) ) ||
+    return (zero() && (peek_is_in( cl::alphabet_not( cl::alphabet_digit() ) ) || error_todo( "Leading zeros not allow on integers" ) && abandon_path() ) ) ||
             pos_integer();
 }
 
