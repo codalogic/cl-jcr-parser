@@ -1,0 +1,5 @@
+Error: 2-one-line-directives/jcr-version-directive-bad-format-5.jcr (line: 1, char: 13):
+      Expected 'major-version' in #jcr-directive
+Error: 2-one-line-directives/jcr-version-directive-bad-format-5.jcr (line: 1, char: 13):
+      Unexpected additional material in directive: '.8.0'
+2 error(s), 0 warning(s)

@@ -568,30 +568,37 @@ bool GrammarParser::jcr_version_d( DirectiveForm::Enum form )
     */
     // jcr_version_kw() && DSPs() && major_version() "." && minor_version() && *( DSPs() "+" [ DSPs() ] && extension_id() )
 
+    class AbandonJCRVersionParse {};
+
     cl::accumulator_deferred major_version_accumulator( this );
     cl::accumulator_deferred minor_version_accumulator( this );
 
     if( jcr_version_kw() )
     {
-        if( (DSPs( form ) || error_todo( "Expected WSP tokens after 'jcr-version' keyword") && abandon_path()) &&
-                major_version_accumulator.select() && major_version() &&
-                is_get_char( '.' ) &&
-                minor_version_accumulator.select() && minor_version()
-                || error_todo( "Bad #jcr-version directive format" ) && abandon_path() )
+        try
         {
-            std::string major_number = major_version_accumulator.get();
-            std::string minor_number = minor_version_accumulator.get();
-
-            if( ! is_supported_jcr_version( major_number, minor_number ) )
-                error_todo( "Unsupported JCR version: %0", major_number + "." + minor_number );
-
-            cl::accumulator extension_accumulator( this );
-            while( extension_accumulator.clear() && DSPs( form ) && is_get_char( '+' ) &&
-                    optional( DSPs( form ) ) && extension_id() )
+            if( (DSPs( form ) || error_todo( "Expected spaces after 'jcr-version' keyword") && retreat<AbandonJCRVersionParse>()) &&
+                    major_version_accumulator.select() && (major_version() || error( "Expected 'major-version' in #jcr-directive" ) && retreat<AbandonJCRVersionParse>()) &&
+                    (is_get_char( '.' ) || error( "Expected '.' after 'major-version' in #jcr-directive" ) && retreat<AbandonJCRVersionParse>()) &&
+                    minor_version_accumulator.select() && (minor_version() || error( "Expected 'minor-version' after '.' in #jcr-directive" ) && retreat<AbandonJCRVersionParse>()) )
             {
-                warning( "Unknown #jcr-version extension id: %0", extension_accumulator.get() );
+                std::string major_number = major_version_accumulator.get();
+                std::string minor_number = minor_version_accumulator.get();
+
+                if( ! is_supported_jcr_version( major_number, minor_number ) )
+                    error( "Unsupported JCR version: %0", major_number + "." + minor_number );
+
+                cl::accumulator extension_accumulator( this );
+                while( extension_accumulator.clear() && DSPs( form ) && is_get_char( '+' ) &&
+                        optional( DSPs( form ) ) && extension_id() )
+                {
+                    error( "Unknown #jcr-version extension id: %0", extension_accumulator.get() );
+                }
             }
         }
+
+        catch( AbandonJCRVersionParse & )
+        {}
 
         return true;
     }
@@ -2492,7 +2499,7 @@ bool GrammarParser::integer()
     */
     // "0" / ["-"] && pos_integer()
 
-    return (zero() && (peek_is_in( cl::alphabet_not( cl::alphabet_digit() ) ) || error_todo( "Leading zeros not allow on integers" ) && abandon_path() ) ) ||
+    return (zero() && (! peek_is_in( cl::alphabet_digit() ) || error_todo( "Leading zeros not allow on integers" ) && abandon_path() ) ) ||
             optional( minus() ) && pos_integer();
 }
 
@@ -2503,7 +2510,7 @@ bool GrammarParser::non_neg_integer()
     */
     // "0" || pos_integer()
 
-    return (zero() && (peek_is_in( cl::alphabet_not( cl::alphabet_digit() ) ) || error_todo( "Leading zeros not allow on integers" ) && abandon_path() ) ) ||
+    return (zero() && (! peek_is_in( cl::alphabet_digit() ) || error_todo( "Leading zeros not allow on integers" ) && abandon_path() ) ) ||
             pos_integer();
 }
 

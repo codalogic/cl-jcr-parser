@@ -1,0 +1,3 @@
+Error: 2-one-line-directives/jcr-version-directive-bad-format-2.jcr (line: 1, char: 16):
+      Expected '.' after 'major-version' in #jcr-directive
+1 error(s), 0 warning(s)
