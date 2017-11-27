@@ -1,3 +1,0 @@
-Error: 2-directives/ruleset-id-directive-extra-content.jcr (line: 1, char: 34):
-      Unexpected additional material in directive: 'extra'
-1 error(s), 0 warning(s)

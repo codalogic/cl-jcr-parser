@@ -1,3 +1,0 @@
-Error: 2-directives/import-directive-bad-as-keyword.jcr (line: 1, char: 30):
-      Unexpected additional material in directive: 'mas'
-1 error(s), 0 warning(s)

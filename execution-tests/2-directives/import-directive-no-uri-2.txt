@@ -1,3 +1,0 @@
-Error: 2-directives/import-directive-no-uri-2.jcr (line: 1, char: 7):
-      Expected space after #import directive keyword
-1 error(s), 0 warning(s)
