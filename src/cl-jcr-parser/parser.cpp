@@ -736,7 +736,7 @@ bool GrammarParser::one_line_tbd_directive_d()
     if( directive_name() &&
         optional( one_star_WSP() && tbd_directive_parameters_accumulator.select() && one_line_directive_parameters() ) )
     {
-        warning( (std::string( "Unknown directive: " ) + tbd_directive_name_accumulator.get() +
+        error( (std::string( "Unknown directive: " ) + tbd_directive_name_accumulator.get() +
                 ", parameters: " + tbd_directive_parameters_accumulator.get()).c_str() );
         return true;
     }
@@ -805,7 +805,7 @@ bool GrammarParser::multi_line_tbd_directive_d()
     if( directive_name() &&
         optional( one_star_sp_cmt() && tbd_directive_parameters_accumulator.select() && multi_line_directive_parameters() ) )
     {
-        warning( (std::string( "Unknown directive: " ) + tbd_directive_name_accumulator.get()).c_str() );
+        error( (std::string( "Unknown directive: " ) + tbd_directive_name_accumulator.get()).c_str() );
         return true;
     }
 

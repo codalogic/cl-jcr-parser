@@ -1,0 +1,3 @@
+Error: 2-directives/unknown-directive.jcr (line: 1, char: 37):
+      Unknown directive: unknown-directive, parameters: unknown parameters
+1 error(s), 0 warning(s)
