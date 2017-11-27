@@ -20,7 +20,9 @@ class ZincReviewer
         TkGrid.rowconfigure @main_content, 0, :weight => 1
 
         @file_label = Tk::Tile::Label.new(@main_content) {text 'File'}.
-                                    grid( :row => 1, :column => 1, :sticky => 'we' )
+                                    grid( :row => 1, :column => 1, :sticky => 'nw' )
+        @rescan_button = Tk::Tile::Button.new(@main_content) {text 'Re-scan'; command {zrself.rescan}}.
+                                    grid( :row => 1, :column => 1, :sticky => 'ne' )
         Tk::Tile::Label.new(@main_content) {text 'JCR:'}.
                                     grid( :row => 2, :column => 1, :sticky => 'we' )
         @jcr_text = TkText.new(@main_content) {width 80; height 10}.
@@ -54,6 +56,11 @@ class ZincReviewer
                                     grid( :row => 8, :column => 1, :sticky => 'we' )
 
         TkWinfo.children(@main_content).each {|w| TkGrid.configure w, :padx => 5, :pady => 5}
+    end
+
+    def rescan
+        read_test_status
+        show_first_file
     end
 
     def prev
