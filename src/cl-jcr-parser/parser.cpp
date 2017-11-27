@@ -568,37 +568,31 @@ bool GrammarParser::jcr_version_d( DirectiveForm::Enum form )
     */
     // jcr_version_kw() && DSPs() && major_version() "." && minor_version() && *( DSPs() "+" [ DSPs() ] && extension_id() )
 
-    class AbandonJCRVersionParse {};
-
     cl::accumulator_deferred major_version_accumulator( this );
     cl::accumulator_deferred minor_version_accumulator( this );
 
     if( jcr_version_kw() )
     {
-        try
+        if( (DSPs( form ) || end_path_with( error( "Expected spaces after 'jcr-version' keyword" ) ) ) &&
+                major_version_accumulator.select() &&
+                (major_version() || end_path_with( error( "Expected 'major-version' in #jcr-directive" ) ) ) &&
+                (is_get_char( '.' ) || end_path_with( error( "Expected '.' after 'major-version' in #jcr-directive" ) ) ) &&
+                minor_version_accumulator.select() &&
+                (minor_version() || end_path_with( error( "Expected 'minor-version' after '.' in #jcr-directive" ) ) ) )
         {
-            if( (DSPs( form ) || error_todo( "Expected spaces after 'jcr-version' keyword") && retreat<AbandonJCRVersionParse>()) &&
-                    major_version_accumulator.select() && (major_version() || error( "Expected 'major-version' in #jcr-directive" ) && retreat<AbandonJCRVersionParse>()) &&
-                    (is_get_char( '.' ) || error( "Expected '.' after 'major-version' in #jcr-directive" ) && retreat<AbandonJCRVersionParse>()) &&
-                    minor_version_accumulator.select() && (minor_version() || error( "Expected 'minor-version' after '.' in #jcr-directive" ) && retreat<AbandonJCRVersionParse>()) )
+            std::string major_number = major_version_accumulator.get();
+            std::string minor_number = minor_version_accumulator.get();
+
+            if( ! is_supported_jcr_version( major_number, minor_number ) )
+                error( "Unsupported JCR version: %0", major_number + "." + minor_number );
+
+            cl::accumulator extension_accumulator( this );
+            while( extension_accumulator.clear() && DSPs( form ) && is_get_char( '+' ) &&
+                    optional( DSPs( form ) ) && extension_id() )
             {
-                std::string major_number = major_version_accumulator.get();
-                std::string minor_number = minor_version_accumulator.get();
-
-                if( ! is_supported_jcr_version( major_number, minor_number ) )
-                    error( "Unsupported JCR version: %0", major_number + "." + minor_number );
-
-                cl::accumulator extension_accumulator( this );
-                while( extension_accumulator.clear() && DSPs( form ) && is_get_char( '+' ) &&
-                        optional( DSPs( form ) ) && extension_id() )
-                {
-                    error( "Unknown #jcr-version extension id: %0", extension_accumulator.get() );
-                }
+                error( "Unknown #jcr-version extension id: %0", extension_accumulator.get() );
             }
         }
-
-        catch( AbandonJCRVersionParse & )
-        {}
 
         return true;
     }
