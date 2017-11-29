@@ -367,12 +367,19 @@ private:
         m.p_parent->report( m.r_reader.get_line_number(), m.r_reader.get_column_number(), p_severity, p_message );
     }
 
-    bool recover_to_eol( bool ret = true )
+    bool recover_to_eol()
     {
         while( is_get_char_in( cl::alphabet_not( cl::alphabet_eol() ) ) )
         {}
         get();  // Get the end of line character
-        return ret;
+        return true;
+    }
+    bool recover_to( char c )
+    {
+        while( skip_until( cl::alphabet_char( c ) ) )
+        {}
+        get();  // Chew the target character
+        return true;
     }
     bool abandon_path()
     {
@@ -538,8 +545,23 @@ bool GrammarParser::multi_line_directive()
 
     if( is_get_char( '{' ) )
     {
-        star_sp_cmt() && (directive_def( DirectiveForm::multi_line ) || multi_line_tbd_directive_d()) &&
-            star_sp_cmt() && is_get_char( '}' ) || error_todo( "Invalid multi-line #{directive} format" );
+        bool is_parse_complete = false;
+
+        star_sp_cmt() &&
+            (directive_def( DirectiveForm::multi_line )
+                || multi_line_tbd_directive_d()
+                || end_path_with( error( "Unable to read multi-line #{directive}. Got: %0", error_token() ) )
+                ) &&
+            star_sp_cmt() &&
+            (is_get_char( '}' )
+                || (is_current_at_end() && error( "Unexpected end of file in multi-line #{directive}" )
+                    || end_path_with( error( "Unexpected additional material in multi-line #{directive}: %0", error_token() ) ) )
+                ) &&
+            set( is_parse_complete, true );
+        
+        if( ! is_parse_complete )
+            recover_to( '}' );
+
         return true;
     }
 
@@ -573,7 +595,7 @@ bool GrammarParser::jcr_version_d( DirectiveForm::Enum form )
 
     if( jcr_version_kw() )
     {
-        if( (DSPs( form ) || end_path_with( error( "Expected spaces after 'jcr-version' keyword" ) ) ) &&
+        if( (DSPs( form ) || end_path_with( error( "Expected spaces and major.minor version after 'jcr-version' keyword in #jcr-directive" ) ) ) &&
                 major_version_accumulator.select() &&
                 (major_version() || end_path_with( error( "Expected 'major-version' in #jcr-directive" ) ) ) &&
                 (is_get_char( '.' ) || end_path_with( error( "Expected '.' after 'major-version' in #jcr-directive" ) ) ) &&
@@ -584,13 +606,14 @@ bool GrammarParser::jcr_version_d( DirectiveForm::Enum form )
             std::string minor_number = minor_version_accumulator.get();
 
             if( ! is_supported_jcr_version( major_number, minor_number ) )
-                error( "Unsupported JCR version: %0", major_number + "." + minor_number );
+                error( "Unsupported JCR version in #jcr-directive: %0", major_number + "." + minor_number );
 
             cl::accumulator extension_accumulator( this );
             while( extension_accumulator.clear() && DSPs( form ) && is_get_char( '+' ) &&
-                    optional( DSPs( form ) ) && extension_id() )
+                    optional( DSPs( form ) ) &&
+                    (extension_id() || end_path_with( error( "Expected 'extension-id' after '+' in #jcr-directive. Got: %0", error_token() ))) )
             {
-                error( "Unknown #jcr-version extension id: %0", extension_accumulator.get() );
+                error( "Unknown 'extension-id' in #jcr-directive: %0", extension_accumulator.get() );
             }
         }
 
@@ -672,13 +695,13 @@ bool GrammarParser::import_d( DirectiveForm::Enum form )
         cl::accumulator_deferred ruleset_id_accumulator( this );
         cl::accumulator_deferred ruleset_id_alias_accumulator( this );
 
-        if( (DSPs( form ) || error_todo( "Expected space after #import directive keyword" ) && abandon_path()) &&
+        if( (DSPs( form ) || error( "Expected space and ruleset-id after #import directive keyword" ) && abandon_path()) &&
             (ruleset_id_accumulator.select() && ruleset_id() || error_todo( "Unable to read ruleset-id in #import directive" ) && abandon_path()) &&
             optional(
                 DSPs( form ) &&
                 as_kw() &&
-                (DSPs( form ) || error_todo( "Expected space after 'as' keyword in #import directive" ) && abandon_path()) &&
-                (ruleset_id_alias_accumulator.select() && ruleset_id_alias() || error_todo( "Unable to read alias for ruleset-id in #import directive" ) && abandon_path()) ) )
+                (DSPs( form ) || error( "Expected space and alias after 'as' keyword in #import directive" ) && abandon_path()) &&
+                (ruleset_id_alias_accumulator.select() && ruleset_id_alias() || error( "Unable to read alias for ruleset-id in #import directive" ) && abandon_path()) ) )
         {
             std::string ruleset_id = ruleset_id_accumulator.get();
             std::string ruleset_id_alias = ruleset_id_alias_accumulator.get();

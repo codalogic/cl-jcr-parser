@@ -1,0 +1,5 @@
+Error: 3-multi-line-directives/jcr-version-directive-bad-options-2.jcr (line: 1, char: 20):
+      Expected 'extension-id' after '+' in #jcr-directive. Got: .
+Error: 3-multi-line-directives/jcr-version-directive-bad-options-2.jcr (line: 1, char: 20):
+      Unexpected additional material in multi-line #{directive}: .
+2 error(s), 0 warning(s)

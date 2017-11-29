@@ -1,7 +1,7 @@
 Error: 2-one-line-directives/jcr-version-directive-plus-options.jcr (line: 1, char: 17):
-      Unsupported JCR version: 1.0
+      Unsupported JCR version in #jcr-directive: 1.0
 Error: 2-one-line-directives/jcr-version-directive-plus-options.jcr (line: 1, char: 37):
-      Unknown #jcr-version extension id: co-constraints-1.2
+      Unknown 'extension-id' in #jcr-directive: co-constraints-1.2
 Error: 2-one-line-directives/jcr-version-directive-plus-options.jcr (line: 1, char: 52):
-      Unknown #jcr-version extension id: jcr-doc-1.0
+      Unknown 'extension-id' in #jcr-directive: jcr-doc-1.0
 3 error(s), 0 warning(s)
