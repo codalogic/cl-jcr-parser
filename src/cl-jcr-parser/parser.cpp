@@ -6,7 +6,14 @@
 // this file, you can obtain one at http://opensource.org/licenses/LGPL-3.0.
 //----------------------------------------------------------------------------
 
-// Implements jcr-abnf - 2017-08-31
+// Implements jcr-abnf - 2017-11-30
+
+//----------------------------------------------------------------------------
+// Notes:
+//      Leave_as_warning :
+//              Leave these as warnings to facilitate unit testing.  Also, if
+//              they are important, other errors are likely to show up also.
+//----------------------------------------------------------------------------
 
 #include "cl-jcr-parser/parser.h"
 
@@ -129,12 +136,12 @@ private:
     bool major_version();
     bool minor_version();
     bool extension_id();
+    bool id();
+    bool id_tail();
+    STAR( id_tail )
     bool ruleset_id_d( DirectiveForm::Enum form );
     bool import_d( DirectiveForm::Enum form );
     bool ruleset_id();
-    bool not_space();
-    STAR( not_space )
-    ONE_STAR( not_space )
     bool ruleset_id_alias();
     bool one_line_tbd_directive_d();
     bool directive_name();
@@ -558,7 +565,7 @@ bool GrammarParser::multi_line_directive()
                     || end_path_with( error( "Unexpected additional material in multi-line #{directive}: %0", error_token() ) ) )
                 ) &&
             set( is_parse_complete, true );
-        
+
         if( ! is_parse_complete )
             recover_to( '}' );
 
@@ -613,7 +620,7 @@ bool GrammarParser::jcr_version_d( DirectiveForm::Enum form )
                     optional( DSPs( form ) ) &&
                     (extension_id() || end_path_with( error( "Expected 'extension-id' after '+' in #jcr-directive. Got: %0", error_token() ))) )
             {
-                error( "Unknown 'extension-id' in #jcr-directive: %0", extension_accumulator.get() );
+                warning( "Unknown 'extension-id' in #jcr-directive: %0", extension_accumulator.get() ); // See Leave_as_warning
             }
         }
 
@@ -651,11 +658,31 @@ bool GrammarParser::minor_version()
 bool GrammarParser::extension_id()
 {
     /* ABNF:
-    extension-id     = ALPHA *not-space
+    extension-id     = id
     */
-    // ALPHA() && *not_space()
+    // id()
 
-    return ALPHA() && star_not_space();
+    return id();
+}
+
+bool GrammarParser::id()
+{
+    /* ABNF:
+    id               = ALPHA *id-tail
+    */
+    // ALPHA() && *id_tail()
+
+    return ALPHA() && star_id_tail();
+}
+
+bool GrammarParser::id_tail()
+{
+    /* ABNF:
+    id-tail          = %x21-7C / %x7E-10FFFF ; not spaces, not }
+    */
+    // %x21-7C / %x7E-10FFFF ; not spaces(), not }
+
+    return accumulate( cl::alphabet_not( cl::alphabet_or( cl::alphabet_space(), cl::alphabet_char( '}' ) ) ) );
 }
 
 bool GrammarParser::ruleset_id_d( DirectiveForm::Enum form )
@@ -720,21 +747,11 @@ bool GrammarParser::import_d( DirectiveForm::Enum form )
 bool GrammarParser::ruleset_id()
 {
     /* ABNF:
-    ruleset-id       = ALPHA *not-space
+    ruleset-id       = id
     */
-    // ALPHA() && *not_space()
+    // id()
 
-    return ALPHA() && star_not_space();
-}
-
-bool GrammarParser::not_space()
-{
-    /* ABNF:
-    not-space        = %x21-10FFFF
-    */
-    // %x21-10FFFF
-
-    return accumulate( cl::alphabet_not( cl::alphabet_space() ) );
+    return id();
 }
 
 bool GrammarParser::ruleset_id_alias()
@@ -760,7 +777,7 @@ bool GrammarParser::one_line_tbd_directive_d()
     if( directive_name() &&
         optional( one_star_WSP() && tbd_directive_parameters_accumulator.select() && one_line_directive_parameters() ) )
     {
-        error( (std::string( "Unknown directive: " ) + tbd_directive_name_accumulator.get() +
+        warning( (std::string( "Unknown directive: " ) + tbd_directive_name_accumulator.get() + // See Leave_as_warning
                 ", parameters: " + tbd_directive_parameters_accumulator.get()).c_str() );
         return true;
     }
@@ -829,7 +846,7 @@ bool GrammarParser::multi_line_tbd_directive_d()
     if( directive_name() &&
         optional( one_star_sp_cmt() && tbd_directive_parameters_accumulator.select() && multi_line_directive_parameters() ) )
     {
-        error( (std::string( "Unknown directive: " ) + tbd_directive_name_accumulator.get()).c_str() );
+        warning( (std::string( "Unknown directive: " ) + tbd_directive_name_accumulator.get()).c_str() ); // See Leave_as_warning
         return true;
     }
 
@@ -1279,7 +1296,7 @@ bool GrammarParser::tbd_annotation()
     annotation_name() && optional( spaces() && name_accumulator.none() && annotation_parameters() );
 
     if( name_accumulator.get() == "id" || name_accumulator.get() == "assert" || name_accumulator.get() == "when" || name_accumulator.get() == "doc" )
-        warning( (std::string( "Annotation: '" ) + name_accumulator.get() + "' not yet implemented").c_str() );
+        warning( (std::string( "Annotation: '" ) + name_accumulator.get() + "' not yet implemented").c_str() ); // See Leave_as_warning
     else
         fatal( (std::string( "Annotation: '" ) + name_accumulator.get() + "' unknown").c_str() );
 
