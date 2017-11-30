@@ -1006,13 +1006,13 @@ bool GrammarParser::target_rule_name()
 bool GrammarParser::name()
 {
     /* ABNF:
-    name             = ALPHA *( ALPHA / DIGIT / "-" / "-" )
+    name             = ALPHA *( ALPHA / DIGIT / "-" / "_" )
     */
-    // ALPHA() && *( ALPHA() || DIGIT() || "-" || "-" )
+    // ALPHA() && *( ALPHA() || DIGIT() || "-" || "_" )
 
     if( ALPHA() )
     {
-        while( ALPHA() || DIGIT() || accumulate( '_' ) || accumulate( '-' ) )
+        while( ALPHA() || DIGIT() || accumulate( '-' ) || accumulate( '_' ) )
         {}
         return true;
     }
