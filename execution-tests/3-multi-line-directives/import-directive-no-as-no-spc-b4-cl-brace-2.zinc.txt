@@ -1,5 +1,1 @@
-Error: 3-multi-line-directives/import-directive-no-as-no-spc-b4-cl-brace-2.jcr (line: 4, char: 0):
-      Unexpected additional material in multi-line #{directive}: [
-Fatal: 3-multi-line-directives/import-directive-no-as-no-spc-b4-cl-brace-2.jcr (line: 4, char: 3):
-      Unexpected input: '*'
-2 error(s), 0 warning(s)
+0 error(s), 0 warning(s)

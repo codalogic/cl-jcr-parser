@@ -1,4 +1,2 @@
-; Closing } of directive is parsed as part of ruleset-id.
-; This test aims to highlight problems that may occur with this.
 #{import com.codalogic.file-io}
 [{}*]

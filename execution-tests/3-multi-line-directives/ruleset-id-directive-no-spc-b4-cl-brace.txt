@@ -1,3 +1,1 @@
-Error: 3-multi-line-directives/ruleset-id-directive-no-spc-b4-cl-brace.jcr (line: 2, char: 10):
-      Unexpected end of file in multi-line #{directive}
-1 error(s), 0 warning(s)
+0 error(s), 0 warning(s)
