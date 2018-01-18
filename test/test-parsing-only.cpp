@@ -497,6 +497,20 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TTEST( ph.grammar().rules[0].max.as_string() == "/pref\\d+/i" );
     }
     {
+        TSETUP( ParserHarness ph( "$rule-2 = /pref\\/d/i\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::STRING_REGEX );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.is_string() == true );
+        TTEST( ph.grammar().rules[0].min.as_string() == "/pref\\/d/i" );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.is_string() == true );
+        TTEST( ph.grammar().rules[0].max.as_string() == "/pref\\/d/i" );
+    }
+    {
         TSETUP( ParserHarness ph( "$rule-2 = : float\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
