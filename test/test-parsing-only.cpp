@@ -352,6 +352,46 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TTEST( ph.grammar().rules[0].repetition.max == 1 );
     }
     {
+        TSETUP( ParserHarness ph( "$my_rule=null\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "my_rule" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::TNULL );
+
+        TTEST( ph.grammar().rules[0].repetition.min == 1 );
+        TTEST( ph.grammar().rules[0].repetition.max == 1 );
+    }
+    {
+        TSETUP( ParserHarness ph( "$my_rule= null\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "my_rule" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::TNULL );
+
+        TTEST( ph.grammar().rules[0].repetition.min == 1 );
+        TTEST( ph.grammar().rules[0].repetition.max == 1 );
+    }
+    {
+        TSETUP( ParserHarness ph( "$my_rule = null\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "my_rule" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::TNULL );
+
+        TTEST( ph.grammar().rules[0].repetition.min == 1 );
+        TTEST( ph.grammar().rules[0].repetition.max == 1 );
+    }
+    {
+        TSETUP( ParserHarness ph( "$my_rule =null\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "my_rule" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::TNULL );
+
+        TTEST( ph.grammar().rules[0].repetition.min == 1 );
+        TTEST( ph.grammar().rules[0].repetition.max == 1 );
+    }
+    {
         TSETUP( ParserHarness ph( "$another_rule= : boolean\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
@@ -411,7 +451,39 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TTEST( ph.grammar().rules[0].max.as_string() == "a string" );
     }
     {
+        TSETUP( ParserHarness ph( "$rule-2 = \"a string\"\n" ) );
+        TCRITICALTEST( ph.status() != JCRParser::S_OK );
+    }
+    {
+        TSETUP( ParserHarness ph( "$rule-2 = 'a string'\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::STRING_LITERAL );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.is_string() == true );
+        TTEST( ph.grammar().rules[0].min.as_string() == "a string" );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.is_string() == true );
+        TTEST( ph.grammar().rules[0].max.as_string() == "a string" );
+    }
+    {
         TSETUP( ParserHarness ph( "$rule-2 = : /pref\\d+/i\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::STRING_REGEX );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.is_string() == true );
+        TTEST( ph.grammar().rules[0].min.as_string() == "/pref\\d+/i" );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.is_string() == true );
+        TTEST( ph.grammar().rules[0].max.as_string() == "/pref\\d+/i" );
+    }
+    {
+        TSETUP( ParserHarness ph( "$rule-2 = /pref\\d+/i\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
         TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
@@ -435,7 +507,27 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TTEST( ph.grammar().rules[0].max.is_set() == false );
     }
     {
+        TSETUP( ParserHarness ph( "$rule-2 = float\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::FLOAT );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
         TSETUP( ParserHarness ph( "$rule-2 = : double\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::DOUBLE );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
+        TSETUP( ParserHarness ph( "$rule-2 = double\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
         TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
@@ -457,7 +549,33 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TTEST( ph.grammar().rules[0].max.is_set() == false );
     }
     {
+        TSETUP( ParserHarness ph( "$rule-2 = 1.0..\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::DOUBLE );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.is_float() == true );
+        TTEST( ph.grammar().rules[0].min.as_float() == 1.0 );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
         TSETUP( ParserHarness ph( "$rule-2 = : -1.0..3.5e-2\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::DOUBLE );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.is_float() == true );
+        TTEST( ph.grammar().rules[0].min.as_float() == -1.0 );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.is_float() == true );
+        TTEST( ph.grammar().rules[0].max.as_float() == 3.5e-2 );
+    }
+    {
+        TSETUP( ParserHarness ph( "$rule-2 = -1.0..3.5e-2\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
         TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
@@ -485,6 +603,20 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TTEST( ph.grammar().rules[0].max.as_float() == -3.5e-2 );
     }
     {
+        TSETUP( ParserHarness ph( "$rule-2 = -1.0..-3.5e-2\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::DOUBLE );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.is_float() == true );
+        TTEST( ph.grammar().rules[0].min.as_float() == -1.0 );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.is_float() == true );
+        TTEST( ph.grammar().rules[0].max.as_float() == -3.5e-2 );
+    }
+    {
         TSETUP( ParserHarness ph( "$rule-2 = : ..-3.5e-2\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
@@ -497,7 +629,33 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TTEST( ph.grammar().rules[0].max.as_float() == -3.5e-2 );
     }
     {
+        TSETUP( ParserHarness ph( "$rule-2 = ..-3.5e-2\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::DOUBLE );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.is_float() == true );
+        TTEST( ph.grammar().rules[0].max.as_float() == -3.5e-2 );
+    }
+    {
         TSETUP( ParserHarness ph( "$rule-2 = : 4.0\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::DOUBLE );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.is_float() == true );
+        TTEST( ph.grammar().rules[0].min.as_float() == 4.0 );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.is_float() == true );
+        TTEST( ph.grammar().rules[0].max.as_float() == 4.0 );
+    }
+    {
+        TSETUP( ParserHarness ph( "$rule-2 = 4.0\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
         TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
@@ -525,6 +683,20 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TTEST( ph.grammar().rules[0].max.as_float() == -3.5e-2 );
     }
     {
+        TSETUP( ParserHarness ph( "$rule-2 = -3.5e-2\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::DOUBLE );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.is_float() == true );
+        TTEST( ph.grammar().rules[0].min.as_float() == -3.5e-2 );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.is_float() == true );
+        TTEST( ph.grammar().rules[0].max.as_float() == -3.5e-2 );
+    }
+    {
         TSETUP( ParserHarness ph( "$rule-2 = : integer\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
@@ -535,7 +707,29 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TTEST( ph.grammar().rules[0].max.is_set() == false );
     }
     {
+        TSETUP( ParserHarness ph( "$rule-2 = integer\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::INTEGER );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
         TSETUP( ParserHarness ph( "$rule-2 = : 100..\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::UINTEGER );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.is_uint() == true );
+        TTEST( ph.grammar().rules[0].min.as_uint() == 100 );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
+        TSETUP( ParserHarness ph( "$rule-2 = 100..\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
         TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
@@ -561,6 +755,20 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TTEST( ph.grammar().rules[0].max.as_int() == -50 );
     }
     {
+        TSETUP( ParserHarness ph( "$rule-2 = -100..-50\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::INTEGER );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.is_int() == true );
+        TTEST( ph.grammar().rules[0].min.as_int() == -100 );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.is_int() == true );
+        TTEST( ph.grammar().rules[0].max.as_int() == -50 );
+    }
+    {
         TSETUP( ParserHarness ph( "$rule-2 = : ..50\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
@@ -573,7 +781,33 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TTEST( ph.grammar().rules[0].max.as_int() == 50 );
     }
     {
+        TSETUP( ParserHarness ph( "$rule-2 = ..50\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::INTEGER );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.is_int() == true );
+        TTEST( ph.grammar().rules[0].max.as_int() == 50 );
+    }
+    {
         TSETUP( ParserHarness ph( "$rule-2 = : 64\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::UINTEGER );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.is_uint() == true );
+        TTEST( ph.grammar().rules[0].min.as_uint() == 64 );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.is_uint() == true );
+        TTEST( ph.grammar().rules[0].max.as_uint() == 64 );
+    }
+    {
+        TSETUP( ParserHarness ph( "$rule-2 = 64\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
         TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
@@ -601,7 +835,35 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TTEST( ph.grammar().rules[0].max.as_uint() == 255 );
     }
     {
+        TSETUP( ParserHarness ph( "$rule-2 = uint8\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::UINTEGER );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.is_uint() == true );
+        TTEST( ph.grammar().rules[0].min.as_uint() == 0 );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.is_uint() == true );
+        TTEST( ph.grammar().rules[0].max.as_uint() == 255 );
+    }
+    {
         TSETUP( ParserHarness ph( "$rule-2 = : int8\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::INTEGER );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.is_int() == true );
+        TTEST( ph.grammar().rules[0].min.as_int() == -128 );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.is_int() == true );
+        TTEST( ph.grammar().rules[0].max.as_int() == 127 );
+    }
+    {
+        TSETUP( ParserHarness ph( "$rule-2 = int8\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
         TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
@@ -628,7 +890,33 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TTEST( ph.grammar().rules[0].max.as_uint() == 4294967295 );
     }
     {
+        TSETUP( ParserHarness ph( "$rule-2 = uint32\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::UINTEGER );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.is_uint() == true );
+        TTEST( ph.grammar().rules[0].min.as_uint() == 0 );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.is_uint() == true );
+        TTEST( ph.grammar().rules[0].max.as_uint() == 4294967295 );
+    }
+    {
         TSETUP( ParserHarness ph( "$rule-2 = : int32\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::INTEGER );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.is_int() == true );
+        TTEST( ph.grammar().rules[0].min.as_int() == -2147483648LL );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.is_int() == true );
+        TTEST( ph.grammar().rules[0].max.as_int() == 2147483647 );
+    }
+    {
+        TSETUP( ParserHarness ph( "$rule-2 = int32\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
         TCRITICALTEST( ph.grammar().rules[0].type == Rule::INTEGER );
@@ -654,7 +942,33 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TTEST( ph.grammar().rules[0].max.as_uint() == 18446744073709551615 );
     }
     {
+        TSETUP( ParserHarness ph( "$rule-2 = uint64\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::UINTEGER );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.is_uint() == true );
+        TTEST( ph.grammar().rules[0].min.as_uint() == 0 );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.is_uint() == true );
+        TTEST( ph.grammar().rules[0].max.as_uint() == 18446744073709551615 );
+    }
+    {
         TSETUP( ParserHarness ph( "$rule-2 = : int64\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::INTEGER );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.is_int() == true );
+        TTEST( ph.grammar().rules[0].min.as_int() == -9223372036854775808LL );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.is_int() == true );
+        TTEST( ph.grammar().rules[0].max.as_int() == 9223372036854775807 );
+    }
+    {
+        TSETUP( ParserHarness ph( "$rule-2 = int64\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
         TCRITICALTEST( ph.grammar().rules[0].type == Rule::INTEGER );
@@ -674,7 +988,21 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TCRITICALTEST( ph.grammar().rules[0].type == Rule::IPV4 );
     }
     {
+        TSETUP( ParserHarness ph( "$rule-2 = ipv4\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::IPV4 );
+    }
+    {
         TSETUP( ParserHarness ph( "$rule-2 = : ipv6\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::IPV6 );
+    }
+    {
+        TSETUP( ParserHarness ph( "$rule-2 = ipv6\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
         TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
@@ -688,7 +1016,21 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TCRITICALTEST( ph.grammar().rules[0].type == Rule::IPADDR );
     }
     {
+        TSETUP( ParserHarness ph( "$rule-2 = ipaddr\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::IPADDR );
+    }
+    {
         TSETUP( ParserHarness ph( "$rule-2 = : idn\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::IDN );
+    }
+    {
+        TSETUP( ParserHarness ph( "$rule-2 = idn\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
         TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
@@ -702,7 +1044,28 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TCRITICALTEST( ph.grammar().rules[0].type == Rule::FQDN );
     }
     {
+        TSETUP( ParserHarness ph( "$rule-2 = fqdn\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::FQDN );
+    }
+    {
         TSETUP( ParserHarness ph( "$rule-2 = : uri..http\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::URI_RANGE );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.is_string() == true );
+        TTEST( ph.grammar().rules[0].min.as_string() == "http" );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.is_string() == true );
+        TTEST( ph.grammar().rules[0].max.as_string() == "http" );
+    }
+    {
+        TSETUP( ParserHarness ph( "$rule-2 = uri..http\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
         TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
@@ -730,7 +1093,31 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TTEST( ph.grammar().rules[0].max.as_string() == "sip" );
     }
     {
+        TSETUP( ParserHarness ph( "$rule-2 = uri..sip" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::URI_RANGE );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.is_string() == true );
+        TTEST( ph.grammar().rules[0].min.as_string() == "sip" );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.is_string() == true );
+        TTEST( ph.grammar().rules[0].max.as_string() == "sip" );
+    }
+    {
         TSETUP( ParserHarness ph( "$rule-2 = : uri\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::URI_TYPE );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
+        TSETUP( ParserHarness ph( "$rule-2 = uri\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
         TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
@@ -750,7 +1137,27 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TTEST( ph.grammar().rules[0].max.is_set() == false );
     }
     {
+        TSETUP( ParserHarness ph( "$rule-2 = phone\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::PHONE );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
         TSETUP( ParserHarness ph( "$rule-2 = : email\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::EMAIL );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
+        TSETUP( ParserHarness ph( "$rule-2 = email\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
         TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
@@ -770,7 +1177,27 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TTEST( ph.grammar().rules[0].max.is_set() == false );
     }
     {
+        TSETUP( ParserHarness ph( "$rule-2 = date\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::DATE );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
         TSETUP( ParserHarness ph( "$rule-2 = : time\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::TIME );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
+        TSETUP( ParserHarness ph( "$rule-2 = time\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
         TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
@@ -790,7 +1217,27 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TTEST( ph.grammar().rules[0].max.is_set() == false );
     }
     {
+        TSETUP( ParserHarness ph( "$rule-2 = datetime\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::DATETIME );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
         TSETUP( ParserHarness ph( "$rule-2 = : hex\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::HEX );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
+        TSETUP( ParserHarness ph( "$rule-2 = hex\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
         TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
@@ -810,7 +1257,27 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TTEST( ph.grammar().rules[0].max.is_set() == false );
     }
     {
+        TSETUP( ParserHarness ph( "$rule-2 = base32\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::BASE32 );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
         TSETUP( ParserHarness ph( "$rule-2 = : base32hex\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::BASE32HEX );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
+        TSETUP( ParserHarness ph( "$rule-2 = base32hex\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
         TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
@@ -830,7 +1297,27 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TTEST( ph.grammar().rules[0].max.is_set() == false );
     }
     {
+        TSETUP( ParserHarness ph( "$rule-2 = base64\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::BASE64 );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
         TSETUP( ParserHarness ph( "$rule-2 = : base64url\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::BASE64URL );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
+        TSETUP( ParserHarness ph( "$rule-2 = base64url\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
         TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
@@ -850,7 +1337,25 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
         TTEST( ph.grammar().rules[0].max.is_set() == false );
     }
     {
+        TSETUP( ParserHarness ph( "$rule-2 = any\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::ANY );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == false );
+        TTEST( ph.grammar().rules[0].max.is_set() == false );
+    }
+    {
         TSETUP( ParserHarness ph( "$my_rule = : @{root} null\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].annotations.is_root == true );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "my_rule" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::TNULL );
+    }
+    {
+        TSETUP( ParserHarness ph( "$my_rule = @{root} null\n" ) );
         TCRITICALTEST( ph.status() == JCRParser::S_OK );
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
         TCRITICALTEST( ph.grammar().rules[0].annotations.is_root == true );

@@ -1,4 +1,4 @@
-Tests run on Thu Jan 18 15:51:35 2018
+Tests run on Thu Jan 18 16:12:02 2018
 
     Config - Configuration [test-config.cpp:40]
     ===========================================
@@ -514,6 +514,34 @@ jcr-version
     ok: ph.grammar().rules[0].type == Rule::TNULL
     ok: ph.grammar().rules[0].repetition.min == 1
     ok: ph.grammar().rules[0].repetition.max == 1
+      : ParserHarness ph( "$my_rule=null\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "my_rule"
+    ok: ph.grammar().rules[0].type == Rule::TNULL
+    ok: ph.grammar().rules[0].repetition.min == 1
+    ok: ph.grammar().rules[0].repetition.max == 1
+      : ParserHarness ph( "$my_rule= null\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "my_rule"
+    ok: ph.grammar().rules[0].type == Rule::TNULL
+    ok: ph.grammar().rules[0].repetition.min == 1
+    ok: ph.grammar().rules[0].repetition.max == 1
+      : ParserHarness ph( "$my_rule = null\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "my_rule"
+    ok: ph.grammar().rules[0].type == Rule::TNULL
+    ok: ph.grammar().rules[0].repetition.min == 1
+    ok: ph.grammar().rules[0].repetition.max == 1
+      : ParserHarness ph( "$my_rule =null\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "my_rule"
+    ok: ph.grammar().rules[0].type == Rule::TNULL
+    ok: ph.grammar().rules[0].repetition.min == 1
+    ok: ph.grammar().rules[0].repetition.max == 1
       : ParserHarness ph( "$another_rule= : boolean\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
@@ -559,7 +587,31 @@ jcr-version
     ok: ph.grammar().rules[0].max.is_set() == true
     ok: ph.grammar().rules[0].max.is_string() == true
     ok: ph.grammar().rules[0].max.as_string() == "a string"
+      : ParserHarness ph( "$rule-2 = \"a string\"\n" )
+    ok: ph.status() != JCRParser::S_OK
+      : ParserHarness ph( "$rule-2 = 'a string'\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::STRING_LITERAL
+    ok: ph.grammar().rules[0].min.is_set() == true
+    ok: ph.grammar().rules[0].min.is_string() == true
+    ok: ph.grammar().rules[0].min.as_string() == "a string"
+    ok: ph.grammar().rules[0].max.is_set() == true
+    ok: ph.grammar().rules[0].max.is_string() == true
+    ok: ph.grammar().rules[0].max.as_string() == "a string"
       : ParserHarness ph( "$rule-2 = : /pref\\d+/i\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::STRING_REGEX
+    ok: ph.grammar().rules[0].min.is_set() == true
+    ok: ph.grammar().rules[0].min.is_string() == true
+    ok: ph.grammar().rules[0].min.as_string() == "/pref\\d+/i"
+    ok: ph.grammar().rules[0].max.is_set() == true
+    ok: ph.grammar().rules[0].max.is_string() == true
+    ok: ph.grammar().rules[0].max.as_string() == "/pref\\d+/i"
+      : ParserHarness ph( "$rule-2 = /pref\\d+/i\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].rule_name == "rule-2"
@@ -577,7 +629,21 @@ jcr-version
     ok: ph.grammar().rules[0].type == Rule::FLOAT
     ok: ph.grammar().rules[0].min.is_set() == false
     ok: ph.grammar().rules[0].max.is_set() == false
+      : ParserHarness ph( "$rule-2 = float\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::FLOAT
+    ok: ph.grammar().rules[0].min.is_set() == false
+    ok: ph.grammar().rules[0].max.is_set() == false
       : ParserHarness ph( "$rule-2 = : double\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::DOUBLE
+    ok: ph.grammar().rules[0].min.is_set() == false
+    ok: ph.grammar().rules[0].max.is_set() == false
+      : ParserHarness ph( "$rule-2 = double\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].rule_name == "rule-2"
@@ -593,7 +659,27 @@ jcr-version
     ok: ph.grammar().rules[0].min.is_float() == true
     ok: ph.grammar().rules[0].min.as_float() == 1.0
     ok: ph.grammar().rules[0].max.is_set() == false
+      : ParserHarness ph( "$rule-2 = 1.0..\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::DOUBLE
+    ok: ph.grammar().rules[0].min.is_set() == true
+    ok: ph.grammar().rules[0].min.is_float() == true
+    ok: ph.grammar().rules[0].min.as_float() == 1.0
+    ok: ph.grammar().rules[0].max.is_set() == false
       : ParserHarness ph( "$rule-2 = : -1.0..3.5e-2\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::DOUBLE
+    ok: ph.grammar().rules[0].min.is_set() == true
+    ok: ph.grammar().rules[0].min.is_float() == true
+    ok: ph.grammar().rules[0].min.as_float() == -1.0
+    ok: ph.grammar().rules[0].max.is_set() == true
+    ok: ph.grammar().rules[0].max.is_float() == true
+    ok: ph.grammar().rules[0].max.as_float() == 3.5e-2
+      : ParserHarness ph( "$rule-2 = -1.0..3.5e-2\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].rule_name == "rule-2"
@@ -615,6 +701,17 @@ jcr-version
     ok: ph.grammar().rules[0].max.is_set() == true
     ok: ph.grammar().rules[0].max.is_float() == true
     ok: ph.grammar().rules[0].max.as_float() == -3.5e-2
+      : ParserHarness ph( "$rule-2 = -1.0..-3.5e-2\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::DOUBLE
+    ok: ph.grammar().rules[0].min.is_set() == true
+    ok: ph.grammar().rules[0].min.is_float() == true
+    ok: ph.grammar().rules[0].min.as_float() == -1.0
+    ok: ph.grammar().rules[0].max.is_set() == true
+    ok: ph.grammar().rules[0].max.is_float() == true
+    ok: ph.grammar().rules[0].max.as_float() == -3.5e-2
       : ParserHarness ph( "$rule-2 = : ..-3.5e-2\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
@@ -624,7 +721,27 @@ jcr-version
     ok: ph.grammar().rules[0].max.is_set() == true
     ok: ph.grammar().rules[0].max.is_float() == true
     ok: ph.grammar().rules[0].max.as_float() == -3.5e-2
+      : ParserHarness ph( "$rule-2 = ..-3.5e-2\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::DOUBLE
+    ok: ph.grammar().rules[0].min.is_set() == false
+    ok: ph.grammar().rules[0].max.is_set() == true
+    ok: ph.grammar().rules[0].max.is_float() == true
+    ok: ph.grammar().rules[0].max.as_float() == -3.5e-2
       : ParserHarness ph( "$rule-2 = : 4.0\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::DOUBLE
+    ok: ph.grammar().rules[0].min.is_set() == true
+    ok: ph.grammar().rules[0].min.is_float() == true
+    ok: ph.grammar().rules[0].min.as_float() == 4.0
+    ok: ph.grammar().rules[0].max.is_set() == true
+    ok: ph.grammar().rules[0].max.is_float() == true
+    ok: ph.grammar().rules[0].max.as_float() == 4.0
+      : ParserHarness ph( "$rule-2 = 4.0\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].rule_name == "rule-2"
@@ -646,6 +763,17 @@ jcr-version
     ok: ph.grammar().rules[0].max.is_set() == true
     ok: ph.grammar().rules[0].max.is_float() == true
     ok: ph.grammar().rules[0].max.as_float() == -3.5e-2
+      : ParserHarness ph( "$rule-2 = -3.5e-2\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::DOUBLE
+    ok: ph.grammar().rules[0].min.is_set() == true
+    ok: ph.grammar().rules[0].min.is_float() == true
+    ok: ph.grammar().rules[0].min.as_float() == -3.5e-2
+    ok: ph.grammar().rules[0].max.is_set() == true
+    ok: ph.grammar().rules[0].max.is_float() == true
+    ok: ph.grammar().rules[0].max.as_float() == -3.5e-2
       : ParserHarness ph( "$rule-2 = : integer\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
@@ -653,7 +781,23 @@ jcr-version
     ok: ph.grammar().rules[0].type == Rule::INTEGER
     ok: ph.grammar().rules[0].min.is_set() == false
     ok: ph.grammar().rules[0].max.is_set() == false
+      : ParserHarness ph( "$rule-2 = integer\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::INTEGER
+    ok: ph.grammar().rules[0].min.is_set() == false
+    ok: ph.grammar().rules[0].max.is_set() == false
       : ParserHarness ph( "$rule-2 = : 100..\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::UINTEGER
+    ok: ph.grammar().rules[0].min.is_set() == true
+    ok: ph.grammar().rules[0].min.is_uint() == true
+    ok: ph.grammar().rules[0].min.as_uint() == 100
+    ok: ph.grammar().rules[0].max.is_set() == false
+      : ParserHarness ph( "$rule-2 = 100..\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].rule_name == "rule-2"
@@ -673,6 +817,17 @@ jcr-version
     ok: ph.grammar().rules[0].max.is_set() == true
     ok: ph.grammar().rules[0].max.is_int() == true
     ok: ph.grammar().rules[0].max.as_int() == -50
+      : ParserHarness ph( "$rule-2 = -100..-50\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::INTEGER
+    ok: ph.grammar().rules[0].min.is_set() == true
+    ok: ph.grammar().rules[0].min.is_int() == true
+    ok: ph.grammar().rules[0].min.as_int() == -100
+    ok: ph.grammar().rules[0].max.is_set() == true
+    ok: ph.grammar().rules[0].max.is_int() == true
+    ok: ph.grammar().rules[0].max.as_int() == -50
       : ParserHarness ph( "$rule-2 = : ..50\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
@@ -682,7 +837,27 @@ jcr-version
     ok: ph.grammar().rules[0].max.is_set() == true
     ok: ph.grammar().rules[0].max.is_int() == true
     ok: ph.grammar().rules[0].max.as_int() == 50
+      : ParserHarness ph( "$rule-2 = ..50\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::INTEGER
+    ok: ph.grammar().rules[0].min.is_set() == false
+    ok: ph.grammar().rules[0].max.is_set() == true
+    ok: ph.grammar().rules[0].max.is_int() == true
+    ok: ph.grammar().rules[0].max.as_int() == 50
       : ParserHarness ph( "$rule-2 = : 64\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::UINTEGER
+    ok: ph.grammar().rules[0].min.is_set() == true
+    ok: ph.grammar().rules[0].min.is_uint() == true
+    ok: ph.grammar().rules[0].min.as_uint() == 64
+    ok: ph.grammar().rules[0].max.is_set() == true
+    ok: ph.grammar().rules[0].max.is_uint() == true
+    ok: ph.grammar().rules[0].max.as_uint() == 64
+      : ParserHarness ph( "$rule-2 = 64\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].rule_name == "rule-2"
@@ -704,7 +879,29 @@ jcr-version
     ok: ph.grammar().rules[0].max.is_set() == true
     ok: ph.grammar().rules[0].max.is_uint() == true
     ok: ph.grammar().rules[0].max.as_uint() == 255
+      : ParserHarness ph( "$rule-2 = uint8\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::UINTEGER
+    ok: ph.grammar().rules[0].min.is_set() == true
+    ok: ph.grammar().rules[0].min.is_uint() == true
+    ok: ph.grammar().rules[0].min.as_uint() == 0
+    ok: ph.grammar().rules[0].max.is_set() == true
+    ok: ph.grammar().rules[0].max.is_uint() == true
+    ok: ph.grammar().rules[0].max.as_uint() == 255
       : ParserHarness ph( "$rule-2 = : int8\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::INTEGER
+    ok: ph.grammar().rules[0].min.is_set() == true
+    ok: ph.grammar().rules[0].min.is_int() == true
+    ok: ph.grammar().rules[0].min.as_int() == -128
+    ok: ph.grammar().rules[0].max.is_set() == true
+    ok: ph.grammar().rules[0].max.is_int() == true
+    ok: ph.grammar().rules[0].max.as_int() == 127
+      : ParserHarness ph( "$rule-2 = int8\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].rule_name == "rule-2"
@@ -725,7 +922,27 @@ jcr-version
     ok: ph.grammar().rules[0].max.is_set() == true
     ok: ph.grammar().rules[0].max.is_uint() == true
     ok: ph.grammar().rules[0].max.as_uint() == 4294967295
+      : ParserHarness ph( "$rule-2 = uint32\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].type == Rule::UINTEGER
+    ok: ph.grammar().rules[0].min.is_set() == true
+    ok: ph.grammar().rules[0].min.is_uint() == true
+    ok: ph.grammar().rules[0].min.as_uint() == 0
+    ok: ph.grammar().rules[0].max.is_set() == true
+    ok: ph.grammar().rules[0].max.is_uint() == true
+    ok: ph.grammar().rules[0].max.as_uint() == 4294967295
       : ParserHarness ph( "$rule-2 = : int32\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].type == Rule::INTEGER
+    ok: ph.grammar().rules[0].min.is_set() == true
+    ok: ph.grammar().rules[0].min.is_int() == true
+    ok: ph.grammar().rules[0].min.as_int() == -2147483648LL
+    ok: ph.grammar().rules[0].max.is_set() == true
+    ok: ph.grammar().rules[0].max.is_int() == true
+    ok: ph.grammar().rules[0].max.as_int() == 2147483647
+      : ParserHarness ph( "$rule-2 = int32\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].type == Rule::INTEGER
@@ -745,7 +962,27 @@ jcr-version
     ok: ph.grammar().rules[0].max.is_set() == true
     ok: ph.grammar().rules[0].max.is_uint() == true
     ok: ph.grammar().rules[0].max.as_uint() == 18446744073709551615
+      : ParserHarness ph( "$rule-2 = uint64\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].type == Rule::UINTEGER
+    ok: ph.grammar().rules[0].min.is_set() == true
+    ok: ph.grammar().rules[0].min.is_uint() == true
+    ok: ph.grammar().rules[0].min.as_uint() == 0
+    ok: ph.grammar().rules[0].max.is_set() == true
+    ok: ph.grammar().rules[0].max.is_uint() == true
+    ok: ph.grammar().rules[0].max.as_uint() == 18446744073709551615
       : ParserHarness ph( "$rule-2 = : int64\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].type == Rule::INTEGER
+    ok: ph.grammar().rules[0].min.is_set() == true
+    ok: ph.grammar().rules[0].min.is_int() == true
+    ok: ph.grammar().rules[0].min.as_int() == -9223372036854775808LL
+    ok: ph.grammar().rules[0].max.is_set() == true
+    ok: ph.grammar().rules[0].max.is_int() == true
+    ok: ph.grammar().rules[0].max.as_int() == 9223372036854775807
+      : ParserHarness ph( "$rule-2 = int64\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].type == Rule::INTEGER
@@ -760,7 +997,17 @@ jcr-version
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].rule_name == "rule-2"
     ok: ph.grammar().rules[0].type == Rule::IPV4
+      : ParserHarness ph( "$rule-2 = ipv4\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::IPV4
       : ParserHarness ph( "$rule-2 = : ipv6\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::IPV6
+      : ParserHarness ph( "$rule-2 = ipv6\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].rule_name == "rule-2"
@@ -770,7 +1017,17 @@ jcr-version
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].rule_name == "rule-2"
     ok: ph.grammar().rules[0].type == Rule::IPADDR
+      : ParserHarness ph( "$rule-2 = ipaddr\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::IPADDR
       : ParserHarness ph( "$rule-2 = : idn\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::IDN
+      : ParserHarness ph( "$rule-2 = idn\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].rule_name == "rule-2"
@@ -780,7 +1037,23 @@ jcr-version
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].rule_name == "rule-2"
     ok: ph.grammar().rules[0].type == Rule::FQDN
+      : ParserHarness ph( "$rule-2 = fqdn\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::FQDN
       : ParserHarness ph( "$rule-2 = : uri..http\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::URI_RANGE
+    ok: ph.grammar().rules[0].min.is_set() == true
+    ok: ph.grammar().rules[0].min.is_string() == true
+    ok: ph.grammar().rules[0].min.as_string() == "http"
+    ok: ph.grammar().rules[0].max.is_set() == true
+    ok: ph.grammar().rules[0].max.is_string() == true
+    ok: ph.grammar().rules[0].max.as_string() == "http"
+      : ParserHarness ph( "$rule-2 = uri..http\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].rule_name == "rule-2"
@@ -802,7 +1075,25 @@ jcr-version
     ok: ph.grammar().rules[0].max.is_set() == true
     ok: ph.grammar().rules[0].max.is_string() == true
     ok: ph.grammar().rules[0].max.as_string() == "sip"
+      : ParserHarness ph( "$rule-2 = uri..sip" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::URI_RANGE
+    ok: ph.grammar().rules[0].min.is_set() == true
+    ok: ph.grammar().rules[0].min.is_string() == true
+    ok: ph.grammar().rules[0].min.as_string() == "sip"
+    ok: ph.grammar().rules[0].max.is_set() == true
+    ok: ph.grammar().rules[0].max.is_string() == true
+    ok: ph.grammar().rules[0].max.as_string() == "sip"
       : ParserHarness ph( "$rule-2 = : uri\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::URI_TYPE
+    ok: ph.grammar().rules[0].min.is_set() == false
+    ok: ph.grammar().rules[0].max.is_set() == false
+      : ParserHarness ph( "$rule-2 = uri\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].rule_name == "rule-2"
@@ -816,7 +1107,21 @@ jcr-version
     ok: ph.grammar().rules[0].type == Rule::PHONE
     ok: ph.grammar().rules[0].min.is_set() == false
     ok: ph.grammar().rules[0].max.is_set() == false
+      : ParserHarness ph( "$rule-2 = phone\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::PHONE
+    ok: ph.grammar().rules[0].min.is_set() == false
+    ok: ph.grammar().rules[0].max.is_set() == false
       : ParserHarness ph( "$rule-2 = : email\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::EMAIL
+    ok: ph.grammar().rules[0].min.is_set() == false
+    ok: ph.grammar().rules[0].max.is_set() == false
+      : ParserHarness ph( "$rule-2 = email\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].rule_name == "rule-2"
@@ -830,7 +1135,21 @@ jcr-version
     ok: ph.grammar().rules[0].type == Rule::DATE
     ok: ph.grammar().rules[0].min.is_set() == false
     ok: ph.grammar().rules[0].max.is_set() == false
+      : ParserHarness ph( "$rule-2 = date\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::DATE
+    ok: ph.grammar().rules[0].min.is_set() == false
+    ok: ph.grammar().rules[0].max.is_set() == false
       : ParserHarness ph( "$rule-2 = : time\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::TIME
+    ok: ph.grammar().rules[0].min.is_set() == false
+    ok: ph.grammar().rules[0].max.is_set() == false
+      : ParserHarness ph( "$rule-2 = time\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].rule_name == "rule-2"
@@ -844,7 +1163,21 @@ jcr-version
     ok: ph.grammar().rules[0].type == Rule::DATETIME
     ok: ph.grammar().rules[0].min.is_set() == false
     ok: ph.grammar().rules[0].max.is_set() == false
+      : ParserHarness ph( "$rule-2 = datetime\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::DATETIME
+    ok: ph.grammar().rules[0].min.is_set() == false
+    ok: ph.grammar().rules[0].max.is_set() == false
       : ParserHarness ph( "$rule-2 = : hex\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::HEX
+    ok: ph.grammar().rules[0].min.is_set() == false
+    ok: ph.grammar().rules[0].max.is_set() == false
+      : ParserHarness ph( "$rule-2 = hex\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].rule_name == "rule-2"
@@ -858,7 +1191,21 @@ jcr-version
     ok: ph.grammar().rules[0].type == Rule::BASE32
     ok: ph.grammar().rules[0].min.is_set() == false
     ok: ph.grammar().rules[0].max.is_set() == false
+      : ParserHarness ph( "$rule-2 = base32\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::BASE32
+    ok: ph.grammar().rules[0].min.is_set() == false
+    ok: ph.grammar().rules[0].max.is_set() == false
       : ParserHarness ph( "$rule-2 = : base32hex\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::BASE32HEX
+    ok: ph.grammar().rules[0].min.is_set() == false
+    ok: ph.grammar().rules[0].max.is_set() == false
+      : ParserHarness ph( "$rule-2 = base32hex\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].rule_name == "rule-2"
@@ -872,7 +1219,21 @@ jcr-version
     ok: ph.grammar().rules[0].type == Rule::BASE64
     ok: ph.grammar().rules[0].min.is_set() == false
     ok: ph.grammar().rules[0].max.is_set() == false
+      : ParserHarness ph( "$rule-2 = base64\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::BASE64
+    ok: ph.grammar().rules[0].min.is_set() == false
+    ok: ph.grammar().rules[0].max.is_set() == false
       : ParserHarness ph( "$rule-2 = : base64url\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::BASE64URL
+    ok: ph.grammar().rules[0].min.is_set() == false
+    ok: ph.grammar().rules[0].max.is_set() == false
+      : ParserHarness ph( "$rule-2 = base64url\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].rule_name == "rule-2"
@@ -886,7 +1247,20 @@ jcr-version
     ok: ph.grammar().rules[0].type == Rule::ANY
     ok: ph.grammar().rules[0].min.is_set() == false
     ok: ph.grammar().rules[0].max.is_set() == false
+      : ParserHarness ph( "$rule-2 = any\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].rule_name == "rule-2"
+    ok: ph.grammar().rules[0].type == Rule::ANY
+    ok: ph.grammar().rules[0].min.is_set() == false
+    ok: ph.grammar().rules[0].max.is_set() == false
       : ParserHarness ph( "$my_rule = : @{root} null\n" )
+    ok: ph.status() == JCRParser::S_OK
+    ok: ph.grammar().rules.size() == 1
+    ok: ph.grammar().rules[0].annotations.is_root == true
+    ok: ph.grammar().rules[0].rule_name == "my_rule"
+    ok: ph.grammar().rules[0].type == Rule::TNULL
+      : ParserHarness ph( "$my_rule = @{root} null\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].annotations.is_root == true
@@ -894,8 +1268,8 @@ jcr-version
     ok: ph.grammar().rules[0].type == Rule::TNULL
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - Syntax parsing - root rule [test-parsing-only.cpp:862]
-    ======================================================================
+    GrammarParser - Syntax parsing - root rule [test-parsing-only.cpp:1367]
+    =======================================================================
       : ParserHarness ph( " integer" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
@@ -943,18 +1317,18 @@ jcr-version
     ok: ph.grammar().rules[0].type == Rule::ARRAY
     ok: ph.grammar().rules[0].repetition.min == 1
     ok: ph.grammar().rules[0].repetition.max == 1
-      Calling: test_parsing_bad_input( ": junk\n" ) (928)
+      Calling: test_parsing_bad_input( ": junk\n" ) (1433)
       #### : junk
  ####
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "* junk\n" ) (930)
+      Calling: test_parsing_bad_input( "* junk\n" ) (1435)
       #### * junk
  ####
     ok: status != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - Syntax parsing - Member name [test-parsing-only.cpp:933]
-    ========================================================================
+    GrammarParser - Syntax parsing - Member name [test-parsing-only.cpp:1438]
+    =========================================================================
       : ParserHarness ph( "$my_rule = \"Fred\" : null\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
@@ -998,14 +1372,14 @@ jcr-version
     ok: ph.grammar().rules[0].member_name.is_literal() == true
     ok: ph.grammar().rules[0].member_name.name() == "abc\xF0\x92\x8D\x85=Ra"
     ok: ph.grammar().rules[0].type == Rule::TNULL
-      Calling: test_parsing_bad_input( "$my_rule = `p_ref\\d+` * integer\n" ) (992)
+      Calling: test_parsing_bad_input( "$my_rule = `p_ref\\d+` * integer\n" ) (1497)
       #### $my_rule = `p_ref\d+` * integer
  ####
     ok: status != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - Syntax parsing - type-choice [test-parsing-only.cpp:995]
-    ========================================================================
+    GrammarParser - Syntax parsing - type-choice [test-parsing-only.cpp:1500]
+    =========================================================================
       : ParserHarness ph( "$my_rule = : (null)\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
@@ -1070,29 +1444,29 @@ jcr-version
     ok: ph.grammar().rules[0].children[0].rule_name == ""
     ok: ph.grammar().rules[0].children[0].type == Rule::TNULL
     ok: ph.grammar().rules[0].children[1].type == Rule::INTEGER
-      Calling: test_parsing_bad_input( "$my_rule = : ( )\n" ) (1080)
+      Calling: test_parsing_bad_input( "$my_rule = : ( )\n" ) (1585)
       #### $my_rule = : ( )
  ####
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = : ( | )\n" ) (1082)
+      Calling: test_parsing_bad_input( "$my_rule = : ( | )\n" ) (1587)
       #### $my_rule = : ( | )
  ####
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = : ( integer | )\n" ) (1084)
+      Calling: test_parsing_bad_input( "$my_rule = : ( integer | )\n" ) (1589)
       #### $my_rule = : ( integer | )
  ####
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = : ( integer * )\n" ) (1086)
+      Calling: test_parsing_bad_input( "$my_rule = : ( integer * )\n" ) (1591)
       #### $my_rule = : ( integer * )
  ####
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = : ( integer : null )\n" ) (1088)
+      Calling: test_parsing_bad_input( "$my_rule = : ( integer : null )\n" ) (1593)
       #### $my_rule = : ( integer : null )
  ####
     ok: status != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - Syntax parsing - object [test-parsing-only.cpp:1091]
+    GrammarParser - Syntax parsing - object [test-parsing-only.cpp:1596]
     ====================================================================
       : ParserHarness ph( "$my_rule = { \"member\" : integer }\n" )
     ok: ph.status() == JCRParser::S_OK
@@ -1352,17 +1726,17 @@ jcr-version
     ok: ph.grammar().rules[0].type == Rule::OBJECT
     ok: ph.grammar().rules[0].children.size() == 1
     ok: ph.grammar().rules[0].children[0].type == Rule::OBJECT_GROUP
-      Calling: test_parsing_bad_input( "$my_rule = : { \"flt\":float?, \"flt2\":float | \"str\" : string }\n" ) (1405)
+      Calling: test_parsing_bad_input( "$my_rule = : { \"flt\":float?, \"flt2\":float | \"str\" : string }\n" ) (1910)
       #### $my_rule = : { "flt":float?, "flt2":float | "str" : string }
  ####
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = : {\"flt\":float ?, }\n" ) (1407)
+      Calling: test_parsing_bad_input( "$my_rule = : {\"flt\":float ?, }\n" ) (1912)
       #### $my_rule = : {"flt":float ?, }
  ####
     ok: status != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - Syntax parsing - array [test-parsing-only.cpp:1410]
+    GrammarParser - Syntax parsing - array [test-parsing-only.cpp:1915]
     ===================================================================
       : ParserHarness ph( "$my_rule = [ integer ]\n" )
     ok: ph.status() == JCRParser::S_OK
@@ -1573,17 +1947,17 @@ jcr-version
     ok: ph.grammar().rules[0].children[1].children[0].children[0].type == Rule::INTEGER
     ok: ph.grammar().rules[0].children[1].children[0].children[1].type == Rule::FLOAT
     ok: ph.grammar().rules[0].children[1].children[1].type == Rule::STRING_TYPE
-      Calling: test_parsing_bad_input( "$my_rule = [ integer, float | string ]\n" ) (1678)
+      Calling: test_parsing_bad_input( "$my_rule = [ integer, float | string ]\n" ) (2183)
       #### $my_rule = [ integer, float | string ]
  ####
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = [ integer, ]\n" ) (1680)
+      Calling: test_parsing_bad_input( "$my_rule = [ integer, ]\n" ) (2185)
       #### $my_rule = [ integer, ]
  ####
     ok: status != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - Syntax parsing - group [test-parsing-only.cpp:1683]
+    GrammarParser - Syntax parsing - group [test-parsing-only.cpp:2188]
     ===================================================================
       : ParserHarness ph( "$my_rule = ( integer )\n" )
     ok: ph.status() == JCRParser::S_OK
@@ -1721,17 +2095,17 @@ jcr-version
     ok: ph.grammar().rules[0].children[1].children[2].children[1].member_name.is_absent()
     ok: ph.grammar().rules[0].children[1].children[2].children[1].min.is_string() == true
     ok: ph.grammar().rules[0].children[1].children[2].children[1].min.as_string() == "/p*/"
-      Calling: test_parsing_bad_input( "$my_rule = (integer,float|string )\n" ) (1857)
+      Calling: test_parsing_bad_input( "$my_rule = (integer,float|string )\n" ) (2362)
       #### $my_rule = (integer,float|string )
  ####
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = (integer, )\n" ) (1859)
+      Calling: test_parsing_bad_input( "$my_rule = (integer, )\n" ) (2364)
       #### $my_rule = (integer, )
  ####
     ok: status != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - Syntax parsing - repetition [test-parsing-only.cpp:1862]
+    GrammarParser - Syntax parsing - repetition [test-parsing-only.cpp:2367]
     ========================================================================
       : ParserHarness ph( "$my_rule = [ integer ]\n" )
     ok: ph.status() == JCRParser::S_OK
@@ -1933,68 +2307,68 @@ jcr-version
     ok: ph.grammar().rules[0].children[0].repetition.min == 2
     ok: ph.grammar().rules[0].children[0].repetition.max == 5
     ok: ph.grammar().rules[0].children[0].repetition.step == 4
-      Calling: test_parsing_bad_input( "$my_rule = [ integer *142.]" ) (2132)
+      Calling: test_parsing_bad_input( "$my_rule = [ integer *142.]" ) (2637)
       #### $my_rule = [ integer *142.] ####
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = [ integer *142..% ]" ) (2134)
+      Calling: test_parsing_bad_input( "$my_rule = [ integer *142..% ]" ) (2639)
       #### $my_rule = [ integer *142..% ] ####
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = [ integer *.. ]" ) (2136)
+      Calling: test_parsing_bad_input( "$my_rule = [ integer *.. ]" ) (2641)
       #### $my_rule = [ integer *.. ] ####
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = [ integer *..%24 ]" ) (2138)
+      Calling: test_parsing_bad_input( "$my_rule = [ integer *..%24 ]" ) (2643)
       #### $my_rule = [ integer *..%24 ] ####
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = [ integer *..145%-12 ]" ) (2140)
+      Calling: test_parsing_bad_input( "$my_rule = [ integer *..145%-12 ]" ) (2645)
       #### $my_rule = [ integer *..145%-12 ] ####
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = [ integer *-142..-145%24 ]" ) (2142)
+      Calling: test_parsing_bad_input( "$my_rule = [ integer *-142..-145%24 ]" ) (2647)
       #### $my_rule = [ integer *-142..-145%24 ] ####
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = [ integer *..-145 ]" ) (2144)
+      Calling: test_parsing_bad_input( "$my_rule = [ integer *..-145 ]" ) (2649)
       #### $my_rule = [ integer *..-145 ] ####
     ok: status != JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule = [ integer *-142.. ]" ) (2146)
+      Calling: test_parsing_bad_input( "$my_rule = [ integer *-142.. ]" ) (2651)
       #### $my_rule = [ integer *-142.. ] ####
     ok: status != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarParser - Syntax parsing - annotations [test-parsing-only.cpp:2149]
+    GrammarParser - Syntax parsing - annotations [test-parsing-only.cpp:2654]
     =========================================================================
-      Calling: test_parsing_only( "$my_rule = @{not} $other_rule\n" ) (2152)
+      Calling: test_parsing_only( "$my_rule = @{not} $other_rule\n" ) (2657)
       #### $my_rule = @{not} $other_rule
  ####
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "$my_rule = [ @{id type} string, float ]\n" ) (2154)
+      Calling: test_parsing_only( "$my_rule = [ @{id type} string, float ]\n" ) (2659)
       #### $my_rule = [ @{id type} string, float ]
  ####
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "$my_rule = [ @{id type} string, @{when $type} float? ]\n" ) (2156)
+      Calling: test_parsing_only( "$my_rule = [ @{id type} string, @{when $type} float? ]\n" ) (2661)
       #### $my_rule = [ @{id type} string, @{when $type} float? ]
  ####
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "$my_rule = [ @{id type} string, @{when $type}@{assert $ > 15.0} float ? ]\n" ) (2158)
+      Calling: test_parsing_only( "$my_rule = [ @{id type} string, @{when $type}@{assert $ > 15.0} float ? ]\n" ) (2663)
       #### $my_rule = [ @{id type} string, @{when $type}@{assert $ > 15.0} float ? ]
  ####
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "$my_rule = [ @{id type}@{assert $==\"in\" || $==\"out\"} string, float ? ]\n" ) (2160)
+      Calling: test_parsing_only( "$my_rule = [ @{id type}@{assert $==\"in\" || $==\"out\"} string, float ? ]\n" ) (2665)
       #### $my_rule = [ @{id type}@{assert $=="in" || $=="out"} string, float ? ]
  ####
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "$my_rule = [ @{id type}@{assert $==/^\\w{1,4}$/} string, float? ]\n" ) (2162)
+      Calling: test_parsing_only( "$my_rule = [ @{id type}@{assert $==/^\\w{1,4}$/} string, float? ]\n" ) (2667)
       #### $my_rule = [ @{id type}@{assert $==/^\w{1,4}$/} string, float? ]
  ####
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "$my_rule = [ @{id type}@{assert $==/^\\w{1,4}$/ ; Must for 4 or less chars{}\n} string, float? ]\n" ) (2164)
+      Calling: test_parsing_only( "$my_rule = [ @{id type}@{assert $==/^\\w{1,4}$/ ; Must for 4 or less chars{}\n} string, float? ]\n" ) (2669)
       #### $my_rule = [ @{id type}@{assert $==/^\w{1,4}$/ ; Must for 4 or less chars{}
 } string, float? ]
  ####
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "$my_rule=[@{not}string,float ]\n" ) (2166)
+      Calling: test_parsing_only( "$my_rule=[@{not}string,float ]\n" ) (2671)
       #### $my_rule=[@{not}string,float ]
  ####
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_bad_input( "$my_rule=[@{unknown}string,float ]\n" ) (2168)
+      Calling: test_parsing_bad_input( "$my_rule=[@{unknown}string,float ]\n" ) (2673)
       #### $my_rule=[@{unknown}string,float ]
  ####
     ok: status != JCRParser::S_OK
@@ -2006,4 +2380,4 @@ TODOs (2):
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:42]
 - Test low level GrammarSet class [test-low-level-objects.cpp:236]
 
-0 error(s), 2 todo(s), 1517 test(s)
+0 error(s), 2 todo(s), 1845 test(s)
