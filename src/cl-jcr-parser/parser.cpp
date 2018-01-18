@@ -728,7 +728,7 @@ bool GrammarParser::import_d( DirectiveForm::Enum form )
                 DSPs( form ) &&
                 as_kw() &&
                 (DSPs( form ) || error( "Expected space and alias after 'as' keyword in #import directive" ) && abandon_path()) &&
-                (ruleset_id_alias_accumulator.select() && ruleset_id_alias() || error( "Unable to read alias for ruleset-id in #import directive" ) && abandon_path()) ) )
+                ((ruleset_id_alias_accumulator.select() && ruleset_id_alias()) || (error( "Unable to read alias for ruleset-id in #import directive" ) && abandon_path())) ) )
         {
             std::string ruleset_id = ruleset_id_accumulator.get();
             std::string ruleset_id_alias = ruleset_id_alias_accumulator.get();
@@ -931,7 +931,11 @@ bool GrammarParser::rule()
         Rule::uniq_ptr pu_rule( new Rule );
         RuleStackLogger rule_stack_logger( this, pu_rule );
 
-        rule_name() && star_sp_cmt() && is_get_char( '=' ) && star_sp_cmt() && rule_def() || fatal( "Unable to read rule definition" );
+        (rule_name() || fatal( "Expected 'rule-name' after '$' in rule definition. Got: '%0'", error_token() )) &&
+            star_sp_cmt() &&
+            (is_get_char( '=' ) || fatal( "Expected '=' after 'rule-name' in rule definition. Got: '%0'", error_token() )) &&
+            star_sp_cmt() &&
+            (rule_def() || fatal( "Expected 'rule-def' after '=' in rule definition. Got: '%0'", error_token() ));
 
         m.p_rule->rule_name = name_accumulator.get();
         m.p_rule->annotations.merge( rule_annotations );
@@ -969,29 +973,30 @@ bool GrammarParser::target_rule_name()
 
     if( annotations( target_rule_name_annotations ) && is_get_char( '$' ) )
     {
-        cl::accumulator first_accumulator( this );
-        cl::accumulator_deferred second_accumulator( this );
+        cl::accumulator name_accumulator( this );
 
-        ruleset_id_alias() || error_todo( "Expected 'target_rule_name' after '$'" );
+        ruleset_id_alias() || fatal( "Expected 'rule_name' after '$' when reading 'target_rule_name'. Got '%0'", error_token() );
 
         if( is_get_char( '.' ) )
         {
-            second_accumulator.select();
+            std::string alias_name( name_accumulator.get() );
+            name_accumulator.clear();
+
+            AliasLookupResult alias_lookup_result( m.p_grammar->get_aliased_import( alias_name ) );
+            if( ! alias_lookup_result.is_found() )
+                return fatal( "Unknown alias in 'target_rule_name': %0", alias_name );
+
             if( rule_name() )
             {
-                AliasLookupResult alias_lookup_result( m.p_grammar->get_aliased_import( first_accumulator.get() ) );
-                if( ! alias_lookup_result.is_found() )
-                    return fatal( (std::string( "Unknown alias in target rule: " ) + first_accumulator.get() ).c_str() );
-
                 m.p_rule->target_rule.rulesetid = alias_lookup_result;
-                m.p_rule->target_rule.local_name = second_accumulator.get();
+                m.p_rule->target_rule.local_name = name_accumulator.get();
             }
             else
-                return error_todo( "Expected 'rule_name' after 'rulesetid_alias'" );
+                return fatal( "Expected 'rule_name' in 'target_rule_name' with format '$<rulesetid_alias>.<rule-name>'. Got '%0'", error_token() );
         }
         else
         {
-            m.p_rule->target_rule.local_name = first_accumulator.get();
+            m.p_rule->target_rule.local_name = name_accumulator.get();
         }
 
         m.p_rule->type = Rule::TARGET_RULE;
@@ -1092,8 +1097,8 @@ bool GrammarParser::member_rule()
 
     if( annotations( member_rule_annotations ) && member_name_spec() )
     {
-        star_sp_cmt() && (is_get_char( ':' ) || fatal( "Expected ':' after member-name %0. Got '%1'", m.p_rule->member_name, error_token() )) &&
-            star_sp_cmt() && type_rule() || fatal( "Expected type-rule after member-name %0. Got '%1'", m.p_rule->member_name, error_token() );
+        star_sp_cmt() && (is_get_char( ':' ) || fatal( "Expected ':' after 'member-name' %0. Got '%1'", m.p_rule->member_name, error_token() )) &&
+            star_sp_cmt() && type_rule() || fatal( "Expected 'type-rule' after 'member-name' %0. Got '%1'", m.p_rule->member_name, error_token() );
 
         m.p_rule->annotations.merge( member_rule_annotations );
 
@@ -1159,14 +1164,14 @@ bool GrammarParser::type_choice()
         m.p_rule->child_combiner = Rule::Choice;
         m.p_rule->annotations.merge( type_choice_annotations );
 
-        type_choice_items() || fatal_todo( "Must be at least one type specified within a type-choice" );
+        type_choice_items() || fatal( "Must be at least one 'type-choice-item' in 'type-choice'. Got: '%0'", error_token() );
 
         while( choice_combiner() )
         {
-            type_choice_items() || fatal_todo( "Expected type-choice-item after choice-combiner in type-choice" );
+            type_choice_items() || fatal( "Expected 'type-choice-item' after 'choice-combiner' in 'type-choice'. Got: '%0'", error_token() );
         }
 
-        is_get_char( ')' ) || fatal_todo( "Expected ')' at end of type-choice" );
+        is_get_char( ')' ) || fatal( "Expected ')' at end of type-choice. Got: '%0'", error_token() );
 
         return true;
     }
@@ -1227,8 +1232,10 @@ bool GrammarParser::annotations( Annotations & r_annotations )
 
     while( fixed( "@{" ) )
     {
-        star_sp_cmt() && annotation_set( r_annotations ) && star_sp_cmt() &&
-            (fixed( "}" ) || fatal_todo( "Expected ')' at end of annotation" )) &&
+        star_sp_cmt() &&
+            annotation_set( r_annotations ) &&
+            star_sp_cmt() &&
+            (fixed( "}" ) || fatal( "Expected '}' at end of annotation. Got '%0'", error_token() )) &&
             star_sp_cmt();
     }
 
@@ -1249,7 +1256,7 @@ bool GrammarParser::annotation_set( Annotations & r_annotations )
             rewind_on_reject( unordered_annotation( r_annotations ) ) ||
             rewind_on_reject( root_annotation( r_annotations ) ) ||
             rewind_on_reject( tbd_annotation() ) ||
-            fatal_todo( "Unrecognised annotation format" );     // Getting to fatal() will throw an exception
+            fatal_todo( "Unrecognised annotation format" );     // Calling fatal() will throw an exception
 }
 
 bool GrammarParser::not_annotation( Annotations & r_annotations )

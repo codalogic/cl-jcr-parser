@@ -1,0 +1,2 @@
+#import my-jcr as my-alias
+$my-rule = "width" : $my-alias.0-type

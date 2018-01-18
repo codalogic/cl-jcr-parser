@@ -1,3 +1,3 @@
 Fatal: 1-simple-object/literal-mname-bad-type.jcr (line: 1, char: 13):
-      Expected type-rule after member-name "an-int". Got 'pinteger'
+      Expected 'type-rule' after 'member-name' "an-int". Got 'pinteger'
 1 error(s), 0 warning(s)

@@ -1,0 +1,2 @@
+$my-rule =: ( integer | ( string | $my-type )
+$my-rule-2 = $my-rule-3
