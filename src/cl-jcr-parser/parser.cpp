@@ -272,7 +272,7 @@ private:
     STAR( qs_char )
     bool unescaped();
     bool escape();
-    bool escape_codes();
+    bool escape_code();
     bool u();
     bool four_HEXDIG();
     bool sq_string_as_utf8();
@@ -281,7 +281,7 @@ private:
     bool sq_char();
     bool sq_unescaped();
     bool regex();
-    bool ascii_char();
+    bool re_escape_code();
     bool not_slash();
     bool regex_modifiers();
     bool backtick_regex();
@@ -2766,7 +2766,7 @@ bool GrammarParser::qs_char()
     //                    %x74 /          ; t    tab             U+0009
     //                    %x75 4HEXDIG )  ; uXXXX                U+XXXX
 
-    return unescaped() || escape() && (escape_codes() || u() && four_HEXDIG());
+    return unescaped() || escape() && (escape_code() || u() && four_HEXDIG());
 }
 
 bool is_qstring_unescaped( char c )
@@ -2796,11 +2796,11 @@ bool GrammarParser::escape()
     return accumulate( '\\' );
 }
 
-cl::alphabet_char_class escape_codes_alphabet( "\"\\/bfnrt" );
+cl::alphabet_char_class escape_code_alphabet( "\"\\/bfnrt" );
 
-bool GrammarParser::escape_codes()
+bool GrammarParser::escape_code()
 {
-    return accumulate( escape_codes_alphabet );
+    return accumulate( escape_code_alphabet );
 }
 
 bool GrammarParser::u()
@@ -2839,11 +2839,11 @@ bool GrammarParser::regex()
     /* ABNF:
     regex            = "/" *( escape ascii-char / not-slash ) "/" [ regex-modifiers ]
     */
-    // "/" && *( escape() ascii_char() || not_slash() ) "/" [ regex_modifiers() ]
+    // "/" && *( escape() re_escape_code() || not_slash() ) "/" [ regex_modifiers() ]
 
     if( accumulate( '/' ) )
     {
-        while( (escape() && ascii_char()) || not_slash() )
+        while( (escape() && re_escape_code()) || not_slash() )
         {}
         accumulate( '/' ) && optional( regex_modifiers() ) || fatal_todo( "Error reading regular expression" );
 
@@ -2853,19 +2853,19 @@ bool GrammarParser::regex()
     return false;
 }
 
-bool is_ascii( char c )
+bool is_re_escape_code( char c )
 {
     return c >= 0x20 && c <= 0x7f;
 }
 
-bool GrammarParser::ascii_char()
+bool GrammarParser::re_escape_code()
 {
-    /* ABNF:
-    not-slash        = HTAB / CR / LF / %x20-2E / %x30-10FFFF
+    /* ABNF: 
+    re-escape-code   = %x20-7F ; Specific codes listed elsewhere
     */
-    // HTAB() || CR() || LF() / %x20-2E / %x30-10FFFF
+    // %x20-7F ; Specific codes listed elsewhere
 
-    return accumulate( cl::alphabet_function( is_ascii ) );
+    return accumulate( cl::alphabet_function( is_re_escape_code ) );
 }
 
 bool is_not_slash( char c )
@@ -2903,11 +2903,11 @@ bool GrammarParser::backtick_regex()
     /* ABNF: 
     backtick-regex   = "`" *( escape ascii-char / not-backtick ) "`"
     */
-    // "`" && *( escape() ascii_char() || not_backtick() ) "`"
+    // "`" && *( escape() re_escape_code() || not_backtick() ) "`"
 
     if( accumulate( '`' ) )
     {
-        while( (escape() && ascii_char()) || not_backtick() )
+        while( (escape() && re_escape_code()) || not_backtick() )
         {}
         accumulate( '`' ) || fatal_todo( "Error reading backtick quoted regular expression" );
 

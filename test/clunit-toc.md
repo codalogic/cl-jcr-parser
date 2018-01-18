@@ -1,4 +1,4 @@
-Tests table of contents generated on Thu Jan 18 16:12:02 2018
+Tests table of contents generated on Thu Jan 18 16:51:43 2018
 
 # test-config.cpp
 | Description | Line |
@@ -35,11 +35,11 @@ Tests table of contents generated on Thu Jan 18 16:12:02 2018
 | GrammarParser - Syntax parsing - TBD directive | 230 |
 | GrammarParser - Syntax parsing - target_rule_name | 244 |
 | GrammarParser - Syntax parsing - Primitive rules | 267 |
-| GrammarParser - Syntax parsing - root rule | 1367 |
-| GrammarParser - Syntax parsing - Member name | 1438 |
-| GrammarParser - Syntax parsing - type-choice | 1500 |
-| GrammarParser - Syntax parsing - object | 1596 |
-| GrammarParser - Syntax parsing - array | 1915 |
-| GrammarParser - Syntax parsing - group | 2188 |
-| GrammarParser - Syntax parsing - repetition | 2367 |
-| GrammarParser - Syntax parsing - annotations | 2654 |
+| GrammarParser - Syntax parsing - root rule | 1381 |
+| GrammarParser - Syntax parsing - Member name | 1452 |
+| GrammarParser - Syntax parsing - type-choice | 1514 |
+| GrammarParser - Syntax parsing - object | 1610 |
+| GrammarParser - Syntax parsing - array | 1929 |
+| GrammarParser - Syntax parsing - group | 2202 |
+| GrammarParser - Syntax parsing - repetition | 2381 |
+| GrammarParser - Syntax parsing - annotations | 2668 |
