@@ -3394,13 +3394,14 @@ std::string GrammarParser::error_token()    // Attempts to extract the token tha
 
     if( is_digit( current() ) || current() == '.' || current() == '-' )
     {
-        while( is_digit( get() ) || current() == '.' || current() == '-' )
+        while( is_digit( get() ) || current() == '.' || current() == 'e' || current() == '-' || current() == '+' )
             token += current();
     }
 
     else if( current() == '$' || is_alpha( current() ) || current() == '_' )
     {
-        while( is_digit( get() ) || is_alpha( current() ) || current() == '_' )
+        while( is_alpha( get() ) || is_digit( current() ) ||
+                current() == '_' || current() == '-' || current() == '.' )
             token += current();
     }
 
