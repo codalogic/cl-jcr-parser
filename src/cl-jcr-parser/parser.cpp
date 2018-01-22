@@ -1268,7 +1268,7 @@ bool GrammarParser::annotation_set( Annotations & r_annotations )
             rewind_on_reject( unordered_annotation( r_annotations ) ) ||
             rewind_on_reject( root_annotation( r_annotations ) ) ||
             rewind_on_reject( tbd_annotation() ) ||
-            fatal_todo( "Unrecognised annotation format" );     // Calling fatal() will throw an exception
+            fatal( "Unrecognised 'annotation' format. Got: '%0'" );     // Calling fatal() will throw an exception
 }
 
 bool GrammarParser::not_annotation( Annotations & r_annotations )
@@ -1315,9 +1315,11 @@ bool GrammarParser::tbd_annotation()
     annotation_name() && optional( spaces() && name_accumulator.none() && annotation_parameters() );
 
     if( name_accumulator.get() == "id" || name_accumulator.get() == "assert" || name_accumulator.get() == "when" || name_accumulator.get() == "doc" )
-        warning( (std::string( "Annotation: '" ) + name_accumulator.get() + "' not yet implemented").c_str() ); // See Leave_as_warning
+        warning( "Unimplemented 'Annotation': '%0'", name_accumulator.get() ); // See Leave_as_warning
+    else if( ! name_accumulator.get().empty() )
+        fatal( "Unknown 'Annotation': '%0'", name_accumulator.get() );
     else
-        fatal( (std::string( "Annotation: '" ) + name_accumulator.get() + "' unknown").c_str() );
+        fatal( "Bad 'Annotation' name: '%0'", error_token() );
 
     return true;    // We've 'accepted' this path despite having decided to error
 }
