@@ -1106,8 +1106,10 @@ bool GrammarParser::member_rule()
 
     if( annotations( member_rule_annotations ) && member_name_spec() )
     {
-        star_sp_cmt() && (is_get_char( ':' ) || fatal( "Expected ':' after 'member-name' %0. Got '%1'", m.p_rule->member_name, error_token() )) &&
-            star_sp_cmt() && type_rule() || fatal( "Expected 'type-rule' after 'member-name' %0. Got '%1'", m.p_rule->member_name, error_token() );
+        star_sp_cmt() &&
+            (is_get_char( ':' ) || fatal( "Expected ':' after 'member-name' %0. Got '%1'", m.p_rule->member_name, error_token() ) ) &&
+            star_sp_cmt() &&
+            (type_rule() || fatal( "Expected 'type-rule' after 'member-name' %0. Got '%1'", m.p_rule->member_name, error_token() ) );
 
         m.p_rule->annotations.merge( member_rule_annotations );
 
@@ -3464,8 +3466,8 @@ JCRParser::Status JCRParser::parse_grammar( cl::reader & reader )
 
 std::string MemberName::pattern() const
 {
-    size_t first = m.name.find_first_of( '/' );
-    size_t last = m.name.find_last_of( '/' );
+    size_t first = m.name.find_first_of( '`' );
+    size_t last = m.name.find_last_of( '`' );
     if( first == std::string::npos || last == std::string::npos )
         return m.name;
     return m.name.substr( first + 1, last - 1 );
@@ -3473,7 +3475,7 @@ std::string MemberName::pattern() const
 
 std::string MemberName::modifiers() const
 {
-    size_t last = m.name.find_last_of( '/' );
+    size_t last = m.name.find_last_of( '`' );
     if( last == std::string::npos )
         return "";
     return m.name.substr( last + 1 );
@@ -3486,7 +3488,7 @@ std::ostream & operator << ( std::ostream & r_os, const MemberName & r_mn )
     else if( r_mn.is_literal() )
         r_os << '"' << r_mn.name() << '"';
     else
-        r_os << '/' << r_mn.pattern() << '/' << r_mn.modifiers();
+        r_os << '`' << r_mn.pattern() << '`' << r_mn.modifiers();
     return r_os;
 }
 
