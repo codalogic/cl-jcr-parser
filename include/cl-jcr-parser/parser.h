@@ -167,6 +167,8 @@ public:
     bool is_uint() const { return m.form == Members::uint_form; }
     bool is_float() const { return m.form == Members::float_form; }
     const std::string & as_string() const { assert( m.form == Members::string_form ); return m.string_value; }
+    std::string as_pattern() const;
+    std::string as_modifiers() const;
     bool as_bool() const { assert( m.form == Members::bool_form ); return m.bool_value; }
     int64 as_int() const { assert( m.form == Members::int_form ); return m.int_value; }
     uint64 as_uint() const { assert( m.form == Members::uint_form ); return m.uint_value; }

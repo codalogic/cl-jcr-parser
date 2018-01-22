@@ -48,6 +48,8 @@ TFEATURE( "ValueConstraint" )
     TTEST( vc.is_string() == true );
     TTEST( vc.as_string() == "string" );
     TTEST( vc.as_string() != "other" );
+    TTEST( vc.as_pattern() == "string" );   // Regex constraint is stored as a string, with relevant /s
+    TTEST( vc.as_modifiers() == "" );
     TTEST( vc.is_bool() == false );
     TTEST( vc.is_int() == false );
     TTEST( vc.is_uint() == false );
@@ -58,10 +60,28 @@ TFEATURE( "ValueConstraint" )
     TTEST( vc.is_string() == true );
     TTEST( vc.as_string() == "string" );
     TTEST( vc.as_string() != "other" );
+    TTEST( vc.as_pattern() == "string" );   // Regex constraint is stored as a string, with relevant /s
+    TTEST( vc.as_modifiers() == "" );
     TTEST( vc.is_bool() == false );
     TTEST( vc.is_int() == false );
     TTEST( vc.is_uint() == false );
     TTEST( vc.is_float() == false );
+
+    TSETUP( vc = std::string( "/regex/" ) );   // Regex constraint is stored as a string, with relevant /s
+    TTEST( vc.is_set() == true );
+    TTEST( vc.is_string() == true );
+    TTEST( vc.as_string() == "/regex/" );
+    TTEST( vc.as_string() != "other" );
+    TTEST( vc.as_pattern() == "regex" );
+    TTEST( vc.as_modifiers() == "" );
+
+    TSETUP( vc = std::string( "/regex/i" ) );   // Regex constraint is stored as a string, with relevant /s
+    TTEST( vc.is_set() == true );
+    TTEST( vc.is_string() == true );
+    TTEST( vc.as_string() == "/regex/i" );
+    TTEST( vc.as_string() != "other" );
+    TTEST( vc.as_pattern() == "regex" );
+    TTEST( vc.as_modifiers() == "i" );
 
     TSETUP( vc = true );
     TTEST( vc.is_set() == true );

@@ -1,4 +1,4 @@
-Tests run on Mon Jan 22 14:10:58 2018
+Tests run on Mon Jan 22 15:14:01 2018
 
     Config - Configuration [test-config.cpp:40]
     ===========================================
@@ -34,6 +34,8 @@ Tests run on Mon Jan 22 14:10:58 2018
     ok: vc.is_string() == true
     ok: vc.as_string() == "string"
     ok: vc.as_string() != "other"
+    ok: vc.as_pattern() == "string"
+    ok: vc.as_modifiers() == ""
     ok: vc.is_bool() == false
     ok: vc.is_int() == false
     ok: vc.is_uint() == false
@@ -43,10 +45,26 @@ Tests run on Mon Jan 22 14:10:58 2018
     ok: vc.is_string() == true
     ok: vc.as_string() == "string"
     ok: vc.as_string() != "other"
+    ok: vc.as_pattern() == "string"
+    ok: vc.as_modifiers() == ""
     ok: vc.is_bool() == false
     ok: vc.is_int() == false
     ok: vc.is_uint() == false
     ok: vc.is_float() == false
+      : vc = std::string( "/regex/" )
+    ok: vc.is_set() == true
+    ok: vc.is_string() == true
+    ok: vc.as_string() == "/regex/"
+    ok: vc.as_string() != "other"
+    ok: vc.as_pattern() == "regex"
+    ok: vc.as_modifiers() == ""
+      : vc = std::string( "/regex/i" )
+    ok: vc.is_set() == true
+    ok: vc.is_string() == true
+    ok: vc.as_string() == "/regex/i"
+    ok: vc.as_string() != "other"
+    ok: vc.as_pattern() == "regex"
+    ok: vc.as_modifiers() == "i"
       : vc = true
     ok: vc.is_set() == true
     ok: vc.is_bool() == true
@@ -104,7 +122,7 @@ Tests run on Mon Jan 22 14:10:58 2018
     ok: vc.is_float() == false
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    MemberName [test-low-level-objects.cpp:129]
+    MemberName [test-low-level-objects.cpp:149]
     ===========================================
     ok: mn.is_absent() == true
     ok: mn.is_literal() == false
@@ -132,12 +150,12 @@ Tests run on Mon Jan 22 14:10:58 2018
     ok: mn.name() == ""
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    TargetRule [test-low-level-objects.cpp:163]
+    TargetRule [test-low-level-objects.cpp:183]
     ===========================================
     ok: ! tr.p_rule
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Rule [test-low-level-objects.cpp:170]
+    Rule [test-low-level-objects.cpp:190]
     =====================================
     ok: ! r.p_parent
     ok: r.type == Rule::NONE
@@ -150,7 +168,7 @@ Tests run on Mon Jan 22 14:10:58 2018
     ok: p_appended_rule->p_parent == &r
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Grammar [test-low-level-objects.cpp:188]
+    Grammar [test-low-level-objects.cpp:208]
     ========================================
       #### Adding and accessing unaliased imports ####
       : g.add_unaliased_import( "foo" )
@@ -2389,6 +2407,6 @@ jcr-version
 TODOs (2):
 ------------------------
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:42]
-- Test low level GrammarSet class [test-low-level-objects.cpp:236]
+- Test low level GrammarSet class [test-low-level-objects.cpp:256]
 
-0 error(s), 2 todo(s), 1855 test(s)
+0 error(s), 2 todo(s), 1871 test(s)

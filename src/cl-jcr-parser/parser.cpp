@@ -3492,4 +3492,27 @@ std::ostream & operator << ( std::ostream & r_os, const MemberName & r_mn )
     return r_os;
 }
 
+//----------------------------------------------------------------------------
+//                           class ValueConstraint
+//----------------------------------------------------------------------------
+
+std::string ValueConstraint::as_pattern() const
+{
+    assert( m.form == Members::string_form );
+    size_t first = m.string_value.find_first_of( '/' );
+    size_t last = m.string_value.find_last_of( '/' );
+    if( first == std::string::npos || last == std::string::npos )
+        return m.string_value;
+    return m.string_value.substr( first + 1, last - 1 );
+}
+
+std::string ValueConstraint::as_modifiers() const
+{
+    assert( m.form == Members::string_form );
+    size_t last = m.string_value.find_last_of( '/' );
+    if( last == std::string::npos )
+        return "";
+    return m.string_value.substr( last + 1 );
+}
+
 }   // namespace cljcr
