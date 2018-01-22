@@ -1,4 +1,4 @@
-Tests run on Thu Jan 18 16:51:43 2018
+Tests run on Mon Jan 22 14:10:58 2018
 
     Config - Configuration [test-config.cpp:40]
     ===========================================
@@ -115,14 +115,14 @@ Tests run on Thu Jan 18 16:51:43 2018
     ok: mn.is_literal() == true
     ok: mn.is_regex() == false
     ok: mn.name() == "foo"
-      : mn.set_regex( "/name*/i" )
+      : mn.set_regex( "`name*`i" )
     ok: mn.is_absent() == false
     ok: mn.is_literal() == false
     ok: mn.is_regex() == true
-    ok: mn.name() == "/name*/i"
+    ok: mn.name() == "`name*`i"
     ok: mn.pattern() == "name*"
     ok: mn.modifiers() == "i"
-      : mn.set_regex( "//" )
+      : mn.set_regex( "``" )
     ok: mn.pattern() == ""
     ok: mn.modifiers() == ""
       : mn.set_absent()
