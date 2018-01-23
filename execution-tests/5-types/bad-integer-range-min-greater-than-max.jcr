@@ -1,0 +1,2 @@
+$irange = 100..10
+$name = 'Fred'

@@ -1,3 +1,3 @@
 Fatal: 5-types/bad-type-choice-bad-nesting.jcr (line: 2, char: 0):
-      Expected ')' at end of type-choice. Got: '$my-rule-2'
+      Expected ')' at end of <type-choice>. Got: '$my-rule-2'
 1 error(s), 0 warning(s)

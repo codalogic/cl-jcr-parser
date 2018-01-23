@@ -1,3 +1,3 @@
 Error: 3-multi-line-directives/jcr-version-directive-bad-format-1.jcr (line: 1, char: 13):
-      Expected spaces and major.minor version after 'jcr-version' keyword in #jcr-directive
+      Expected spaces and major.minor version after <jcr-version> keyword in #jcr-directive
 1 error(s), 0 warning(s)

@@ -360,6 +360,10 @@ private:
     {
         return error( expand( p_format, r_arg_1 ).c_str() );
     }
+    bool error( const char * p_format, const clutils::str_args & r_arg_1, const clutils::str_args & r_arg_2 )
+    {
+        return error( expand( p_format, r_arg_1, r_arg_2 ).c_str() );
+    }
     #define fatal_todo fatal    // DEGUG - TODO - Review and replace allow messages in fatal_todo comments
     bool fatal( const char * p_message )
     {
@@ -435,7 +439,7 @@ bool GrammarParser::jcr()
     {
         while( sp_cmt() || directive() || root_rule() || rule() )
         {}
-        return is_peek_at_end() || fatal( "Unexpected input: '%0'", error_token() );
+        return is_peek_at_end() || fatal( "Expected start of <directive> or <rule>. Got: '%0'", error_token() );
     }
     catch( const GrammarParserFatalError & )
     {
@@ -611,12 +615,12 @@ bool GrammarParser::jcr_version_d( DirectiveForm::Enum form )
 
     if( jcr_version_kw() )
     {
-        if( (DSPs( form ) || end_path_with( error( "Expected spaces and major.minor version after 'jcr-version' keyword in #jcr-directive" ) ) ) &&
+        if( (DSPs( form ) || end_path_with( error( "Expected spaces and major.minor version after <jcr-version> keyword in #jcr-directive" ) ) ) &&
                 major_version_accumulator.select() &&
-                (major_version() || end_path_with( error( "Expected 'major-version' in #jcr-directive" ) ) ) &&
-                (is_get_char( '.' ) || end_path_with( error( "Expected '.' after 'major-version' in #jcr-directive" ) ) ) &&
+                (major_version() || end_path_with( error( "Expected <major-version> in #jcr-directive" ) ) ) &&
+                (is_get_char( '.' ) || end_path_with( error( "Expected '.' after <major-version> in #jcr-directive" ) ) ) &&
                 minor_version_accumulator.select() &&
-                (minor_version() || end_path_with( error( "Expected 'minor-version' after '.' in #jcr-directive" ) ) ) )
+                (minor_version() || end_path_with( error( "Expected <minor-version> after '.' in #jcr-directive" ) ) ) )
         {
             std::string major_number = major_version_accumulator.get();
             std::string minor_number = minor_version_accumulator.get();
@@ -627,9 +631,9 @@ bool GrammarParser::jcr_version_d( DirectiveForm::Enum form )
             cl::accumulator extension_accumulator( this );
             while( extension_accumulator.clear() && DSPs( form ) && is_get_char( '+' ) &&
                     optional( DSPs( form ) ) &&
-                    (extension_id() || end_path_with( error( "Expected 'extension-id' after '+' in #jcr-directive. Got: %0", error_token() ))) )
+                    (extension_id() || end_path_with( error( "Expected <extension-id> after '+' in #jcr-directive. Got: %0", error_token() ))) )
             {
-                warning( "Unknown 'extension-id' in #jcr-directive: %0", extension_accumulator.get() ); // See Leave_as_warning
+                warning( "Unknown <extension-id> in #jcr-directive: %0", extension_accumulator.get() ); // See Leave_as_warning
             }
         }
 
@@ -940,11 +944,11 @@ bool GrammarParser::rule()
         Rule::uniq_ptr pu_rule( new Rule );
         RuleStackLogger rule_stack_logger( this, pu_rule );
 
-        (rule_name() || fatal( "Expected 'rule-name' after '$' in rule definition. Got: '%0'", error_token() )) &&
+        (rule_name() || fatal( "Expected <rule-name> after '$' in rule definition. Got: '%0'", error_token() )) &&
             star_sp_cmt() &&
-            (is_get_char( '=' ) || fatal( "Expected '=' after 'rule-name' in rule definition. Got: '%0'", error_token() )) &&
+            (is_get_char( '=' ) || fatal( "Expected '=' after <rule-name> in rule definition. Got: '%0'", error_token() )) &&
             star_sp_cmt() &&
-            (rule_def() || fatal( "Expected 'rule-def' after '=' in rule definition. Got: '%0'", error_token() ));
+            (rule_def() || fatal( "Expected <rule-def> after '=' in rule definition. Got: '%0'", error_token() ));
 
         m.p_rule->rule_name = name_accumulator.get();
         m.p_rule->annotations.merge( rule_annotations );
@@ -984,7 +988,7 @@ bool GrammarParser::target_rule_name()
     {
         cl::accumulator name_accumulator( this );
 
-        ruleset_id_alias() || fatal( "Expected 'rule_name' after '$' when reading 'target_rule_name'. Got '%0'", error_token() );
+        ruleset_id_alias() || fatal( "Expected <rule_name> after '$' when reading <target_rule_name>. Got '%0'", error_token() );
 
         if( is_get_char( '.' ) )
         {
@@ -993,7 +997,7 @@ bool GrammarParser::target_rule_name()
 
             AliasLookupResult alias_lookup_result( m.p_grammar->get_aliased_import( alias_name ) );
             if( ! alias_lookup_result.is_found() )
-                return fatal( "Unknown alias in 'target_rule_name': %0", alias_name );
+                return fatal( "Unknown alias in <target_rule_name>: %0", alias_name );
 
             if( rule_name() )
             {
@@ -1001,7 +1005,7 @@ bool GrammarParser::target_rule_name()
                 m.p_rule->target_rule.local_name = name_accumulator.get();
             }
             else
-                return fatal( "Expected 'rule_name' in 'target_rule_name' with format '$<rulesetid_alias>.<rule-name>'. Got '%0'", error_token() );
+                return fatal( "Expected <rule_name> in <target_rule_name> with format \"$<rulesetid_alias>.<rule-name>\". Got '$%0.%1'", alias_name, error_token() );
         }
         else
         {
@@ -1107,9 +1111,9 @@ bool GrammarParser::member_rule()
     if( annotations( member_rule_annotations ) && member_name_spec() )
     {
         star_sp_cmt() &&
-            (is_get_char( ':' ) || fatal( "Expected ':' after 'member-name' %0. Got '%1'", m.p_rule->member_name, error_token() ) ) &&
+            (is_get_char( ':' ) || fatal( "Expected ':' after <member-name> %0. Got '%1'", m.p_rule->member_name, error_token() ) ) &&
             star_sp_cmt() &&
-            (type_rule() || fatal( "Expected 'type-rule' after 'member-name' %0. Got '%1'", m.p_rule->member_name, error_token() ) );
+            (type_rule() || fatal( "Expected <type-rule> after <member-name> %0. Got '%1'", m.p_rule->member_name, error_token() ) );
 
         m.p_rule->annotations.merge( member_rule_annotations );
 
@@ -1176,14 +1180,14 @@ bool GrammarParser::type_choice()
         m.p_rule->child_combiner = Rule::Choice;
         m.p_rule->annotations.merge( type_choice_annotations );
 
-        type_choice_items() || fatal( "Must be at least one 'type-choice-item' in 'type-choice'. Got: '%0'", error_token() );
+        type_choice_items() || fatal( "Must be at least one <type-choice-item> in <type-choice>. Got: '%0'", error_token() );
 
         while( choice_combiner() )
         {
-            type_choice_items() || fatal( "Expected 'type-choice-item' after 'choice-combiner' in 'type-choice'. Got: '%0'", error_token() );
+            type_choice_items() || fatal( "Expected <type-choice-item> after <choice-combiner> in <type-choice>. Got: '%0'", error_token() );
         }
 
-        is_get_char( ')' ) || fatal( "Expected ')' at end of type-choice. Got: '%0'", error_token() );
+        is_get_char( ')' ) || fatal( "Expected ')' at end of <type-choice>. Got: '%0'", error_token() );
 
         return true;
     }
@@ -1247,7 +1251,7 @@ bool GrammarParser::annotations( Annotations & r_annotations )
         star_sp_cmt() &&
             annotation_set( r_annotations ) &&
             star_sp_cmt() &&
-            (fixed( "}" ) || fatal( "Expected '}' at end of annotation. Got '%0'", error_token() )) &&
+            (fixed( "}" ) || fatal( "Expected '}' at end of <annotation>. Got '%0'", error_token() )) &&
             star_sp_cmt();
     }
 
@@ -1268,7 +1272,7 @@ bool GrammarParser::annotation_set( Annotations & r_annotations )
             rewind_on_reject( unordered_annotation( r_annotations ) ) ||
             rewind_on_reject( root_annotation( r_annotations ) ) ||
             rewind_on_reject( tbd_annotation() ) ||
-            fatal( "Unrecognised 'annotation' format. Got: '%0'" );     // Calling fatal() will throw an exception
+            fatal( "Unrecognised <annotation> format. Got: '%0'" );     // Calling fatal() will throw an exception
 }
 
 bool GrammarParser::not_annotation( Annotations & r_annotations )
@@ -1308,18 +1312,16 @@ bool GrammarParser::tbd_annotation()
     */
     // annotation_name() [ spaces() && annotation_parameters() ]
 
-    // annotation_name() [ spaces() && annotation_parameters() ]
-
     cl::accumulator name_accumulator( this );
 
     annotation_name() && optional( spaces() && name_accumulator.none() && annotation_parameters() );
 
     if( name_accumulator.get() == "id" || name_accumulator.get() == "assert" || name_accumulator.get() == "when" || name_accumulator.get() == "doc" )
-        warning( "Unimplemented 'Annotation': '%0'", name_accumulator.get() ); // See Leave_as_warning
+        warning( "Unimplemented <annotation>: '%0'", name_accumulator.get() ); // See Leave_as_warning
     else if( ! name_accumulator.get().empty() )
-        fatal( "Unknown 'Annotation': '%0'", name_accumulator.get() );
+        fatal( "Unknown <annotation>: '%0'", name_accumulator.get() );
     else
-        fatal( "Bad 'Annotation' name: '%0'", error_token() );
+        fatal( "Expected <annotation> name. Got: '%0'", error_token() );
 
     return true;    // We've 'accepted' this path despite having decided to error
 }
@@ -1650,7 +1652,10 @@ bool GrammarParser::integer_range()
         {
             m.p_rule->type = Rule::INTEGER;
             if( ! integer_min_accumulator.get().empty() && ! integer_max_accumulator.get().empty() )
-                (integer_min_accumulator.to_int64() <= integer_max_accumulator.to_int64()) || error_todo( "integer range minimum greater than maximum" );
+            {
+                if( integer_min_accumulator.to_int64() > integer_max_accumulator.to_int64() )
+                    error( "Integer range minimum ('%0') greater than maximum ('%1')", integer_min_accumulator.get(), integer_max_accumulator.get() );
+            }
             if( ! integer_min_accumulator.get().empty() )
                 m.p_rule->min = integer_min_accumulator.to_int64();
             if( ! integer_max_accumulator.get().empty() )
@@ -1660,7 +1665,10 @@ bool GrammarParser::integer_range()
         {
             m.p_rule->type = Rule::UINTEGER;
             if( ! integer_min_accumulator.get().empty() && ! integer_max_accumulator.get().empty() )
-                (integer_min_accumulator.to_uint64() <= integer_max_accumulator.to_uint64()) || error_todo( "integer range minimum greater than maximum" );
+            {
+                if( integer_min_accumulator.to_uint64() > integer_max_accumulator.to_uint64() )
+                    error( "Integer range minimum ('%0') greater than maximum ('%1')", integer_min_accumulator.get(), integer_max_accumulator.get() );
+            }
             if( ! integer_min_accumulator.get().empty() )
                 m.p_rule->min = integer_min_accumulator.to_uint64();
             if( ! integer_max_accumulator.get().empty() )
