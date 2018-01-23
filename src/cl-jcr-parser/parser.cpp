@@ -1577,14 +1577,29 @@ bool GrammarParser::float_range()
 
     // No need to record location because always part of primitive_def() rewind choice
 
-    return rewind_on_reject( float_min() && fixed( ".." ) &&
-                    set( m.p_rule->type, Rule::DOUBLE ) &&
-                    set( m.p_rule->min, float_min_accumulator.to_float() ) &&
-                optional( float_max_accumulator.select() && float_max() &&
-                        set( m.p_rule->max, float_max_accumulator.to_float() ) ) ) ||
-            rewind_on_reject( fixed( ".." ) && float_max_accumulator.select() && float_max() &&
-                    set( m.p_rule->type, Rule::DOUBLE ) &&
-                    set( m.p_rule->max, float_max_accumulator.to_float() ) );
+    if( rewind_on_reject( float_min() && fixed( ".." ) && optional( float_max_accumulator.select() && float_max() ) ) ||    // See note 'float_max_partial'
+            rewind_on_reject( fixed( ".." ) && float_max_accumulator.select() && float_max() ) )
+    {
+        m.p_rule->type = Rule::DOUBLE;
+        if( ! float_min_accumulator.get().empty() && ! float_max_accumulator.get().empty() )
+        {
+            if( float_min_accumulator.to_float() > float_max_accumulator.to_float() )
+                error( "Float range minimum ('%0') greater than maximum ('%1')", float_min_accumulator.get(), float_max_accumulator.get() );
+        }
+        
+        if( ! float_min_accumulator.get().empty() )
+            m.p_rule->min = float_min_accumulator.to_float();
+        if( ! float_max_accumulator.get().empty() )
+            m.p_rule->max = float_max_accumulator.to_float();
+        
+        return true;
+    }
+
+    // Note 'float_max_partial': The final 'float_max()' call may only pick up
+    // a partial float number.  But this can give a preferable result to
+    // insisting on a complete float value.
+
+    return false;
 }
 
 bool GrammarParser::float_min()

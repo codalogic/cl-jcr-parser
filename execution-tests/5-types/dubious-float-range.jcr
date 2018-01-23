@@ -1,0 +1,2 @@
+$frange = 100.0..1000
+$name = 'Fred'
