@@ -1856,28 +1856,25 @@ bool GrammarParser::uri_type()
     */
     // uri_kw() [ ".." && uri_scheme() ]
 
-    bool is_uri_rule = false;
-
     if( uri_kw() )
     {
-        is_uri_rule = true;
-
         m.p_rule->type = Rule::URI_TYPE;
         if( fixed( ".." ) )
         {
-            is_uri_rule = false;
-
             cl::accumulator uri_scheme_accumulator( this );
             if( uri_scheme() )
             {
                 m.p_rule->type = Rule::URI_RANGE;
                 m.p_rule->min = m.p_rule->max = uri_scheme_accumulator.get();
-                is_uri_rule = true;
             }
+            else
+                error( "Expected URI scheme specification after 'uri..' keyword. Got: '%0'", error_token() );
         }
+
+        return true;
     }
 
-    return is_uri_rule;
+    return false;
 }
 
 bool GrammarParser::phone_type()
