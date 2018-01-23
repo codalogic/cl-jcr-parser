@@ -1,0 +1,3 @@
+Error: 5-types/bad-sized-int-too-large.jcr (line: 1, char: 12):
+      sized int of 65 bits is larger than supported
+1 error(s), 0 warning(s)

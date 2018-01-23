@@ -1745,8 +1745,6 @@ bool GrammarParser::integer_value()
 
 int64 sized_int_min( int bits )
 {
-    assert( bits >= 1 && bits <= 64 );
-
     if( bits <= 0 || bits > 64 )
         return -1;
     uint64 v = ~0;
@@ -1779,7 +1777,7 @@ bool GrammarParser::sized_int_type()
     cl::accumulator num_bits_accumulator( this );
 
     return int_kw() && pos_integer() &&
-            ( num_bits_accumulator.to_int() <= 64 || error_todo( "sized int size too large" ) && abandon_path() ) &&
+            ( num_bits_accumulator.to_int() <= 64 || error( "sized int of %0 bits is larger than supported", num_bits_accumulator.get() ) ) &&
             set( m.p_rule->type, Rule::INTEGER ) &&
             set( m.p_rule->min, sized_int_min( num_bits_accumulator.to_int() ) ) &&
             set( m.p_rule->max, sized_int_max( num_bits_accumulator.to_int() ) );
@@ -1795,7 +1793,7 @@ bool GrammarParser::sized_uint_type()
     cl::accumulator num_bits_accumulator( this );
 
     return uint_kw() && pos_integer() &&
-            ( num_bits_accumulator.to_int() <= 64 || error_todo( "sized iint size too large" ) && abandon_path() ) &&
+            ( num_bits_accumulator.to_int() <= 64 || error( "sized uint of %0 bits is larger than supported", num_bits_accumulator.get() ) ) &&
             set( m.p_rule->type, Rule::UINTEGER ) &&
             set( m.p_rule->min, sized_uint_min( num_bits_accumulator.to_int() ) ) &&
             set( m.p_rule->max, sized_uint_max( num_bits_accumulator.to_int() ) );
