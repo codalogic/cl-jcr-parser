@@ -2007,7 +2007,7 @@ bool GrammarParser::object_rule()
 
         star_sp_cmt() && optional( object_items() ) && star_sp_cmt();
 
-        is_get_char( '}' ) || fatal_todo( "Expected '}' at end of object rule" );
+        is_get_char( '}' ) || fatal( "Unexpected character in <object-rule>. Got: '%0'", error_token() );
 
         return true;
     }
@@ -3408,7 +3408,7 @@ std::string GrammarParser::error_token()    // Attempts to extract the token tha
     get();
 
     if( is_current_at_end() )
-        return token;
+        return "<end-of-input>";
 
     token += current();
 

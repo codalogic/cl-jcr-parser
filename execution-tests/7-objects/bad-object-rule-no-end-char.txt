@@ -1,0 +1,3 @@
+Fatal: 7-objects/bad-object-rule-no-end-char.jcr (line: 2, char: 18):
+      Unexpected character in <object-rule>. Got: '<end-of-input>'
+1 error(s), 0 warning(s)
