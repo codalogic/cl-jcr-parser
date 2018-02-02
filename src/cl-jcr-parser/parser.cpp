@@ -348,6 +348,10 @@ private:
     {
         return warning( expand( p_format, r_arg_1 ).c_str() );
     }
+    bool warning( const char * p_format, const clutils::str_args & r_arg_1, const clutils::str_args & r_arg_2 )
+    {
+        return warning( expand( p_format, r_arg_1, r_arg_2 ).c_str() );
+    }
     #define error_todo error    // DEGUG - TODO - Review and replace allow messages in error_todo comments
     bool error( const char * p_message )
     {
@@ -547,7 +551,7 @@ bool GrammarParser::one_line_directive()
         // Use is_peek_at_end() to allow ruleset to end with a directive that doesn't have newline at end
         star_WSP() &&
             (eol() || is_peek_at_end() ||
-                error( "Unexpected additional material in directive: '%0'", error_token() ) && recover_to_eol());
+                error( "Unexpected additional material in directive. Got: '%0'", error_token() ) && recover_to_eol());
 
         return true;
     }
@@ -570,12 +574,12 @@ bool GrammarParser::multi_line_directive()
         star_sp_cmt() &&
             (directive_def( DirectiveForm::multi_line )
                 || multi_line_tbd_directive_d()
-                || end_path_with( error( "Unable to read multi-line #{directive}. Got: %0", error_token() ) )
+                || end_path_with( error( "Unable to read multi-line #{directive}. Got: '%0'", error_token() ) )
                 ) &&
             star_sp_cmt() &&
             (is_get_char( '}' )
                 || (is_current_at_end() && error( "Unexpected end of file in multi-line #{directive}" )
-                    || end_path_with( error( "Unexpected additional material in multi-line #{directive}: %0", error_token() ) ) )
+                    || end_path_with( error( "Unexpected additional material in multi-line #{directive}. Got: '%0'", error_token() ) ) )
                 ) &&
             set( is_parse_complete, true );
 
@@ -615,25 +619,25 @@ bool GrammarParser::jcr_version_d( DirectiveForm::Enum form )
 
     if( jcr_version_kw() )
     {
-        if( (DSPs( form ) || end_path_with( error( "Expected spaces and major.minor version after <jcr-version> keyword in #jcr-directive" ) ) ) &&
+        if( (DSPs( form ) || fatal( "Expected spaces and major.minor version after <jcr-version> keyword in #jcr-directive. Got '%0'", error_token() ) ) &&
                 major_version_accumulator.select() &&
-                (major_version() || end_path_with( error( "Expected <major-version> in #jcr-directive" ) ) ) &&
-                (is_get_char( '.' ) || end_path_with( error( "Expected '.' after <major-version> in #jcr-directive" ) ) ) &&
+                (major_version() || fatal( "Expected <major-version> in #jcr-directive. Got '%0'", error_token() ) ) &&
+                (is_get_char( '.' ) || fatal( "Expected '.' after <major-version> in #jcr-directive. Got '%0'", error_token() ) ) &&
                 minor_version_accumulator.select() &&
-                (minor_version() || end_path_with( error( "Expected <minor-version> after '.' in #jcr-directive" ) ) ) )
+                (minor_version() || fatal( "Expected <minor-version> after '.' in #jcr-directive. Got '%0'", error_token() ) ) )
         {
             std::string major_number = major_version_accumulator.get();
             std::string minor_number = minor_version_accumulator.get();
 
             if( ! is_supported_jcr_version( major_number, minor_number ) )
-                error( "Unsupported JCR version in #jcr-directive: %0", major_number + "." + minor_number );
+                error( "Unsupported JCR version in #jcr-directive. Got: '%0.%1'", major_number, minor_number );
 
             cl::accumulator extension_accumulator( this );
             while( extension_accumulator.clear() && DSPs( form ) && is_get_char( '+' ) &&
                     optional( DSPs( form ) ) &&
-                    (extension_id() || end_path_with( error( "Expected <extension-id> after '+' in #jcr-directive. Got: %0", error_token() ))) )
+                    (extension_id() || end_path_with( error( "Expected <extension-id> after '+' in #jcr-directive. Got: '%0'", error_token() ))) )
             {
-                warning( "Unknown <extension-id> in #jcr-directive: %0", extension_accumulator.get() ); // See Leave_as_warning
+                warning( "Unknown <extension-id> in #jcr-directive. Got: '%0'", extension_accumulator.get() ); // See Leave_as_warning
             }
         }
 
@@ -709,8 +713,8 @@ bool GrammarParser::ruleset_id_d( DirectiveForm::Enum form )
     {
         cl::accumulator ruleset_id_accumulator( this );
 
-        if( (DSPs( form ) && ruleset_id())
-            || error_todo( "Unable to read ruleset-id value in #ruleset-id directive" ) && abandon_path() )
+        if( (DSPs( form ) && ruleset_id() )
+            || fatal( "Unable to read <ruleset-id> in #ruleset-id directive. Got '%0'", error_token() ) )
         {
             m.p_grammar->ruleset_id = ruleset_id_accumulator.get();
         }
@@ -735,13 +739,13 @@ bool GrammarParser::import_d( DirectiveForm::Enum form )
         cl::accumulator_deferred ruleset_id_accumulator( this );
         cl::accumulator_deferred ruleset_id_alias_accumulator( this );
 
-        if( (DSPs( form ) || error( "Expected space and ruleset-id after #import directive keyword" ) && abandon_path()) &&
-            (ruleset_id_accumulator.select() && ruleset_id() || error_todo( "Unable to read ruleset-id in #import directive" ) && abandon_path()) &&
+        if( (DSPs( form ) || fatal( "Expected space and <ruleset-id> after #import directive keyword. Got '%0'", error_token() )) &&
+            (ruleset_id_accumulator.select() && ruleset_id() || fatal( "Unable to read <ruleset-id> in #import directive. Got '%0'", error_token() )) &&
             optional(
                 DSPs( form ) &&
                 as_kw() &&
-                (DSPs( form ) || error( "Expected space and alias after 'as' keyword in #import directive" ) && abandon_path()) &&
-                ((ruleset_id_alias_accumulator.select() && ruleset_id_alias()) || (error( "Unable to read alias for ruleset-id in #import directive" ) && abandon_path())) ) )
+                (DSPs( form ) || fatal( "Expected space and <ruleset-id-alias> after 'as' keyword in #import directive. Got '%0'", error_token() )) &&
+                ((ruleset_id_alias_accumulator.select() && ruleset_id_alias()) || (fatal( "Unable to read <ruleset-id-alias> after 'as' keyword in #import directive. Got '%0'", error_token() ))) ) )
         {
             std::string ruleset_id = ruleset_id_accumulator.get();
             std::string ruleset_id_alias = ruleset_id_alias_accumulator.get();
@@ -790,8 +794,8 @@ bool GrammarParser::one_line_tbd_directive_d()
     if( directive_name() &&
         optional( one_star_WSP() && tbd_directive_parameters_accumulator.select() && one_line_directive_parameters() ) )
     {
-        warning( (std::string( "Unknown directive: " ) + tbd_directive_name_accumulator.get() + // See Leave_as_warning
-                ", parameters: " + tbd_directive_parameters_accumulator.get()).c_str() );
+        warning( "Unknown #directive '%0', with parameters '%1'",
+                tbd_directive_name_accumulator.get(), tbd_directive_parameters_accumulator.get() );  // See Leave_as_warning
         return true;
     }
 

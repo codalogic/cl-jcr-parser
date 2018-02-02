@@ -1,3 +1,3 @@
 Error: 2-one-line-directives/jcr-version-directive-bad-format-4.jcr (line: 1, char: 16):
-      Unexpected additional material in directive: '.'
+      Unexpected additional material in directive. Got: '.'
 1 error(s), 0 warning(s)

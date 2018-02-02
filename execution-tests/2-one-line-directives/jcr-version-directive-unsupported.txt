@@ -1,3 +1,3 @@
 Error: 2-one-line-directives/jcr-version-directive-unsupported.jcr (line: 1, char: 18):
-      Unsupported JCR version in #jcr-directive: 20.8
+      Unsupported JCR version in #jcr-directive. Got: '20.8'
 1 error(s), 0 warning(s)

@@ -1,3 +1,3 @@
 Error: 3-multi-line-directives/jcr-version-directive-bad-options.jcr (line: 1, char: 19):
-      Unexpected additional material in multi-line #{directive}: -
+      Unexpected additional material in multi-line #{directive}. Got: '-'
 1 error(s), 0 warning(s)

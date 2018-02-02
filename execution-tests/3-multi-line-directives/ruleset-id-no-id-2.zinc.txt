@@ -1,3 +1,3 @@
-Error: 3-multi-line-directives/ruleset-id-no-id-2.jcr (line: 1, char: 13):
-      Unable to read ruleset-id value in #ruleset-id directive
+Fatal: 3-multi-line-directives/ruleset-id-no-id-2.jcr (line: 1, char: 13):
+      Unable to read <ruleset-id> in #ruleset-id directive. Got '}'
 1 error(s), 0 warning(s)

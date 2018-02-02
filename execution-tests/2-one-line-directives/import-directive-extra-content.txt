@@ -1,3 +1,3 @@
 Error: 2-one-line-directives/import-directive-extra-content.jcr (line: 1, char: 41):
-      Unexpected additional material in directive: 'extra'
+      Unexpected additional material in directive. Got: 'extra'
 1 error(s), 0 warning(s)

@@ -1,5 +1,5 @@
 Error: 2-one-line-directives/jcr-version-directive-bad-options-2.jcr (line: 1, char: 19):
-      Expected <extension-id> after '+' in #jcr-directive. Got: .
+      Expected <extension-id> after '+' in #jcr-directive. Got: '.'
 Error: 2-one-line-directives/jcr-version-directive-bad-options-2.jcr (line: 1, char: 19):
-      Unexpected additional material in directive: '.'
+      Unexpected additional material in directive. Got: '.'
 2 error(s), 0 warning(s)
