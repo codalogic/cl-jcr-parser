@@ -1,1 +1,1 @@
-{ "an-int" : integer }
+{ `p\d+` : integer }

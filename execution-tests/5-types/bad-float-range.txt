@@ -1,3 +1,5 @@
 Error: 5-types/bad-float-range.jcr (line: 1, char: 17):
+      Incomplete <float-max> value in <float-range>. Got: '10'
+Error: 5-types/bad-float-range.jcr (line: 1, char: 17):
       Float range minimum ('100.0') greater than maximum ('10')
-1 error(s), 0 warning(s)
+2 error(s), 0 warning(s)
