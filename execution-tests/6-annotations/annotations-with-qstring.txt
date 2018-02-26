@@ -1,0 +1,3 @@
+Fatal: 6-annotations/annotations-with-qstring.jcr (line: 1, char: 31):
+      Unknown <annotation>: 'undefined'
+1 error(s), 0 warning(s)

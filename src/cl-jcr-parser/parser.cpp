@@ -1044,7 +1044,7 @@ bool GrammarParser::name()
 
 bool GrammarParser::rule_def()
 {
-    /* ABNF: 
+    /* ABNF:
     rule-def         = member-rule / type-designator rule-def-type-rule /
                    value-rule / group-rule / target-rule-name
     */
@@ -1129,7 +1129,7 @@ bool GrammarParser::member_rule()
 
 bool GrammarParser::member_name_spec()
 {
-    /* ABNF: 
+    /* ABNF:
     member-name-spec = backtick-regex / q-string
     */
     // backtick_regex() || q_string()
@@ -1489,7 +1489,7 @@ bool GrammarParser::string_type()
 
 bool GrammarParser::string_value1()
 {
-    /* ABNF: 
+    /* ABNF:
     string-value1    = sq-string
     */
     // sq_string()
@@ -1509,7 +1509,7 @@ bool GrammarParser::string_value1()
 
 bool GrammarParser::string_value2()
 {
-    /* ABNF: 
+    /* ABNF:
     string-value2    = q-string
     */
     // q_string()
@@ -1580,13 +1580,13 @@ bool GrammarParser::float_range()
     cl::accumulator_deferred float_max_accumulator( this );
 
     // No need to record location because always part of primitive_def() rewind choice
-    
+
     bool is_float_max_complete( false );
 
     if( rewind_on_reject( float_min() && fixed( ".." ) && optional( float_max_accumulator.select() && record( is_float_max_complete, float_max() ) ) ) )
     {
         m.p_rule->type = Rule::DOUBLE;
-        
+
         if( ! float_max_accumulator.get().empty() && ! is_float_max_complete )
             error( "Incomplete <float-max> value in <float-range>. Got: '%0'", float_max_accumulator.get() );
 
@@ -1595,21 +1595,21 @@ bool GrammarParser::float_range()
             if( float_min_accumulator.to_float() > float_max_accumulator.to_float() )
                 error( "Float range minimum ('%0') greater than maximum ('%1')", float_min_accumulator.get(), float_max_accumulator.get() );
         }
-        
+
         if( ! float_min_accumulator.get().empty() )
             m.p_rule->min = float_min_accumulator.to_float();
         if( ! float_max_accumulator.get().empty() )
             m.p_rule->max = float_max_accumulator.to_float();
-        
+
         return true;
     }
 
     else if( rewind_on_reject( fixed( ".." ) && float_max_accumulator.select() && float_max() ) )
     {
         m.p_rule->type = Rule::DOUBLE;
-        
+
         m.p_rule->max = float_max_accumulator.to_float();
-        
+
         return true;
     }
 
@@ -2771,9 +2771,9 @@ bool GrammarParser::zero()
     return accumulate( '0' );
 }
 
-bool GrammarParser::q_string_as_utf8()
+bool GrammarParser::q_string_as_utf8()  // Doesn't collect wrapping quotation marks
 {
-    if( is_get_char( '"' ) )
+    if( is_get_char( '"' ) )    // Don't accumulate quotation_mark()
     {
         std::string utf8_string;
 
@@ -2784,7 +2784,7 @@ bool GrammarParser::q_string_as_utf8()
     return false;
 }
 
-bool GrammarParser::q_string()
+bool GrammarParser::q_string()  // Collects wrapping quotation marks
 {
     /* ABNF:
     q-string         = quotation-mark *char quotation-mark
@@ -2793,7 +2793,14 @@ bool GrammarParser::q_string()
 
     if( quotation_mark() )
     {
-        star_qs_char() && quotation_mark() || fatal_todo( "Badly formed QString" );
+        cl::accumulator qstring_accumulator( this );
+
+        star_qs_char();
+
+        if( quotation_mark() )
+            qstring_accumulator.previous() && accumulator_append( qstring_accumulator );
+        else
+            fatal( "Badly formed QString. Got '%0'", qstring_accumulator.get() );
 
         return true;
     }
@@ -2931,7 +2938,7 @@ bool is_re_escape_code( char c )
 
 bool GrammarParser::re_escape_code()
 {
-    /* ABNF: 
+    /* ABNF:
     re-escape-code   = %x20-7F ; Specific codes listed elsewhere
     */
     // %x20-7F ; Specific codes listed elsewhere
@@ -2971,7 +2978,7 @@ bool GrammarParser::regex_modifiers()
 
 bool GrammarParser::backtick_regex()
 {
-    /* ABNF: 
+    /* ABNF:
     backtick-regex   = "`" *( escape ascii-char / not-backtick ) "`"
     */
     // "`" && *( escape() re_escape_code() || not_backtick() ) "`"
@@ -2998,7 +3005,7 @@ bool is_not_backtick( char c )
 
 bool GrammarParser::not_backtick()
 {
-    /* ABNF: 
+    /* ABNF:
     not-backtick     = HTAB / CR / LF / %x20-5F / %x61-10FFFF
     */
     // HTAB() || CR() || LF() / %x20-5F / %x61-10FFFF

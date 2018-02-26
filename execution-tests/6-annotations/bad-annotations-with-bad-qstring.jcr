@@ -1,0 +1,1 @@
+$my-rule =: @{ undefined "bar\u12xx" } integer
