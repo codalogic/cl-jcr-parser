@@ -1676,8 +1676,7 @@ bool GrammarParser::integer_range()
     if( rewind_on_reject( integer_min() && fixed( ".." ) && optional( integer_max_accumulator.select() && integer_max() ) ) ||
             rewind_on_reject( fixed( ".." ) && integer_max_accumulator.select() && integer_max() ) )
     {
-        if( (! integer_min_accumulator.get().empty() && integer_min_accumulator.get()[0] == '-') ||     // If either min or max has sign, assume signed integer
-                (! integer_max_accumulator.get().empty() && integer_max_accumulator.get()[0] == '-') )
+        if( integer_min_accumulator.get().empty() || integer_min_accumulator.get()[0] == '-' )
         {
             m.p_rule->type = Rule::INTEGER;
             if( ! integer_min_accumulator.get().empty() && ! integer_max_accumulator.get().empty() )
