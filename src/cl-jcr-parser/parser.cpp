@@ -2743,7 +2743,7 @@ bool GrammarParser::q_string_as_utf8()
         std::string utf8_string;
 
         return get_qstring_contents( &utf8_string ) && is_get_char( '"' ) &&
-                accumulator_append( utf8_string ) || fatal_todo( "Badly formed QString" );
+                accumulator_append( utf8_string ) || fatal( "Badly formed QString. Got '%0'", utf8_string );
     }
 
     return false;
