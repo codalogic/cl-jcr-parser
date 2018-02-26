@@ -1,0 +1,3 @@
+Error: 9-groups/bad-group-rule-object-choice-and-seq.jcr (line: 1, char: 37):
+      <sequence-combiner> can not be used with <choice-combiner> in <group-rule> without Parentheses
+1 error(s), 0 warning(s)

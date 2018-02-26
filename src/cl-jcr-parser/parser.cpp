@@ -2315,7 +2315,7 @@ bool GrammarParser::group_rule()
 
         star_sp_cmt() && optional( group_items() ) && star_sp_cmt();
 
-        is_get_char( ')' ) || fatal_todo( "Expected ')' at end of group rule" );
+        is_get_char( ')' ) || fatal( "Unexpected character in <group-rule> or <group-group>. Got: '%0'", error_token() );
 
         return true;
     }
@@ -2343,34 +2343,45 @@ bool GrammarParser::group_items()
 
 bool GrammarParser::one_star_sequence_combiner_and_group_item()
 {
-    bool is_used = false;
+    bool is_sequence = false;
+    bool is_choice_combiner = false;
 
-    while( sequence_combiner() )
+    while( sequence_combiner() || (is_sequence && record( is_choice_combiner, choice_combiner())) )
     {
-        is_used = true;
-        group_item() || fatal_todo( "Expected group-item after sequence-combiner in group definition" );
+        is_sequence = true;
+
+        if( is_choice_combiner )
+        {
+            error( "<choice-combiner> can not be used with <sequence-combiner> in <group-rule> without Parentheses" );
+            is_choice_combiner = false;
+        }
+
+        group_item() || fatal( "Expected <group-item> after <sequence-combiner> in object definition" );
+
     }
 
-    if( is_used && choice_combiner() )
-        fatal_todo( "choice-combiner can not be used with sequence-combiner without Parentheses" );
-
-    return is_used;
+    return is_sequence;
 }
 
 bool GrammarParser::one_star_choice_combiner_and_group_item()
 {
-    bool is_used = false;
+    bool is_choice = false;
+    bool is_sequence_combiner = false;
 
-    while( choice_combiner() )
+    while( choice_combiner() || (is_choice && record( is_sequence_combiner, sequence_combiner())) )
     {
-        is_used = true;
-        group_item() || fatal_todo( "Expected group-item after choice-combiner in group definition" );
+        is_choice = true;
+
+        if( is_sequence_combiner )
+        {
+            error( "<sequence-combiner> can not be used with <choice-combiner> in <group-rule> without Parentheses" );
+            is_sequence_combiner = false;
+        }
+
+        group_item() || fatal( "Expected <group-item> after <choice-combiner> in object definition" );
     }
 
-    if( is_used && sequence_combiner() )
-        fatal_todo( "sequence-combiner can not be used with choice-combiner without Parentheses" );
-
-    return is_used;
+    return is_choice;
 }
 
 bool GrammarParser::group_item()
