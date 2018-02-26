@@ -2798,7 +2798,7 @@ bool GrammarParser::q_string()  // Collects wrapping quotation marks
         star_qs_char();
 
         if( quotation_mark() )
-            qstring_accumulator.previous() && accumulator_append( qstring_accumulator );
+            qstring_accumulator.append_to_previous();
         else
             fatal( "Badly formed QString. Got '%0'", qstring_accumulator.get() );
 
@@ -2919,11 +2919,18 @@ bool GrammarParser::regex()
     */
     // "/" && *( escape() re_escape_code() || not_slash() ) "/" [ regex_modifiers() ]
 
-    if( accumulate( '/' ) )
+    if( is_get_char( '/' ) )
     {
-        while( (escape() && re_escape_code()) || not_slash() )
+        cl::accumulator re_accumulator( this );
+
+        re_accumulator.append( '/' );
+
+        while( escape() ? re_escape_code() : not_slash() )
         {}
-        accumulate( '/' ) && optional( regex_modifiers() ) || fatal_todo( "Error reading regular expression" );
+
+        (accumulate( '/' ) && optional( regex_modifiers() )) || fatal( "Error reading regular expression. Got: '%0'", re_accumulator.get() );
+        
+        re_accumulator.append_to_previous();
 
         return true;
     }
