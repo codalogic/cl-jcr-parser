@@ -2058,7 +2058,7 @@ bool GrammarParser::one_star_sequence_combiner_and_object_item()
 
         if( is_choice_combiner )
         {
-            error( "<choice-combiner> can not be used with <sequence-combiner> without Parentheses" );
+            error( "<choice-combiner> can not be used with <sequence-combiner> in <object-rule> without Parentheses" );
             is_choice_combiner = false;
         }
 
@@ -2080,7 +2080,7 @@ bool GrammarParser::one_star_choice_combiner_and_object_item()
 
         if( is_sequence_combiner )
         {
-            error( "<sequence-combiner> can not be used with <choice-combiner> without Parentheses" );
+            error( "<sequence-combiner> can not be used with <choice-combiner> in <object-rule> without Parentheses" );
             is_sequence_combiner = false;
         }
 
@@ -2141,7 +2141,8 @@ bool GrammarParser::object_group()
         m.p_rule->annotations.merge( object_group_annotations );
 
         star_sp_cmt() && optional( object_items() ) && star_sp_cmt();
-        is_get_char( ')' ) || fatal_todo( "Expected ')' at end of object-group" );
+
+        is_get_char( ')' ) || fatal( "Unexpected character in <object-group>. Got: '%0'", error_token() );
 
         return true;
     }
@@ -2167,7 +2168,7 @@ bool GrammarParser::array_rule()
 
         star_sp_cmt() && optional( array_items() ) && star_sp_cmt();
 
-        is_get_char( ']' ) || fatal_todo( "Expected ']' at end of array rule" );
+        is_get_char( ']' ) || fatal( "Unexpected character in <array-rule>. Got: '%0'", error_token() );
 
         return true;
     }
@@ -2195,34 +2196,45 @@ bool GrammarParser::array_items()
 
 bool GrammarParser::one_star_sequence_combiner_and_array_item()
 {
-    bool is_used = false;
+    bool is_sequence = false;
+    bool is_choice_combiner = false;
 
-    while( sequence_combiner() )
+    while( sequence_combiner() || (is_sequence && record( is_choice_combiner, choice_combiner())) )
     {
-        is_used = true;
-        array_item() || fatal_todo( "Expected array-item after sequence-combiner in array definition" );
+        is_sequence = true;
+
+        if( is_choice_combiner )
+        {
+            error( "<choice-combiner> can not be used with <sequence-combiner> in <array-rule> without Parentheses" );
+            is_choice_combiner = false;
+        }
+
+        array_item() || fatal( "Expected <array-item> after <sequence-combiner> in object definition" );
+
     }
 
-    if( is_used && choice_combiner() )
-        fatal_todo( "choice-combiner can not be used with sequence-combiner without Parentheses" );
-
-    return is_used;
+    return is_sequence;
 }
 
 bool GrammarParser::one_star_choice_combiner_and_array_item()
 {
-    bool is_used = false;
+    bool is_choice = false;
+    bool is_sequence_combiner = false;
 
-    while( choice_combiner() )
+    while( choice_combiner() || (is_choice && record( is_sequence_combiner, sequence_combiner())) )
     {
-        is_used = true;
-        array_item() || fatal_todo( "Expected array-item after choice-combiner in array definition" );
+        is_choice = true;
+
+        if( is_sequence_combiner )
+        {
+            error( "<sequence-combiner> can not be used with <choice-combiner> in <array-rule> without Parentheses" );
+            is_sequence_combiner = false;
+        }
+
+        array_item() || fatal( "Expected <array-item> after <choice-combiner> in object definition" );
     }
 
-    if( is_used && sequence_combiner() )
-        fatal_todo( "sequence-combiner can not be used with choice-combiner without Parentheses" );
-
-    return is_used;
+    return is_choice;
 }
 
 bool GrammarParser::array_item()
@@ -2276,7 +2288,8 @@ bool GrammarParser::array_group()
         m.p_rule->annotations.merge( array_group_annotations );
 
         star_sp_cmt() && optional( array_items() ) && star_sp_cmt();
-        is_get_char( ')' ) || fatal_todo( "Expected ')' at end of array-group" );
+
+        is_get_char( ')' ) || fatal( "Unexpected character in <array-group>. Got: '%0'", error_token() );
 
         return true;
     }
