@@ -2521,7 +2521,7 @@ bool GrammarParser::repetition_range()
                 rewind_on_reject( min_repetition() ) ||
                 rewind_on_reject( max_repetition() ) ||
                 rewind_on_reject( specific_repetition() ) )
-            return true;   // if false, fall through to loc_outer recorded location
+            return true;   // if false, fall through to restore loc_outer recorded location (we'll want to re-scan the '*')
     }
 
     location_top();
@@ -2617,7 +2617,7 @@ bool GrammarParser::repetition_step()
     {
         cl::accumulator repetition_accumulator( this );
 
-        step_size() && set( m.p_rule->repetition.step, repetition_accumulator.to_int() ) || fatal_todo( "Expected repetition step size after '%'" );
+        step_size() && set( m.p_rule->repetition.step, repetition_accumulator.to_int() ) || fatal( "Expected repetition step size after '%'. Got: '%0'", error_token() );
 
         return true;
     }

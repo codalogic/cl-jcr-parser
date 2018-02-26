@@ -1,0 +1,3 @@
+Fatal: 8-arrays/bad-array-rule-with-repetition-start-and-bad-step.jcr (line: 1, char: 14):
+      Expected repetition step size after '%'. Got: 'foo'
+1 error(s), 0 warning(s)
