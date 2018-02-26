@@ -2641,7 +2641,7 @@ bool GrammarParser::integer()
     */
     // "0" / ["-"] && pos_integer()
 
-    return (zero() && (! peek_is_in( cl::alphabet_digit() ) || error_todo( "Leading zeros not allow on integers" ) && abandon_path() ) ) ||
+    return (zero() && (! peek_is_in( cl::alphabet_digit() ) || fatal( "Leading zeros not allowed on integers. Got '0%0'", error_token() ) ) ) ||
             optional( minus() ) && pos_integer();
 }
 
@@ -2652,7 +2652,7 @@ bool GrammarParser::non_neg_integer()
     */
     // "0" || pos_integer()
 
-    return (zero() && (! peek_is_in( cl::alphabet_digit() ) || error_todo( "Leading zeros not allow on integers" ) && abandon_path() ) ) ||
+    return (zero() && (! peek_is_in( cl::alphabet_digit() ) || fatal( "Leading zeros not allowed on integers. Got '0%0'", error_token() ) ) ) ||
             pos_integer();
 }
 
