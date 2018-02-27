@@ -1,12 +1,12 @@
 //----------------------------------------------------------------------------
-// Copyright (c) 2015-2017, Codalogic Ltd (http://www.codalogic.com)
+// Copyright (c) 2015-2018, Codalogic Ltd (http://www.codalogic.com)
 //
 // This Source Code is subject to the terms of the GNU LESSER GENERAL PUBLIC
 // LICENSE version 3. If a copy of the LGPLv3 was not distributed with
 // this file, you can obtain one at http://opensource.org/licenses/LGPL-3.0.
 //----------------------------------------------------------------------------
 
-// Implements jcr-abnf - 2018-01-17
+// Implements jcr-abnf - 2018-02-01
 
 //----------------------------------------------------------------------------
 // Notes:
@@ -165,7 +165,6 @@ private:
     bool member_rule();
     bool member_name_spec();
     bool type_rule();
-    bool explicit_type_choice();
     bool type_choice();
     bool type_choice_items();
     bool annotations( Annotations & );
@@ -183,8 +182,7 @@ private:
     bool true_value();
     bool false_value();
     bool string_type();
-    bool string_value1();
-    bool string_value2();
+    bool string_value();
     bool string_range();
     bool double_type();
     bool float_type();
@@ -267,25 +265,18 @@ private:
     bool zero();
     bool q_string_as_utf8();
     bool q_string();
-    bool quotation_mark();
     bool qs_char();
     STAR( qs_char )
-    bool unescaped();
     bool escape();
     bool escape_code();
     bool u();
     bool four_HEXDIG();
-    bool sq_string_as_utf8();
-    bool sq_string();
-    bool single_quote_mark();
-    bool sq_char();
-    bool sq_unescaped();
+    bool quotation_mark();
+    bool unescaped();
     bool regex();
     bool re_escape_code();
     bool not_slash();
     bool regex_modifiers();
-    bool backtick_regex();
-    bool not_backtick();
     bool uri_scheme();
     bool any_kw();
     bool as_kw();
@@ -1130,14 +1121,13 @@ bool GrammarParser::member_rule()
 bool GrammarParser::member_name_spec()
 {
     /* ABNF:
-    member-name-spec = backtick-regex / q-string
+    member-name-spec = regex / q-string
     */
-    // backtick_regex() || q_string()
-
+    // regex() || q_string()
 
     cl::accumulator member_name_accumulator( this );
 
-    if( backtick_regex() )
+    if( regex() )
     {
         m.p_rule->member_name.set_regex( member_name_accumulator.get() );
 
@@ -1197,18 +1187,6 @@ bool GrammarParser::type_choice()
     }
 
     return false;
-}
-
-bool GrammarParser::explicit_type_choice()
-{
-    /* ABNF:
-    explicit-type-choice = type-designator type-choice
-    */
-    // type_designator() && type_choice()
-
-    cl::locator loc_outer( this );
-
-    return type_designator() && type_choice() || location_top( false );
 }
 
 bool GrammarParser::type_choice_items()
@@ -1371,7 +1349,7 @@ bool GrammarParser::primitive_rule()
 bool GrammarParser::primitive_def()
 {
     /* ABNF:
-    primitive-def    = string-type / string-range / string-value1 / string-value2 /
+    primitive-def    = string-type / string-range / string-value /
                    null-type / boolean-type / true-value / false-value /
                    double-type / float-type / float-range / float-value /
                    integer-type / integer-range / integer-value /
@@ -1382,7 +1360,7 @@ bool GrammarParser::primitive_def()
                    hex-type / base32hex-type / base32-type / base64url-type / base64-type /
                    any
     */
-    // string_type() || string_range() || string_value1() || string_value2() ||
+    // string_type() || string_range() || string_value() ||
     //      null_type() ||
     //      boolean_type() || true_value() || false_value() ||
     //      double_type() || float_type() || float_range() || float_value() ||
@@ -1401,8 +1379,7 @@ bool GrammarParser::primitive_def()
             rewind_on_reject( false_value() ) ||
             rewind_on_reject( string_type() ) ||
             rewind_on_reject( string_range() ) ||
-            rewind_on_reject( string_value1() ) ||
-            rewind_on_reject( string_value2() ) ||
+            rewind_on_reject( string_value() ) ||
             rewind_on_reject( double_type() ) ||
             rewind_on_reject( float_type() ) ||
             rewind_on_reject( float_range() ) ||
@@ -1487,30 +1464,10 @@ bool GrammarParser::string_type()
     return string_kw() && set( m.p_rule->type, Rule::STRING_TYPE );
 }
 
-bool GrammarParser::string_value1()
+bool GrammarParser::string_value()
 {
     /* ABNF:
-    string-value1    = sq-string
-    */
-    // sq_string()
-
-    cl::accumulator q_string_accumulator( this );
-
-    if( sq_string_as_utf8() )
-    {
-        m.p_rule->type = Rule::STRING_LITERAL;
-        m.p_rule->min = m.p_rule->max = q_string_accumulator.get();
-
-        return true;
-    }
-
-    return false;
-}
-
-bool GrammarParser::string_value2()
-{
-    /* ABNF:
-    string-value2    = q-string
+    string-value    = q-string
     */
     // q_string()
 
@@ -2261,15 +2218,14 @@ bool GrammarParser::array_item()
 bool GrammarParser::array_item_types()
 {
     /* ABNF:
-    array-item-types = array-group / type-rule / explicit-type-choice
+    array-item-types = array-group / type-rule
     */
-    // array_group() || type_rule() || explicit_type_choice()
+    // array_group() || type_rule()
 
     cl::locator loc( this );
 
     return rewind_on_reject( array_group() ) ||
-            rewind_on_reject( type_rule() ) ||
-            rewind_on_reject( explicit_type_choice() );
+            rewind_on_reject( type_rule() );
 }
 
 bool GrammarParser::array_group()
@@ -2408,16 +2364,15 @@ bool GrammarParser::group_item()
 bool GrammarParser::group_item_types()
 {
     /* ABNF:
-    group-item-types = group-group / member-rule / type-rule / explicit-type-choice
+    group-item-types = group-group / member-rule / type-rule
     */
-    // group_group() || member_rule() || type_rule() || explicit_type_choice()
+    // group_group() || member_rule() || type_rule()
 
     cl::locator loc( this );
 
     return rewind_on_reject( group_group() ) ||
             rewind_on_reject( member_rule() ) ||
-            rewind_on_reject( type_rule() ) ||
-            rewind_on_reject( explicit_type_choice() );
+            rewind_on_reject( type_rule() );
 }
 
 bool GrammarParser::group_group()
@@ -2807,16 +2762,6 @@ bool GrammarParser::q_string()  // Collects wrapping quotation marks
     return false;
 }
 
-bool GrammarParser::quotation_mark()
-{
-    /* ABNF:
-    quotation-mark   = %x22      ; "
-    */
-    // %x22      ; "
-
-    return accumulate( '"' );
-}
-
 bool GrammarParser::qs_char()
 {
     /* ABNF:
@@ -2844,23 +2789,6 @@ bool GrammarParser::qs_char()
     //                    %x75 4HEXDIG )  ; uXXXX                U+XXXX
 
     return unescaped() || escape() && (escape_code() || u() && four_HEXDIG());
-}
-
-bool is_qstring_unescaped( char c )
-{
-    // unescaped        = %x20-21 / %x23-5B / %x5D-10FFFF
-
-    return c >= 0x20 && c <= 0x21 || c >= 0x23 && c <= 0x5b || c >= 0x5d;
-}
-
-bool GrammarParser::unescaped()
-{
-    /* ABNF:
-    unescaped        = %x20-21 / %x23-5B / %x5D-10FFFF
-    */
-    // %x20-21 / %x23-5B / %x5D-10FFFF
-
-    return accumulate( cl::alphabet_function( is_qstring_unescaped ) );
 }
 
 bool GrammarParser::escape()
@@ -2893,23 +2821,32 @@ bool GrammarParser::four_HEXDIG()
     return true;
 }
 
-bool GrammarParser::sq_string_as_utf8()
+bool GrammarParser::quotation_mark()
 {
-    if( is_get_char( '\'' ) )
-    {
-        std::string utf8_string;
+    /* ABNF:
+    quotation-mark   = %x22      ; "
+    */
+    // %x22      ; "
 
-        return get_qstring_contents( &utf8_string, '\'' ) && is_get_char( '\'' ) &&
-                accumulator_append( utf8_string ) || fatal_todo( "Badly formed QString" );
-    }
-
-    return false;
+    return accumulate( '"' );
 }
 
-// bool GrammarParser::sq_string()
-// {
-//     Not used in code. Implemented by sq_string_as_utf8() instead
-// }
+bool is_qstring_unescaped( char c )
+{
+    // unescaped        = %x20-21 / %x23-5B / %x5D-10FFFF
+
+    return c >= 0x20 && c <= 0x21 || c >= 0x23 && c <= 0x5b || c >= 0x5d;
+}
+
+bool GrammarParser::unescaped()
+{
+    /* ABNF:
+    unescaped        = %x20-21 / %x23-5B / %x5D-10FFFF
+    */
+    // %x20-21 / %x23-5B / %x5D-10FFFF
+
+    return accumulate( cl::alphabet_function( is_qstring_unescaped ) );
+}
 
 bool GrammarParser::regex()
 {
@@ -2980,43 +2917,6 @@ bool GrammarParser::regex_modifiers()
     // *( "i" || "s" || "x" )
 
     return accumulate( regex_modifiers_alphabet );
-}
-
-bool GrammarParser::backtick_regex()
-{
-    /* ABNF:
-    backtick-regex   = "`" *( escape ascii-char / not-backtick ) "`"
-    */
-    // "`" && *( escape() re_escape_code() || not_backtick() ) "`"
-
-    if( accumulate( '`' ) )
-    {
-        while( (escape() && re_escape_code()) || not_backtick() )
-        {}
-        accumulate( '`' ) || fatal_todo( "Error reading backtick quoted regular expression" );
-
-        return true;
-    }
-
-    return false;
-}
-
-bool is_not_backtick( char c )
-{
-    // HTAB() || CR() || LF() / %x20-5F / %x61-10FFFF
-
-    return c == '\t' || c == '\r' || c == '\n' ||
-            c >= 0x20 && c <= 0x5f || c >= 0x61;
-}
-
-bool GrammarParser::not_backtick()
-{
-    /* ABNF:
-    not-backtick     = HTAB / CR / LF / %x20-5F / %x61-10FFFF
-    */
-    // HTAB() || CR() || LF() / %x20-5F / %x61-10FFFF
-
-    return accumulate( cl::alphabet_function( is_not_backtick ) );
 }
 
 bool GrammarParser::uri_scheme()
