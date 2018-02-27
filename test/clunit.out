@@ -1,4 +1,4 @@
-Tests run on Tue Feb 27 16:00:35 2018
+Tests run on Fri Mar 02 18:46:45 2018
 
     Config - Configuration [test-config.cpp:40]
     ===========================================
@@ -148,14 +148,21 @@ Tests run on Tue Feb 27 16:00:35 2018
     ok: mn.is_literal() == false
     ok: mn.is_regex() == false
     ok: mn.name() == ""
+      : mn.set_literal( "foo" )
+    ok: mn.is_literal() == true
+      : mn.clear()
+    ok: mn.is_absent() == true
+    ok: mn.is_literal() == false
+    ok: mn.is_regex() == false
+    ok: mn.name() == ""
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    TargetRule [test-low-level-objects.cpp:183]
+    TargetRule [test-low-level-objects.cpp:191]
     ===========================================
     ok: ! tr.p_rule
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Rule [test-low-level-objects.cpp:190]
+    Rule [test-low-level-objects.cpp:198]
     =====================================
     ok: ! r.p_parent
     ok: r.type == Rule::NONE
@@ -168,7 +175,7 @@ Tests run on Tue Feb 27 16:00:35 2018
     ok: p_appended_rule->p_parent == &r
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Grammar [test-low-level-objects.cpp:208]
+    Grammar [test-low-level-objects.cpp:216]
     ========================================
       #### Adding and accessing unaliased imports ####
       : g.add_unaliased_import( "foo" )
@@ -2387,6 +2394,6 @@ jcr-version
 TODOs (2):
 ------------------------
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:42]
-- Test low level GrammarSet class [test-low-level-objects.cpp:256]
+- Test low level GrammarSet class [test-low-level-objects.cpp:264]
 
-0 error(s), 2 todo(s), 1855 test(s)
+0 error(s), 2 todo(s), 1860 test(s)

@@ -94,6 +94,7 @@ private:
     } m;
 
 public:
+    void clear() { m = Members(); }
     void set_absent() { m.form = Absent; m.name.clear(); }
     void set_literal( const std::string & name ) { m.form = Literal; m.name = name; }
     void set_regex( const std::string & name ) { m.form = Regex; m.name = name; }

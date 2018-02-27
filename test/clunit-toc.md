@@ -1,4 +1,4 @@
-Tests table of contents generated on Tue Feb 27 16:00:35 2018
+Tests table of contents generated on Fri Mar 02 18:46:45 2018
 
 # test-config.cpp
 | Description | Line |
@@ -15,9 +15,9 @@ Tests table of contents generated on Tue Feb 27 16:00:35 2018
 |-------------|------|
 | ValueConstraint | 40 |
 | MemberName | 149 |
-| TargetRule | 183 |
-| Rule | 190 |
-| Grammar | 208 |
+| TargetRule | 191 |
+| Rule | 198 |
+| Grammar | 216 |
 
 # test-main.cpp
 | Description | Line |

@@ -178,6 +178,14 @@ TFEATURE( "MemberName" )
     TTEST( mn.is_literal() == false );
     TTEST( mn.is_regex() == false );
     TTEST( mn.name() == "" );
+
+    TSETUP( mn.set_literal( "foo" ) );
+    TTEST( mn.is_literal() == true );
+    TSETUP( mn.clear() );
+    TTEST( mn.is_absent() == true );
+    TTEST( mn.is_literal() == false );
+    TTEST( mn.is_regex() == false );
+    TTEST( mn.name() == "" );
 }
 
 TFEATURE( "TargetRule" )

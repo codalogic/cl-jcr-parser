@@ -1189,7 +1189,7 @@ bool GrammarParser::convert_member_name_to_string_type()
 {
     m.p_rule->type = m.p_rule->member_name.is_literal() ? Rule::STRING_LITERAL : Rule::STRING_REGEX;
     m.p_rule->min = m.p_rule->max = m.p_rule->member_name.name();
-    m.p_rule->member_name.set_absent();
+    m.p_rule->member_name.clear();
 
     return true;
 }
