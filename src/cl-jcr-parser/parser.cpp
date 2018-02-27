@@ -1096,10 +1096,12 @@ bool GrammarParser::value_rule()
 bool GrammarParser::member_rule_or_string_type_ambiguity_hack()
 {
     /* ABNF:
+    Either:
     member-rule      = annotations
                    member-name-spec *sp-cmt ":" *sp-cmt type-rule
+    Or:
+                     =  annotations ( string-value / string-range )
     */
-    // annotations() && member_name_spec() && *sp_cmt() ":" && *sp_cmt() && type_rule()
 
     // No need to record location because member_rule_or_string_type_ambiguity_hack() is always part of a rewound choice
 
