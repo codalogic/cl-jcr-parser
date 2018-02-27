@@ -162,8 +162,10 @@ private:
     bool type_designator();
     bool rule_def_type_rule();
     bool value_rule();
+    bool member_rule_or_string_type_ambiguity_hack();
     bool member_rule();
     bool member_name_spec();
+    bool convert_member_name_to_string_type();
     bool type_rule();
     bool type_choice();
     bool type_choice_items();
@@ -1039,12 +1041,12 @@ bool GrammarParser::rule_def()
     rule-def         = member-rule / type-designator rule-def-type-rule /
                    value-rule / group-rule / target-rule-name
     */
-    // member_rule() || type_designator() && rule_def_type_rule() || value_rule() || group_rule() || target_rule_name()
+    // member_rule_or_string_type_ambiguity_hack() || type_designator() && rule_def_type_rule() || value_rule() || group_rule() || target_rule_name()
 
 
     cl::locator loc( this );
 
-    return rewind_on_reject( member_rule() ) ||
+    return rewind_on_reject( member_rule_or_string_type_ambiguity_hack() ) ||
             rewind_on_reject( type_designator() && rule_def_type_rule() ) ||
             rewind_on_reject( value_rule() ) ||
             rewind_on_reject( group_rule() ) ||
@@ -1089,6 +1091,43 @@ bool GrammarParser::value_rule()
     return rewind_on_reject( primitive_rule() ) ||
             rewind_on_reject( array_rule() ) ||
             rewind_on_reject( object_rule() );
+}
+
+bool GrammarParser::member_rule_or_string_type_ambiguity_hack()
+{
+    /* ABNF:
+    member-rule      = annotations
+                   member-name-spec *sp-cmt ":" *sp-cmt type-rule
+    */
+    // annotations() && member_name_spec() && *sp_cmt() ":" && *sp_cmt() && type_rule()
+
+    // No need to record location because member_rule_or_string_type_ambiguity_hack() is always part of a rewound choice
+
+    Annotations rule_annotations;
+
+    if( annotations( rule_annotations ) && member_name_spec() )
+    {
+        star_sp_cmt();
+        
+        if( is_get_char( ':' ) )
+        {
+            // It's a member-rule
+            star_sp_cmt() &&
+            (type_rule() || fatal( "Expected <type-rule> after <member-name> %0. Got '%1'", m.p_rule->member_name, error_token() ) );
+        }
+        
+        else
+        {
+            // It's a string type
+            convert_member_name_to_string_type();
+        }
+
+        m.p_rule->annotations.merge( rule_annotations );
+
+        return true;
+    }
+
+    return false;
 }
 
 bool GrammarParser::member_rule()
@@ -1142,6 +1181,15 @@ bool GrammarParser::member_name_spec()
     }
 
     return false;
+}
+
+bool GrammarParser::convert_member_name_to_string_type()
+{
+    m.p_rule->type = m.p_rule->member_name.is_literal() ? Rule::STRING_LITERAL : Rule::STRING_REGEX;
+    m.p_rule->min = m.p_rule->max = m.p_rule->member_name.name();
+    m.p_rule->member_name.set_absent();
+
+    return true;
 }
 
 bool GrammarParser::type_rule()
@@ -2366,12 +2414,12 @@ bool GrammarParser::group_item_types()
     /* ABNF:
     group-item-types = group-group / member-rule / type-rule
     */
-    // group_group() || member_rule() || type_rule()
+    // group_group() || member_rule_or_string_type_ambiguity_hack() || type_rule()
 
     cl::locator loc( this );
 
     return rewind_on_reject( group_group() ) ||
-            rewind_on_reject( member_rule() ) ||
+            rewind_on_reject( member_rule_or_string_type_ambiguity_hack() ) ||
             rewind_on_reject( type_rule() );
 }
 

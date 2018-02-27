@@ -452,7 +452,17 @@ TFEATURE( "GrammarParser - Syntax parsing - Primitive rules" )
     }
     {
         TSETUP( ParserHarness ph( "$rule-2 = \"a string\"\n" ) );
-        TCRITICALTEST( ph.status() != JCRParser::S_OK );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TCRITICALTEST( ph.grammar().rules[0].rule_name == "rule-2" );
+        TCRITICALTEST( ph.grammar().rules[0].type == Rule::STRING_LITERAL );
+
+        TTEST( ph.grammar().rules[0].min.is_set() == true );
+        TTEST( ph.grammar().rules[0].min.is_string() == true );
+        TTEST( ph.grammar().rules[0].min.as_string() == "a string" );
+        TTEST( ph.grammar().rules[0].max.is_set() == true );
+        TTEST( ph.grammar().rules[0].max.is_string() == true );
+        TTEST( ph.grammar().rules[0].max.as_string() == "a string" );
     }
     {
         TSETUP( ParserHarness ph( "$rule-2 = : /pref\\d+/i\n" ) );

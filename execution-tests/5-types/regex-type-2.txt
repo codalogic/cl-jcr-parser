@@ -1,3 +1,1 @@
-Fatal: 5-types/regex-type-2.jcr (line: 2, char: 11):
-      Expected ':' after <member-name> /Fo\/o/i. Got '<end-of-input>'
-1 error(s), 0 warning(s)
+0 error(s), 0 warning(s)
