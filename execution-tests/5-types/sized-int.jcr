@@ -1,2 +1,2 @@
 $int = int8
-$name = 'Fred'
+$name = string

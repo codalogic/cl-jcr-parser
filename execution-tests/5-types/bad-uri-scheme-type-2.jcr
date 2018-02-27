@@ -1,2 +1,2 @@
 $uri = uri..123
-$name = 'Fred'
+$name = string

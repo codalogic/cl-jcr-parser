@@ -1,2 +1,2 @@
 $int = int65
-$name = 'Fred'
+$name = string

@@ -1,2 +1,2 @@
 $frange = 100.0..10
-$name = 'Fred'
+$name = string

@@ -1,1 +1,1 @@
-{ `p\d+` : integer }
+{ /p\d+/ : integer }
