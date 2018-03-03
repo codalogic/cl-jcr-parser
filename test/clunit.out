@@ -1,4 +1,4 @@
-Tests run on Sat Mar 03 12:50:32 2018
+Tests run on Sat Mar 03 18:08:00 2018
 
     Config - Configuration [test-config.cpp:40]
     ===========================================
@@ -179,7 +179,27 @@ Tests run on Sat Mar 03 12:50:32 2018
     ok: p_appended_rule->p_parent == &r
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Grammar [test-low-level-objects.cpp:220]
+    Post-link Rule [test-low-level-objects.cpp:220]
+    ===============================================
+    ok: def.p_rule == &rule
+    ok: def.p_type == &type
+    ok: def.get_repetition().min == 100
+    ok: def.get_repetition().max == 101
+    ok: def.get_annotations().is_root
+    ok: def.get_annotations().is_not
+    ok: def.get_annotations().is_unordered
+    ok: def.get_member_name().name() == "rule"
+    ok: def.get_type() == Rule::OBJECT
+    ok: def.get_min().as_string() == "min"
+    ok: def.get_max().as_string() == "max"
+    ok: def.get_child_combiner() == Rule::Sequence
+    ok: ! def.get_children().empty()
+    ok: def.get_children()[0].type == Rule::INTEGER
+    ok: def.get_children()[0].min.as_int() == 302
+    ok: def.get_children()[0].max.as_int() == 303
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    Grammar [test-low-level-objects.cpp:281]
     ========================================
       #### Adding and accessing unaliased imports ####
       : g.add_unaliased_import( "foo" )
@@ -2398,6 +2418,6 @@ jcr-version
 TODOs (2):
 ------------------------
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:42]
-- Test low level GrammarSet class [test-low-level-objects.cpp:268]
+- Test low level GrammarSet class [test-low-level-objects.cpp:329]
 
-0 error(s), 2 todo(s), 1864 test(s)
+0 error(s), 2 todo(s), 1881 test(s)

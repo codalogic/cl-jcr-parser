@@ -217,6 +217,67 @@ TFEATURE( "Rule" )
     TTEST( p_appended_rule->p_parent == &r );
 }
 
+TFEATURE( "Post-link Rule" )
+{
+    // We set up values in this test that are inconsistentr with a real application.
+    // This is so we can verify that the correct instances are being accessed.
+    Rule def( 100, 102 );
+    def.rule_name = "def";
+    def.repetition.min = 100;
+    def.repetition.max = 101;
+    def.annotations.is_root = true;
+    def.type = Rule::TARGET_RULE;
+    def.child_combiner = Rule::None;
+    def.target_rule.local_name = "rule";
+
+    Rule rule( 300, 502 );
+    rule.rule_name = "rule";
+    rule.annotations.is_not = true;
+    rule.member_name.set_literal( "rule" );
+    rule.type = Rule::TARGET_RULE;
+    rule.child_combiner = Rule::None;
+    rule.target_rule.local_name = "type";
+
+    Rule type( 400, 602 );
+    type.rule_name = "type";
+    type.annotations.is_unordered = true;
+    type.type = Rule::OBJECT;
+    type.min = "min";   // Inconsistent with "type = Rule::OBJECT" to aid testing
+    type.max = "max";   // Inconsistent with "type = Rule::OBJECT" to aid testing
+    type.child_combiner = Rule::Sequence;
+
+    Rule::uniq_ptr pu_child( new Rule( 700, 802 ) );
+    pu_child->type = Rule::INTEGER;
+    pu_child->min = (int64)302;
+    pu_child->max = (int64)303;
+    type.append_child_rule( pu_child );
+
+    // The 'link' operation
+    def.target_rule.p_rule = &rule;
+    rule.target_rule.p_rule = &type;
+    def.p_rule = def.target_rule.p_rule;
+    def.p_type = def.p_rule->target_rule.p_rule;
+    TTEST( def.p_rule == &rule );
+    TTEST( def.p_type == &type );
+    def.merge_target_annotations();
+
+    TTEST( def.get_repetition().min == 100 );
+    TTEST( def.get_repetition().max == 101 );
+    TTEST( def.get_annotations().is_root );
+    TTEST( def.get_annotations().is_not );
+    TTEST( def.get_annotations().is_unordered );
+    TTEST( def.get_member_name().name() == "rule" );
+    TTEST( def.get_type() == Rule::OBJECT );
+    TTEST( def.get_min().as_string() == "min" );
+    TTEST( def.get_max().as_string() == "max" );
+    TTEST( def.get_child_combiner() == Rule::Sequence );
+
+    TTEST( ! def.get_children().empty() );
+    TTEST( def.get_children()[0].type == Rule::INTEGER );
+    TTEST( def.get_children()[0].min.as_int() == 302 );
+    TTEST( def.get_children()[0].max.as_int() == 303 );
+}
+
 TFEATURE( "Grammar" )
 {
     Grammar g;

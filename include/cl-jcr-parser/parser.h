@@ -237,6 +237,25 @@ struct Rule : private detail::NonCopyable
         children.push_back( pu_child_rule.get() );
         return pu_child_rule.release();
     }
+
+    void merge_target_annotations()
+    {
+        // Call after p_rule and p_type have been linked
+        if( p_rule != this )
+            annotations.merge( p_rule->annotations );
+        if( p_type != this )
+            annotations.merge( p_type->annotations );
+    }
+
+    // These method access the relevant Rule after the linking operation
+    const Repetition & get_repetition() const { return repetition; }
+    const Annotations & get_annotations() const { return annotations; }
+    const MemberName & get_member_name() const { return p_rule->member_name; }
+    const Type & get_type() const { return p_type->type; }
+    const ValueConstraint & get_min() const { return p_type->min; }
+    const ValueConstraint & get_max() const { return p_type->max; }
+    const children_container_t & get_children() const { return p_type->children; }
+    const ChildCombiner & get_child_combiner() const { return p_type->child_combiner; }
 };
 
 class AliasLookupResult
