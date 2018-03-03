@@ -251,6 +251,8 @@ struct Rule : private detail::NonCopyable
     const Repetition & get_repetition() const { return repetition; }
     const Annotations & get_annotations() const { return annotations; }
     const MemberName & get_member_name() const { return p_rule->member_name; }
+    bool is_member_rule() const { return ! get_member_name().is_absent(); }
+    bool is_type_rule() const { return get_member_name().is_absent(); }
     const Type & get_type() const { return p_type->type; }
     const ValueConstraint & get_min() const { return p_type->min; }
     const ValueConstraint & get_max() const { return p_type->max; }

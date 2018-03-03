@@ -261,12 +261,15 @@ TFEATURE( "Post-link Rule" )
     TTEST( def.p_type == &type );
     def.merge_target_annotations();
 
+    // The tests
     TTEST( def.get_repetition().min == 100 );
     TTEST( def.get_repetition().max == 101 );
     TTEST( def.get_annotations().is_root );
     TTEST( def.get_annotations().is_not );
     TTEST( def.get_annotations().is_unordered );
     TTEST( def.get_member_name().name() == "rule" );
+    TTEST( def.is_member_rule() == true );
+    TTEST( def.is_type_rule() == false );
     TTEST( def.get_type() == Rule::OBJECT );
     TTEST( def.get_min().as_string() == "min" );
     TTEST( def.get_max().as_string() == "max" );

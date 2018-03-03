@@ -1,4 +1,4 @@
-Tests run on Sat Mar 03 18:08:00 2018
+Tests run on Sat Mar 03 19:28:46 2018
 
     Config - Configuration [test-config.cpp:40]
     ===========================================
@@ -189,6 +189,8 @@ Tests run on Sat Mar 03 18:08:00 2018
     ok: def.get_annotations().is_not
     ok: def.get_annotations().is_unordered
     ok: def.get_member_name().name() == "rule"
+    ok: def.is_member_rule() == true
+    ok: def.is_type_rule() == false
     ok: def.get_type() == Rule::OBJECT
     ok: def.get_min().as_string() == "min"
     ok: def.get_max().as_string() == "max"
@@ -199,7 +201,7 @@ Tests run on Sat Mar 03 18:08:00 2018
     ok: def.get_children()[0].max.as_int() == 303
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Grammar [test-low-level-objects.cpp:281]
+    Grammar [test-low-level-objects.cpp:284]
     ========================================
       #### Adding and accessing unaliased imports ####
       : g.add_unaliased_import( "foo" )
@@ -2418,6 +2420,6 @@ jcr-version
 TODOs (2):
 ------------------------
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:42]
-- Test low level GrammarSet class [test-low-level-objects.cpp:329]
+- Test low level GrammarSet class [test-low-level-objects.cpp:332]
 
-0 error(s), 2 todo(s), 1881 test(s)
+0 error(s), 2 todo(s), 1883 test(s)
