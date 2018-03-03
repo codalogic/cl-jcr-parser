@@ -204,6 +204,8 @@ struct Rule : private detail::NonCopyable
             TARGET_RULE };
 
     Rule * p_parent;
+    int line_number;
+    int column_number;
     std::string rule_name;
     Repetition repetition;
     Annotations annotations;
@@ -215,8 +217,19 @@ struct Rule : private detail::NonCopyable
     children_container_t children;
     enum ChildCombiner { None, Sequence, Choice } child_combiner;
     TargetRule target_rule;
+    Rule * p_rule;
+    Rule * p_type;
 
-    Rule() : p_parent( 0 ), type( NONE ), child_combiner( None ) {}
+    Rule( int line_number_in, int column_number_in )
+        :
+        p_parent( 0 ),
+        line_number( line_number_in ),
+        column_number( column_number_in ),
+        type( NONE ),
+        child_combiner( None )
+    {
+        p_rule = p_type = this;
+    }
 
     Rule * append_child_rule( uniq_ptr pu_child_rule )
     {

@@ -910,7 +910,7 @@ bool GrammarParser::root_rule()
 
     cl::locator loc( this );
 
-    Rule::uniq_ptr pu_rule( new Rule );
+    Rule::uniq_ptr pu_rule( new Rule( m.r_reader.get_line_number(), m.r_reader.get_column_number() ) );
     RuleStackLogger rule_stack_logger( this, pu_rule );
 
     if( rewind_on_reject( value_rule() ) || rewind_on_reject( group_rule() ) )
@@ -938,7 +938,7 @@ bool GrammarParser::rule()
     {
         cl::accumulator name_accumulator( this );
 
-        Rule::uniq_ptr pu_rule( new Rule );
+        Rule::uniq_ptr pu_rule( new Rule( m.r_reader.get_line_number(), m.r_reader.get_column_number() ) );
         RuleStackLogger rule_stack_logger( this, pu_rule );
 
         (rule_name() || fatal( "Expected <rule-name> after '$' in rule definition. Got: '%0'", error_token() )) &&
@@ -1254,7 +1254,7 @@ bool GrammarParser::type_choice_items()
 
     Rule * p_parent = m.p_rule;
 
-    Rule::uniq_ptr pu_rule( new Rule );
+    Rule::uniq_ptr pu_rule( new Rule( m.r_reader.get_line_number(), m.r_reader.get_column_number() ) );
     RuleStackLogger rule_stack_logger( this, pu_rule );
 
     if( ( rewind_on_reject( type_choice() ) || rewind_on_reject( type_rule() ) ) &&
@@ -2105,7 +2105,7 @@ bool GrammarParser::object_item()
 
     Rule * p_parent = m.p_rule;
 
-    Rule::uniq_ptr pu_rule( new Rule );
+    Rule::uniq_ptr pu_rule( new Rule( m.r_reader.get_line_number(), m.r_reader.get_column_number() ) );
     RuleStackLogger rule_stack_logger( this, pu_rule );
 
     if( object_item_types() && star_sp_cmt() && optional( repetition() && star_sp_cmt() ) )
@@ -2252,7 +2252,7 @@ bool GrammarParser::array_item()
 
     Rule * p_parent = m.p_rule;
 
-    Rule::uniq_ptr pu_rule( new Rule );
+    Rule::uniq_ptr pu_rule( new Rule( m.r_reader.get_line_number(), m.r_reader.get_column_number() ) );
     RuleStackLogger rule_stack_logger( this, pu_rule );
 
     if( array_item_types() && star_sp_cmt() && optional( repetition() && star_sp_cmt() ) )
@@ -2398,7 +2398,7 @@ bool GrammarParser::group_item()
 
     Rule * p_parent = m.p_rule;
 
-    Rule::uniq_ptr pu_rule( new Rule );
+    Rule::uniq_ptr pu_rule( new Rule( m.r_reader.get_line_number(), m.r_reader.get_column_number() ) );
     RuleStackLogger rule_stack_logger( this, pu_rule );
 
     if( group_item_types() && star_sp_cmt() && optional( repetition() && star_sp_cmt() ) )

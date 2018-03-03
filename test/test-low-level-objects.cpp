@@ -197,12 +197,16 @@ TFEATURE( "TargetRule" )
 
 TFEATURE( "Rule" )
 {
-    Rule r;
+    Rule r( 100, 102 );
 
     TTEST( ! r.p_parent );
+    TTEST( r.line_number == 100 );
+    TTEST( r.column_number == 102 );
+    TTEST( r.p_rule == &r );
+    TTEST( r.p_type == &r );
     TTEST( r.type == Rule::NONE );
 
-    TSETUP( Rule::uniq_ptr pu_rule( new Rule ) );
+    TSETUP( Rule::uniq_ptr pu_rule( new Rule( 0, 0 ) ) );
 
     TTEST( ! pu_rule->p_parent );
     TTEST( pu_rule->type == Rule::NONE );
@@ -251,7 +255,7 @@ TFEATURE( "Grammar" )
 
     TDOC( "Adding rules" );
     TTEST( g.rules.size() == 0 );
-    TSETUP( Rule::uniq_ptr pu_r( new Rule ) );
+    TSETUP( Rule::uniq_ptr pu_r( new Rule( 0, 0 ) ) );
     TSETUP( pu_r->p_parent = pu_r.get() );  // Set p_parent to non-zero value so we can test it's set to 0 later
     TTEST( pu_r->p_parent != 0 );
     TSETUP( Rule * p_unmanaged_rule = pu_r.get() );

@@ -1,4 +1,4 @@
-Tests run on Fri Mar 02 18:46:45 2018
+Tests run on Sat Mar 03 12:50:32 2018
 
     Config - Configuration [test-config.cpp:40]
     ===========================================
@@ -165,8 +165,12 @@ Tests run on Fri Mar 02 18:46:45 2018
     Rule [test-low-level-objects.cpp:198]
     =====================================
     ok: ! r.p_parent
+    ok: r.line_number == 100
+    ok: r.column_number == 102
+    ok: r.p_rule == &r
+    ok: r.p_type == &r
     ok: r.type == Rule::NONE
-      : Rule::uniq_ptr pu_rule( new Rule )
+      : Rule::uniq_ptr pu_rule( new Rule( 0, 0 ) )
     ok: ! pu_rule->p_parent
     ok: pu_rule->type == Rule::NONE
       : Rule * p_new_rule = pu_rule.get()
@@ -175,7 +179,7 @@ Tests run on Fri Mar 02 18:46:45 2018
     ok: p_appended_rule->p_parent == &r
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Grammar [test-low-level-objects.cpp:216]
+    Grammar [test-low-level-objects.cpp:220]
     ========================================
       #### Adding and accessing unaliased imports ####
       : g.add_unaliased_import( "foo" )
@@ -205,7 +209,7 @@ Tests run on Fri Mar 02 18:46:45 2018
     ok: r_g.get_aliased_import( "blah" ).is_found() == false
       #### Adding rules ####
     ok: g.rules.size() == 0
-      : Rule::uniq_ptr pu_r( new Rule )
+      : Rule::uniq_ptr pu_r( new Rule( 0, 0 ) )
       : pu_r->p_parent = pu_r.get()
     ok: pu_r->p_parent != 0
       : Rule * p_unmanaged_rule = pu_r.get()
@@ -2394,6 +2398,6 @@ jcr-version
 TODOs (2):
 ------------------------
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:42]
-- Test low level GrammarSet class [test-low-level-objects.cpp:264]
+- Test low level GrammarSet class [test-low-level-objects.cpp:268]
 
-0 error(s), 2 todo(s), 1860 test(s)
+0 error(s), 2 todo(s), 1864 test(s)
