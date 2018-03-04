@@ -243,7 +243,7 @@ struct Rule : private detail::NonCopyable
         // Call after p_rule and p_type have been linked
         if( p_rule != this )
             annotations.merge( p_rule->annotations );
-        if( p_type != this )
+        if( p_type != this && p_type != p_rule )
             annotations.merge( p_type->annotations );
     }
 
