@@ -189,7 +189,7 @@ struct TargetRule
 
 struct Rule : private detail::NonCopyable
 {
-    typedef uniq_ptr<Rule>::type uniq_ptr;
+    typedef uniq_ptr< Rule >::type uniq_ptr;
 
     enum Type {
             NONE, TNULL, BOOLEAN, INTEGER, UINTEGER, DOUBLE, FLOAT,
@@ -275,7 +275,7 @@ public:
 
 struct Grammar : private detail::NonCopyable
 {
-    typedef uniq_ptr<Grammar>::type uniq_ptr;
+    typedef uniq_ptr< Grammar >::type uniq_ptr;
     typedef clutils::ptr_vector< Rule > rule_container_t;
 
     std::string ruleset_id;
