@@ -1,4 +1,4 @@
-Tests run on Mon Mar 05 16:46:50 2018
+Tests run on Mon Mar 05 18:08:07 2018
 
     Config - Configuration [test-config.cpp:40]
     ===========================================
@@ -241,6 +241,16 @@ Tests run on Mon Mar 05 16:46:50 2018
     ok: p_r == p_unmanaged_rule
     ok: ! p_r->p_parent
     ok: g.rules.size() == 1
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    Grammar::find_rule() [test-low-level-objects.cpp:340]
+    =====================================================
+    ok: g.find_rule( "r1" ) == p_r1
+    ok: g.find_rule( "r2" ) == p_r2
+    ok: g.find_rule( "r3" ) == 0
+    ok: const_g.find_rule( "r1" ) == p_r1
+    ok: const_g.find_rule( "r2" ) == p_r2
+    ok: const_g.find_rule( "r3" ) == 0
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
@@ -2422,6 +2432,6 @@ jcr-version
 TODOs (2):
 ------------------------
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:42]
-- Test low level GrammarSet class [test-low-level-objects.cpp:340]
+- Test low level GrammarSet class [test-low-level-objects.cpp:361]
 
-0 error(s), 2 todo(s), 1885 test(s)
+0 error(s), 2 todo(s), 1892 test(s)

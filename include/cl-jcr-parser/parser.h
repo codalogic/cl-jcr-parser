@@ -323,6 +323,17 @@ struct Grammar : private detail::NonCopyable
         rules.push_back( pu_rule.get() );
         return pu_rule.release();
     }
+    const Rule * find_rule( const std::string & r_sought_rule_name ) const
+    {
+        for( size_t i=0; i<rules.size(); ++i )
+            if( rules[i].rule_name == r_sought_rule_name )
+                return & rules[i];
+        return 0;
+    }
+    Rule * find_rule( const std::string & r_sought_rule_name )
+    {
+        return const_cast< Rule * >( static_cast< const Grammar & >(*this).find_rule( r_sought_rule_name ) );
+    }
 };
 
 struct GrammarSet : private detail::NonCopyable

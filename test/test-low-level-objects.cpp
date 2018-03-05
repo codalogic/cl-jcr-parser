@@ -337,4 +337,25 @@ TFEATURE( "Grammar" )
     TTEST( g.rules.size() == 1 );
 }
 
+TFEATURE( "Grammar::find_rule()" )
+{
+    GrammarSet gs;
+    Grammar g( &gs );
+    Rule::uniq_ptr pu_r1( new Rule( &g, 0, 0 ) );
+    pu_r1->rule_name = "r1";
+    Rule * p_r1 = g.append_rule( pu_r1 ); // pu_r1 releases ownership here
+    Rule::uniq_ptr pu_r2( new Rule( &g, 0, 0 ) );
+    pu_r2->rule_name = "r2";
+    Rule * p_r2 = g.append_rule( pu_r2 ); // pu_r2 releases ownership here
+
+    TTEST( g.find_rule( "r1" ) == p_r1 );
+    TTEST( g.find_rule( "r2" ) == p_r2 );
+    TTEST( g.find_rule( "r3" ) == 0 );
+
+    const Grammar & const_g = g;
+    TTEST( const_g.find_rule( "r1" ) == p_r1 );
+    TTEST( const_g.find_rule( "r2" ) == p_r2 );
+    TTEST( const_g.find_rule( "r3" ) == 0 );
+}
+
 TFEATURETODO( "Test low level GrammarSet class" );
