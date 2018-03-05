@@ -373,6 +373,19 @@ public:
     size_t size() const { return m.grammars.size(); }
     const Grammar & operator [] ( size_t i ) const { return m.grammars[i]; }
     Grammar & operator [] ( size_t i ) { return m.grammars[i]; }
+
+    const Grammar * find_grammar( const std::string & r_sought_ruleset_id ) const
+    {
+        for( size_t i=0; i<m.grammars.size(); ++i )
+            if( ! m.grammars[i].ruleset_id.empty() &&      // Can't find an unnamed grammar
+                    m.grammars[i].ruleset_id == r_sought_ruleset_id )
+                return & m.grammars[i];
+        return 0;
+    }
+    Grammar * find_grammar( const std::string & r_sought_ruleset_id )
+    {
+        return const_cast< Grammar * >( static_cast< const GrammarSet & >(*this).find_grammar( r_sought_ruleset_id ) );
+    }
 };
 
 class JCRParser : private detail::NonCopyable

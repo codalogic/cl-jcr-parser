@@ -358,4 +358,22 @@ TFEATURE( "Grammar::find_rule()" )
     TTEST( p_const_g->find_rule( "r3" ) == 0 );
 }
 
+TFEATURE( "GrammarSet::find_grammar()" )
+{
+    GrammarSet gs;
+    Grammar * p_g1 = gs.append_grammar();
+    p_g1->ruleset_id = "g1";
+    Grammar * p_g2 = gs.append_grammar();
+    p_g2->ruleset_id = "g2";
+
+    TTEST( gs.find_grammar( "g1" ) == p_g1 );
+    TTEST( gs.find_grammar( "g2" ) == p_g2 );
+    TTEST( gs.find_grammar( "g3" ) == 0 );
+
+    const GrammarSet & r_const_gs = gs;
+    TTEST( r_const_gs.find_grammar( "g1" ) == p_g1 );
+    TTEST( r_const_gs.find_grammar( "g2" ) == p_g2 );
+    TTEST( r_const_gs.find_grammar( "g3" ) == 0 );
+}
+
 TFEATURETODO( "Test low level GrammarSet class" );
