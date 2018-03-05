@@ -348,21 +348,14 @@ private:
     } m;
 
 public:
-    Grammar & append( Grammar * p_grammar )
-    {
-        Grammar::uniq_ptr pu_grammar( p_grammar );
-        append( pu_grammar );
-        return *p_grammar;
-    }
-    void append( Grammar::uniq_ptr pu_grammar )
+    Grammar * append( Grammar::uniq_ptr pu_grammar )
     {
         m.grammars.push_back( pu_grammar.get() );
-        pu_grammar.release();
+        return pu_grammar.release();
     }
     Grammar & append_grammar()
     {
-        append( new Grammar( this ) );
-        return m.grammars.back();
+        return *append( Grammar::uniq_ptr( new Grammar( this ) ) );
     }
 
     void inc_error_count() { ++m.error_count; }
