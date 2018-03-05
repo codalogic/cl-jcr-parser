@@ -197,8 +197,11 @@ TFEATURE( "TargetRule" )
 
 TFEATURE( "Rule" )
 {
-    Rule r( 100, 102 );
+    GrammarSet gs;
+    Grammar g( &gs );
+    Rule r( &g, 100, 102 );
 
+    TTEST( r.p_grammar == &g );
     TTEST( ! r.p_parent );
     TTEST( r.line_number == 100 );
     TTEST( r.column_number == 102 );
@@ -206,7 +209,7 @@ TFEATURE( "Rule" )
     TTEST( r.p_type == &r );
     TTEST( r.type == Rule::NONE );
 
-    TSETUP( Rule::uniq_ptr pu_rule( new Rule( 0, 0 ) ) );
+    TSETUP( Rule::uniq_ptr pu_rule( new Rule( &g, 0, 0 ) ) );
 
     TTEST( ! pu_rule->p_parent );
     TTEST( pu_rule->type == Rule::NONE );
@@ -221,7 +224,9 @@ TFEATURE( "Post-link Rule" )
 {
     // We set up values in this test that are inconsistentr with a real application.
     // This is so we can verify that the correct instances are being accessed.
-    Rule def( 100, 102 );
+    GrammarSet gs;
+    Grammar g( &gs );
+    Rule def( &g, 100, 102 );
     def.rule_name = "def";
     def.repetition.min = 100;
     def.repetition.max = 101;
@@ -230,7 +235,7 @@ TFEATURE( "Post-link Rule" )
     def.child_combiner = Rule::None;
     def.target_rule.local_name = "rule";
 
-    Rule rule( 300, 502 );
+    Rule rule( &g, 300, 502 );
     rule.rule_name = "rule";
     rule.annotations.is_not = true;
     rule.member_name.set_literal( "rule" );
@@ -238,7 +243,7 @@ TFEATURE( "Post-link Rule" )
     rule.child_combiner = Rule::None;
     rule.target_rule.local_name = "type";
 
-    Rule type( 400, 602 );
+    Rule type( &g, 400, 602 );
     type.rule_name = "type";
     type.annotations.is_unordered = true;
     type.type = Rule::OBJECT;
@@ -246,7 +251,7 @@ TFEATURE( "Post-link Rule" )
     type.max = "max";   // Inconsistent with "type = Rule::OBJECT" to aid testing
     type.child_combiner = Rule::Sequence;
 
-    Rule::uniq_ptr pu_child( new Rule( 700, 802 ) );
+    Rule::uniq_ptr pu_child( new Rule( &g, 700, 802 ) );
     pu_child->type = Rule::INTEGER;
     pu_child->min = (int64)302;
     pu_child->max = (int64)303;
@@ -286,6 +291,8 @@ TFEATURE( "Grammar" )
     GrammarSet gs;
     Grammar g( &gs );
 
+    TTEST( g.p_grammar_set == &gs );
+
     TDOC( "Adding and accessing unaliased imports" );
     TSETUP( g.add_unaliased_import( "foo" ) );
     TTEST( g.unaliased_imports.size() == 1 );
@@ -320,7 +327,7 @@ TFEATURE( "Grammar" )
 
     TDOC( "Adding rules" );
     TTEST( g.rules.size() == 0 );
-    TSETUP( Rule::uniq_ptr pu_r( new Rule( 0, 0 ) ) );
+    TSETUP( Rule::uniq_ptr pu_r( new Rule( &g, 0, 0 ) ) );
     TSETUP( pu_r->p_parent = pu_r.get() );  // Set p_parent to non-zero value so we can test it's set to 0 later
     TTEST( pu_r->p_parent != 0 );
     TSETUP( Rule * p_unmanaged_rule = pu_r.get() );

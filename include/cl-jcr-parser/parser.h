@@ -187,6 +187,8 @@ struct TargetRule
     TargetRule() : p_rule( 0 ) {}
 };
 
+struct Grammar;
+
 struct Rule : private detail::NonCopyable
 {
     typedef uniq_ptr< Rule >::type uniq_ptr;
@@ -203,6 +205,7 @@ struct Rule : private detail::NonCopyable
             OBJECT, OBJECT_GROUP, ARRAY, ARRAY_GROUP, GROUP, GROUP_GROUP,
             TARGET_RULE };
 
+    Grammar * p_grammar;
     Rule * p_parent;
     int line_number;
     int column_number;
@@ -220,8 +223,9 @@ struct Rule : private detail::NonCopyable
     Rule * p_rule;
     Rule * p_type;
 
-    Rule( int line_number_in, int column_number_in )
+    Rule( Grammar * p_grammar_in, int line_number_in, int column_number_in )
         :
+        p_grammar( p_grammar_in ),
         p_parent( 0 ),
         line_number( line_number_in ),
         column_number( column_number_in ),

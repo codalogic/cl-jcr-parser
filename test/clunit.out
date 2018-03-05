@@ -1,4 +1,4 @@
-Tests run on Mon Mar 05 16:11:42 2018
+Tests run on Mon Mar 05 16:26:32 2018
 
     Config - Configuration [test-config.cpp:40]
     ===========================================
@@ -164,13 +164,14 @@ Tests run on Mon Mar 05 16:11:42 2018
 
     Rule [test-low-level-objects.cpp:198]
     =====================================
+    ok: r.p_grammar == &g
     ok: ! r.p_parent
     ok: r.line_number == 100
     ok: r.column_number == 102
     ok: r.p_rule == &r
     ok: r.p_type == &r
     ok: r.type == Rule::NONE
-      : Rule::uniq_ptr pu_rule( new Rule( 0, 0 ) )
+      : Rule::uniq_ptr pu_rule( new Rule( &g, 0, 0 ) )
     ok: ! pu_rule->p_parent
     ok: pu_rule->type == Rule::NONE
       : Rule * p_new_rule = pu_rule.get()
@@ -179,7 +180,7 @@ Tests run on Mon Mar 05 16:11:42 2018
     ok: p_appended_rule->p_parent == &r
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Post-link Rule [test-low-level-objects.cpp:220]
+    Post-link Rule [test-low-level-objects.cpp:223]
     ===============================================
     ok: def.p_rule == &rule
     ok: def.p_type == &type
@@ -201,8 +202,9 @@ Tests run on Mon Mar 05 16:11:42 2018
     ok: def.get_children()[0].max.as_int() == 303
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Grammar [test-low-level-objects.cpp:284]
+    Grammar [test-low-level-objects.cpp:289]
     ========================================
+    ok: g.p_grammar_set == &gs
       #### Adding and accessing unaliased imports ####
       : g.add_unaliased_import( "foo" )
     ok: g.unaliased_imports.size() == 1
@@ -231,7 +233,7 @@ Tests run on Mon Mar 05 16:11:42 2018
     ok: r_g.get_aliased_import( "blah" ).is_found() == false
       #### Adding rules ####
     ok: g.rules.size() == 0
-      : Rule::uniq_ptr pu_r( new Rule( 0, 0 ) )
+      : Rule::uniq_ptr pu_r( new Rule( &g, 0, 0 ) )
       : pu_r->p_parent = pu_r.get()
     ok: pu_r->p_parent != 0
       : Rule * p_unmanaged_rule = pu_r.get()
@@ -2420,6 +2422,6 @@ jcr-version
 TODOs (2):
 ------------------------
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:42]
-- Test low level GrammarSet class [test-low-level-objects.cpp:333]
+- Test low level GrammarSet class [test-low-level-objects.cpp:340]
 
-0 error(s), 2 todo(s), 1883 test(s)
+0 error(s), 2 todo(s), 1885 test(s)
