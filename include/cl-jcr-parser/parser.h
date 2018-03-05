@@ -353,9 +353,9 @@ public:
         m.grammars.push_back( pu_grammar.get() );
         return pu_grammar.release();
     }
-    Grammar & append_grammar()
+    Grammar * append_grammar()
     {
-        return *append( Grammar::uniq_ptr( new Grammar( this ) ) );
+        return append( Grammar::uniq_ptr( new Grammar( this ) ) );
     }
 
     void inc_error_count() { ++m.error_count; }

@@ -198,10 +198,10 @@ TFEATURE( "TargetRule" )
 TFEATURE( "Rule" )
 {
     GrammarSet gs;
-    Grammar g( &gs );
-    Rule r( &g, 100, 102 );
+    Grammar * p_g = gs.append_grammar();
+    Rule r( p_g, 100, 102 );
 
-    TTEST( r.p_grammar == &g );
+    TTEST( r.p_grammar == p_g );
     TTEST( ! r.p_parent );
     TTEST( r.line_number == 100 );
     TTEST( r.column_number == 102 );
@@ -209,7 +209,7 @@ TFEATURE( "Rule" )
     TTEST( r.p_type == &r );
     TTEST( r.type == Rule::NONE );
 
-    TSETUP( Rule::uniq_ptr pu_rule( new Rule( &g, 0, 0 ) ) );
+    TSETUP( Rule::uniq_ptr pu_rule( new Rule( p_g, 0, 0 ) ) );
 
     TTEST( ! pu_rule->p_parent );
     TTEST( pu_rule->type == Rule::NONE );
@@ -225,8 +225,8 @@ TFEATURE( "Post-link Rule" )
     // We set up values in this test that are inconsistent with a real application.
     // This is so we can verify that the correct instances are being accessed.
     GrammarSet gs;
-    Grammar g( &gs );
-    Rule def( &g, 100, 102 );
+    Grammar * p_g = gs.append_grammar();
+    Rule def( p_g, 100, 102 );
     def.rule_name = "def";
     def.repetition.min = 100;
     def.repetition.max = 101;
@@ -235,7 +235,7 @@ TFEATURE( "Post-link Rule" )
     def.child_combiner = Rule::None;
     def.target_rule.rule_name = "rule";
 
-    Rule rule( &g, 300, 502 );
+    Rule rule( p_g, 300, 502 );
     rule.rule_name = "rule";
     rule.annotations.is_not = true;
     rule.member_name.set_literal( "rule" );
@@ -243,7 +243,7 @@ TFEATURE( "Post-link Rule" )
     rule.child_combiner = Rule::None;
     rule.target_rule.rule_name = "type";
 
-    Rule type( &g, 400, 602 );
+    Rule type( p_g, 400, 602 );
     type.rule_name = "type";
     type.annotations.is_unordered = true;
     type.type = Rule::OBJECT;
@@ -251,7 +251,7 @@ TFEATURE( "Post-link Rule" )
     type.max = "max";   // Inconsistent with "type = Rule::OBJECT" to aid testing
     type.child_combiner = Rule::Sequence;
 
-    Rule::uniq_ptr pu_child( new Rule( &g, 700, 802 ) );
+    Rule::uniq_ptr pu_child( new Rule( p_g, 700, 802 ) );
     pu_child->type = Rule::INTEGER;
     pu_child->min = (int64)302;
     pu_child->max = (int64)303;
@@ -289,73 +289,73 @@ TFEATURE( "Post-link Rule" )
 TFEATURE( "Grammar" )
 {
     GrammarSet gs;
-    Grammar g( &gs );
+    Grammar * p_g = gs.append_grammar();
 
-    TTEST( g.p_grammar_set == &gs );
+    TTEST( p_g->p_grammar_set == &gs );
 
     TDOC( "Adding and accessing unaliased imports" );
-    TSETUP( g.add_unaliased_import( "foo" ) );
-    TTEST( g.unaliased_imports.size() == 1 );
-    TSETUP( g.add_unaliased_import( "bar" ) );
-    TTEST( g.unaliased_imports.size() == 2 );
-    TTEST( g.unaliased_imports[0] == "foo" );
-    TTEST( g.unaliased_imports[1] == "bar" );
+    TSETUP( p_g->add_unaliased_import( "foo" ) );
+    TTEST( p_g->unaliased_imports.size() == 1 );
+    TSETUP( p_g->add_unaliased_import( "bar" ) );
+    TTEST( p_g->unaliased_imports.size() == 2 );
+    TTEST( p_g->unaliased_imports[0] == "foo" );
+    TTEST( p_g->unaliased_imports[1] == "bar" );
 
     TDOC( "Adding aliased imports" );
-    TTEST( g.has_aliased_import( "foo" ) == false );
-    TTEST( g.add_aliased_import( "foo", "http://foo" ) == true );
-    TTEST( g.has_aliased_import( "foo" ) == true );
-    TTEST( g.has_aliased_import( "bar" ) == false );
+    TTEST( p_g->has_aliased_import( "foo" ) == false );
+    TTEST( p_g->add_aliased_import( "foo", "http://foo" ) == true );
+    TTEST( p_g->has_aliased_import( "foo" ) == true );
+    TTEST( p_g->has_aliased_import( "bar" ) == false );
 
-    TTEST( g.add_aliased_import( "bar", "http://bar" ) == true );
-    TTEST( g.has_aliased_import( "bar" ) == true );
-    TTEST( g.aliased_imports["foo"] == "http://foo" );
-    TTEST( g.aliased_imports["bar"] == "http://bar" );
+    TTEST( p_g->add_aliased_import( "bar", "http://bar" ) == true );
+    TTEST( p_g->has_aliased_import( "bar" ) == true );
+    TTEST( p_g->aliased_imports["foo"] == "http://foo" );
+    TTEST( p_g->aliased_imports["bar"] == "http://bar" );
 
     TDOC( "Adding duplicate aliased imports fails" );
-    TTEST( g.add_aliased_import( "foo", "http://foo" ) == false );
+    TTEST( p_g->add_aliased_import( "foo", "http://foo" ) == false );
 
     TDOC( "Accessing aliased imports for const instances" );
-    TSETUP( const Grammar & r_g( g ) );
-    TTEST( r_g.get_aliased_import( "foo" ).value() == "http://foo" );
-    TSETUP( std::string foo = r_g.get_aliased_import( "foo" ) );        // Can use AliasLookupResult cast to string & to assign directly to string
+    TSETUP( const Grammar * p_const_g( p_g ) );
+    TTEST( p_const_g->get_aliased_import( "foo" ).value() == "http://foo" );
+    TSETUP( std::string foo = p_const_g->get_aliased_import( "foo" ) );        // Can use AliasLookupResult cast to string & to assign directly to string
     TTEST( foo == "http://foo" );
-    TTEST( r_g.get_aliased_import( "bar" ).value() == "http://bar" );
+    TTEST( p_const_g->get_aliased_import( "bar" ).value() == "http://bar" );
 
-    TTEST( r_g.has_aliased_import( "blah" ) == false );
-    TTEST( r_g.get_aliased_import( "blah" ).is_found() == false );
+    TTEST( p_const_g->has_aliased_import( "blah" ) == false );
+    TTEST( p_const_g->get_aliased_import( "blah" ).is_found() == false );
 
     TDOC( "Adding rules" );
-    TTEST( g.rules.size() == 0 );
-    TSETUP( Rule::uniq_ptr pu_r( new Rule( &g, 0, 0 ) ) );
+    TTEST( p_g->rules.size() == 0 );
+    TSETUP( Rule::uniq_ptr pu_r( new Rule( p_g, 0, 0 ) ) );
     TSETUP( pu_r->p_parent = pu_r.get() );  // Set p_parent to non-zero value so we can test it's set to 0 later
     TTEST( pu_r->p_parent != 0 );
     TSETUP( Rule * p_unmanaged_rule = pu_r.get() );
-    TSETUP( Rule * p_r = g.append_rule( pu_r ) );
+    TSETUP( Rule * p_r = p_g->append_rule( pu_r ) );
     TTEST( p_r == p_unmanaged_rule );   // Using append_rule() returns released pointer to rule
     TTEST( ! p_r->p_parent );           // Using append_rule() sets p-parent pointer to null
-    TTEST( g.rules.size() == 1 );
+    TTEST( p_g->rules.size() == 1 );
 }
 
 TFEATURE( "Grammar::find_rule()" )
 {
     GrammarSet gs;
-    Grammar g( &gs );
-    Rule::uniq_ptr pu_r1( new Rule( &g, 0, 0 ) );
+    Grammar * p_g = gs.append_grammar();
+    Rule::uniq_ptr pu_r1( new Rule( p_g, 0, 0 ) );
     pu_r1->rule_name = "r1";
-    Rule * p_r1 = g.append_rule( pu_r1 ); // pu_r1 releases ownership here
-    Rule::uniq_ptr pu_r2( new Rule( &g, 0, 0 ) );
+    Rule * p_r1 = p_g->append_rule( pu_r1 ); // pu_r1 releases ownership here
+    Rule::uniq_ptr pu_r2( new Rule( p_g, 0, 0 ) );
     pu_r2->rule_name = "r2";
-    Rule * p_r2 = g.append_rule( pu_r2 ); // pu_r2 releases ownership here
+    Rule * p_r2 = p_g->append_rule( pu_r2 ); // pu_r2 releases ownership here
 
-    TTEST( g.find_rule( "r1" ) == p_r1 );
-    TTEST( g.find_rule( "r2" ) == p_r2 );
-    TTEST( g.find_rule( "r3" ) == 0 );
+    TTEST( p_g->find_rule( "r1" ) == p_r1 );
+    TTEST( p_g->find_rule( "r2" ) == p_r2 );
+    TTEST( p_g->find_rule( "r3" ) == 0 );
 
-    const Grammar & const_g = g;
-    TTEST( const_g.find_rule( "r1" ) == p_r1 );
-    TTEST( const_g.find_rule( "r2" ) == p_r2 );
-    TTEST( const_g.find_rule( "r3" ) == 0 );
+    const Grammar * p_const_g = p_g;
+    TTEST( p_const_g->find_rule( "r1" ) == p_r1 );
+    TTEST( p_const_g->find_rule( "r2" ) == p_r2 );
+    TTEST( p_const_g->find_rule( "r3" ) == 0 );
 }
 
 TFEATURETODO( "Test low level GrammarSet class" );

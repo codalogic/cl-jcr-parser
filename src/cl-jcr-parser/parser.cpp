@@ -3488,7 +3488,7 @@ JCRParser::Status JCRParser::link()
 
 JCRParser::Status JCRParser::parse_grammar( cl::reader & reader )
 {
-    GrammarParser parser( this, reader, m.p_grammar_set, &m.p_grammar_set->append_grammar() );
+    GrammarParser parser( this, reader, m.p_grammar_set, m.p_grammar_set->append_grammar() );
 
     parser.parse();
 
