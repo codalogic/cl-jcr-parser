@@ -1000,15 +1000,15 @@ bool GrammarParser::target_rule_name()
 
             if( rule_name() )
             {
-                m.p_rule->target_rule.rulesetid = alias_lookup_result;
-                m.p_rule->target_rule.local_name = name_accumulator.get();
+                m.p_rule->target_rule.ruleset_id = alias_lookup_result;
+                m.p_rule->target_rule.rule_name = name_accumulator.get();
             }
             else
-                return fatal( "Expected <rule_name> in <target_rule_name> with format \"$<rulesetid_alias>.<rule-name>\". Got '$%0.%1'", alias_name, error_token() );
+                return fatal( "Expected <rule_name> in <target_rule_name> with format \"$<ruleset_id_alias>.<rule-name>\". Got '$%0.%1'", alias_name, error_token() );
         }
         else
         {
-            m.p_rule->target_rule.local_name = name_accumulator.get();
+            m.p_rule->target_rule.rule_name = name_accumulator.get();
         }
 
         m.p_rule->type = Rule::TARGET_RULE;

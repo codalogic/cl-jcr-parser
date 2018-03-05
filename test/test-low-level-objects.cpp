@@ -233,7 +233,7 @@ TFEATURE( "Post-link Rule" )
     def.annotations.is_root = true;
     def.type = Rule::TARGET_RULE;
     def.child_combiner = Rule::None;
-    def.target_rule.local_name = "rule";
+    def.target_rule.rule_name = "rule";
 
     Rule rule( &g, 300, 502 );
     rule.rule_name = "rule";
@@ -241,7 +241,7 @@ TFEATURE( "Post-link Rule" )
     rule.member_name.set_literal( "rule" );
     rule.type = Rule::TARGET_RULE;
     rule.child_combiner = Rule::None;
-    rule.target_rule.local_name = "type";
+    rule.target_rule.rule_name = "type";
 
     Rule type( &g, 400, 602 );
     type.rule_name = "type";

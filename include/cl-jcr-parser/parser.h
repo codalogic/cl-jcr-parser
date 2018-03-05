@@ -180,8 +180,8 @@ struct Rule;
 
 struct TargetRule
 {
-    std::string rulesetid;
-    std::string local_name;
+    std::string ruleset_id;
+    std::string rule_name;
     Rule * p_rule;      // Filled in when 'compiled'
 
     TargetRule() : p_rule( 0 ) {}

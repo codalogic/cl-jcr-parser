@@ -1,4 +1,4 @@
-Tests run on Mon Mar 05 16:41:55 2018
+Tests run on Mon Mar 05 16:46:50 2018
 
     Config - Configuration [test-config.cpp:40]
     ===========================================
@@ -493,14 +493,14 @@ jcr-version
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].rule_name == "my_rule"
     ok: ph.grammar().rules[0].type == Rule::TARGET_RULE
-    ok: ph.grammar().rules[0].target_rule.local_name == "other_rule"
+    ok: ph.grammar().rules[0].target_rule.rule_name == "other_rule"
       : ParserHarness ph( "#import http://foo.bar as foo\n $my_rule = $foo.other_rule\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].rule_name == "my_rule"
     ok: ph.grammar().rules[0].type == Rule::TARGET_RULE
-    ok: ph.grammar().rules[0].target_rule.rulesetid == "http://foo.bar"
-    ok: ph.grammar().rules[0].target_rule.local_name == "other_rule"
+    ok: ph.grammar().rules[0].target_rule.ruleset_id == "http://foo.bar"
+    ok: ph.grammar().rules[0].target_rule.rule_name == "other_rule"
       Calling: test_parsing_only( "$my_rule = @{not} $other_rule\n" ) (264)
       #### $my_rule = @{not} $other_rule
  ####
@@ -1412,7 +1412,7 @@ jcr-version
     ok: ph.grammar().rules[0].member_name.is_regex() == true
     ok: ph.grammar().rules[0].member_name.name() == "/p_ref\\d+/"
     ok: ph.grammar().rules[0].type == Rule::TARGET_RULE
-    ok: ph.grammar().rules[0].target_rule.local_name == "my_type"
+    ok: ph.grammar().rules[0].target_rule.rule_name == "my_type"
       : ParserHarness ph( "$my_rule = \"abc\xE0\xAC\x8Bz\" : null\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
@@ -1494,8 +1494,8 @@ jcr-version
     ok: ph.grammar().rules[0].children.size() == 2
     ok: ph.grammar().rules[0].children[0].type == Rule::TNULL
     ok: ph.grammar().rules[0].children[1].type == Rule::TARGET_RULE
-    ok: ph.grammar().rules[0].children[1].target_rule.rulesetid == "http://common.com"
-    ok: ph.grammar().rules[0].children[1].target_rule.local_name == "my_type"
+    ok: ph.grammar().rules[0].children[1].target_rule.ruleset_id == "http://common.com"
+    ok: ph.grammar().rules[0].children[1].target_rule.rule_name == "my_type"
       : ParserHarness ph( "$my_rule = : @{not} ( null | integer )\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
@@ -1602,8 +1602,8 @@ jcr-version
     ok: ph.grammar().rules[0].children[0].repetition.max == 1
     ok: ph.grammar().rules[0].children[1].member_name.is_absent()
     ok: ph.grammar().rules[0].children[1].type == Rule::TARGET_RULE
-    ok: ph.grammar().rules[0].children[1].target_rule.local_name == "other-rule"
-    ok: ph.grammar().rules[0].children[1].target_rule.rulesetid == ""
+    ok: ph.grammar().rules[0].children[1].target_rule.rule_name == "other-rule"
+    ok: ph.grammar().rules[0].children[1].target_rule.ruleset_id == ""
     ok: ph.grammar().rules[0].children[1].target_rule.p_rule == 0
     ok: ph.grammar().rules[0].children[1].repetition.min == 1
     ok: ph.grammar().rules[0].children[1].repetition.max == 1
@@ -1877,7 +1877,7 @@ jcr-version
     ok: ph.grammar().rules[0].children.size() == 2
     ok: ph.grammar().rules[0].children[0].type == Rule::INTEGER
     ok: ph.grammar().rules[0].children[1].type == Rule::TARGET_RULE
-    ok: ph.grammar().rules[0].children[1].target_rule.local_name == "my_type"
+    ok: ph.grammar().rules[0].children[1].target_rule.rule_name == "my_type"
       : ParserHarness ph( "$my_rule = [ (integer | string)*5 ]\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
@@ -2041,7 +2041,7 @@ jcr-version
     ok: ph.grammar().rules[0].children[0].rule_name == ""
     ok: ph.grammar().rules[0].children[0].member_name.is_absent()
     ok: ph.grammar().rules[0].children[0].type == Rule::TARGET_RULE
-    ok: ph.grammar().rules[0].children[0].target_rule.local_name == "other-rule"
+    ok: ph.grammar().rules[0].children[0].target_rule.rule_name == "other-rule"
       : ParserHarness ph( "$my_rule = ( float *5, ((integer, float) | string) )\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
@@ -2128,8 +2128,8 @@ jcr-version
     ok: ph.grammar().rules[0].children[1].children[0].children[1].member_name.is_literal()
     ok: ph.grammar().rules[0].children[1].children[0].children[1].member_name.name() == "name"
     ok: ph.grammar().rules[0].children[1].children[1].type == Rule::TARGET_RULE
-    ok: ph.grammar().rules[0].children[1].children[1].target_rule.rulesetid == "http://foo.com"
-    ok: ph.grammar().rules[0].children[1].children[1].target_rule.local_name == "other-rule"
+    ok: ph.grammar().rules[0].children[1].children[1].target_rule.ruleset_id == "http://foo.com"
+    ok: ph.grammar().rules[0].children[1].children[1].target_rule.rule_name == "other-rule"
     ok: ph.grammar().rules[0].children[1].children[1].children.size() == 0
     ok: ph.grammar().rules[0].children[1].children[2].type == Rule::ARRAY
     ok: ph.grammar().rules[0].children[1].children[2].children.size() == 2

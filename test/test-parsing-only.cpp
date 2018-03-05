@@ -249,7 +249,7 @@ TFEATURE( "GrammarParser - Syntax parsing - target_rule_name" )
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
         TCRITICALTEST( ph.grammar().rules[0].rule_name == "my_rule" );
         TCRITICALTEST( ph.grammar().rules[0].type == Rule::TARGET_RULE );
-        TCRITICALTEST( ph.grammar().rules[0].target_rule.local_name == "other_rule" );
+        TCRITICALTEST( ph.grammar().rules[0].target_rule.rule_name == "other_rule" );
     }
     {
         TSETUP( ParserHarness ph( "#import http://foo.bar as foo\n $my_rule = $foo.other_rule\n" ) );
@@ -257,8 +257,8 @@ TFEATURE( "GrammarParser - Syntax parsing - target_rule_name" )
         TCRITICALTEST( ph.grammar().rules.size() == 1 );
         TCRITICALTEST( ph.grammar().rules[0].rule_name == "my_rule" );
         TCRITICALTEST( ph.grammar().rules[0].type == Rule::TARGET_RULE );
-        TCRITICALTEST( ph.grammar().rules[0].target_rule.rulesetid == "http://foo.bar" );
-        TCRITICALTEST( ph.grammar().rules[0].target_rule.local_name == "other_rule" );
+        TCRITICALTEST( ph.grammar().rules[0].target_rule.ruleset_id == "http://foo.bar" );
+        TCRITICALTEST( ph.grammar().rules[0].target_rule.rule_name == "other_rule" );
     }
     TCALL( test_parsing_only(
                         "$my_rule = @{not} $other_rule\n" ) );
@@ -1473,7 +1473,7 @@ TFEATURE( "GrammarParser - Syntax parsing - Member name" )
         TCRITICALTEST( ph.grammar().rules[0].member_name.is_regex() == true );
         TCRITICALTEST( ph.grammar().rules[0].member_name.name() == "/p_ref\\d+/" );
         TCRITICALTEST( ph.grammar().rules[0].type == Rule::TARGET_RULE );
-        TCRITICALTEST( ph.grammar().rules[0].target_rule.local_name == "my_type" );
+        TCRITICALTEST( ph.grammar().rules[0].target_rule.rule_name == "my_type" );
     }
     {
         TSETUP( ParserHarness ph( "$my_rule = \"abc\xE0\xAC\x8Bz\" : null\n" ) );
@@ -1575,8 +1575,8 @@ TFEATURE( "GrammarParser - Syntax parsing - type-choice" )
         TCRITICALTEST( ph.grammar().rules[0].children.size() == 2 );
         TCRITICALTEST( ph.grammar().rules[0].children[0].type == Rule::TNULL );
         TCRITICALTEST( ph.grammar().rules[0].children[1].type == Rule::TARGET_RULE );
-        TCRITICALTEST( ph.grammar().rules[0].children[1].target_rule.rulesetid == "http://common.com" );
-        TCRITICALTEST( ph.grammar().rules[0].children[1].target_rule.local_name == "my_type" );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].target_rule.ruleset_id == "http://common.com" );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].target_rule.rule_name == "my_type" );
     }
     {
         TSETUP( ParserHarness ph( "$my_rule = : @{not} ( null | integer )\n" ) );
@@ -1691,8 +1691,8 @@ TFEATURE( "GrammarParser - Syntax parsing - object" )
         TCRITICALTEST( ph.grammar().rules[0].children[0].repetition.max == 1 );
         TCRITICALTEST( ph.grammar().rules[0].children[1].member_name.is_absent() );
         TCRITICALTEST( ph.grammar().rules[0].children[1].type == Rule::TARGET_RULE );
-        TCRITICALTEST( ph.grammar().rules[0].children[1].target_rule.local_name == "other-rule" );
-        TCRITICALTEST( ph.grammar().rules[0].children[1].target_rule.rulesetid == "" );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].target_rule.rule_name == "other-rule" );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].target_rule.ruleset_id == "" );
         TCRITICALTEST( ph.grammar().rules[0].children[1].target_rule.p_rule == 0 );
         TCRITICALTEST( ph.grammar().rules[0].children[1].repetition.min == 1 );
         TCRITICALTEST( ph.grammar().rules[0].children[1].repetition.max == 1 );
@@ -2024,7 +2024,7 @@ TFEATURE( "GrammarParser - Syntax parsing - array" )
         TCRITICALTEST( ph.grammar().rules[0].children.size() == 2 );
         TCRITICALTEST( ph.grammar().rules[0].children[0].type == Rule::INTEGER );
         TCRITICALTEST( ph.grammar().rules[0].children[1].type == Rule::TARGET_RULE );
-        TCRITICALTEST( ph.grammar().rules[0].children[1].target_rule.local_name == "my_type" );
+        TCRITICALTEST( ph.grammar().rules[0].children[1].target_rule.rule_name == "my_type" );
     }
     {
         TSETUP( ParserHarness ph( "$my_rule = [ (integer | string)*5 ]\n" ) );
@@ -2221,7 +2221,7 @@ TFEATURE( "GrammarParser - Syntax parsing - group" )
         TCRITICALTEST( ph.grammar().rules[0].children[0].rule_name == "" );
         TCRITICALTEST( ph.grammar().rules[0].children[0].member_name.is_absent() );
         TCRITICALTEST( ph.grammar().rules[0].children[0].type == Rule::TARGET_RULE );
-        TCRITICALTEST( ph.grammar().rules[0].children[0].target_rule.local_name == "other-rule" );
+        TCRITICALTEST( ph.grammar().rules[0].children[0].target_rule.rule_name == "other-rule" );
     }
     {
         TSETUP( ParserHarness ph( "$my_rule = ( float *5, ((integer, float) | string) )\n" ) );
@@ -2328,8 +2328,8 @@ TFEATURE( "GrammarParser - Syntax parsing - group" )
                     TCRITICALTEST( ph.grammar().rules[0].children[1].children[0].children[1].member_name.name() == "name" );
 
                 TCRITICALTEST( ph.grammar().rules[0].children[1].children[1].type == Rule::TARGET_RULE );
-                TCRITICALTEST( ph.grammar().rules[0].children[1].children[1].target_rule.rulesetid == "http://foo.com" );
-                TCRITICALTEST( ph.grammar().rules[0].children[1].children[1].target_rule.local_name == "other-rule" );
+                TCRITICALTEST( ph.grammar().rules[0].children[1].children[1].target_rule.ruleset_id == "http://foo.com" );
+                TCRITICALTEST( ph.grammar().rules[0].children[1].children[1].target_rule.rule_name == "other-rule" );
                 TCRITICALTEST( ph.grammar().rules[0].children[1].children[1].children.size() == 0 );
 
                 TCRITICALTEST( ph.grammar().rules[0].children[1].children[2].type == Rule::ARRAY );
