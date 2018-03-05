@@ -222,7 +222,7 @@ TFEATURE( "Rule" )
 
 TFEATURE( "Post-link Rule" )
 {
-    // We set up values in this test that are inconsistentr with a real application.
+    // We set up values in this test that are inconsistent with a real application.
     // This is so we can verify that the correct instances are being accessed.
     GrammarSet gs;
     Grammar g( &gs );
