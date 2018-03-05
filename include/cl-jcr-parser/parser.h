@@ -273,16 +273,21 @@ public:
     operator const std::string & () const { return value(); }
 };
 
+struct GrammarSet;
+
 struct Grammar : private detail::NonCopyable
 {
     typedef uniq_ptr< Grammar >::type uniq_ptr;
     typedef clutils::ptr_vector< Rule > rule_container_t;
 
+    GrammarSet * p_grammar_set;
     std::string ruleset_id;
     std::vector< std::string > unaliased_imports;
     typedef std::map< std::string, std::string > aliased_imports_t;   // Alias -> Ruleset_id
     aliased_imports_t aliased_imports;
     rule_container_t rules;
+
+    Grammar( GrammarSet * p_grammar_set_in ) : p_grammar_set( p_grammar_set_in ) {}
 
     void add_unaliased_import( const std::string & r_import )
     {
@@ -339,7 +344,7 @@ public:
     }
     Grammar & append_grammar()
     {
-        append( new Grammar() );
+        append( new Grammar( this ) );
         return m.grammars.back();
     }
 

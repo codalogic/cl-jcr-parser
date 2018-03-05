@@ -283,7 +283,8 @@ TFEATURE( "Post-link Rule" )
 
 TFEATURE( "Grammar" )
 {
-    Grammar g;
+    GrammarSet gs;
+    Grammar g( &gs );
 
     TDOC( "Adding and accessing unaliased imports" );
     TSETUP( g.add_unaliased_import( "foo" ) );
