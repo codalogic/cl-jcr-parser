@@ -279,11 +279,13 @@ struct Grammar : private detail::NonCopyable
 {
     typedef uniq_ptr< Grammar >::type uniq_ptr;
     typedef clutils::ptr_vector< Rule > rule_container_t;
+    typedef std::string alias_t;
+    typedef std::string ruleset_id_t;
 
     GrammarSet * p_grammar_set;
     std::string ruleset_id;
     std::vector< std::string > unaliased_imports;
-    typedef std::map< std::string, std::string > aliased_imports_t;   // Alias -> Ruleset_id
+    typedef std::map< alias_t, ruleset_id_t > aliased_imports_t;   // Alias -> Ruleset_id
     aliased_imports_t aliased_imports;
     rule_container_t rules;
 
