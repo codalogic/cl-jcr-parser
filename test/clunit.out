@@ -1,4 +1,4 @@
-Tests run on Tue Mar 06 12:04:31 2018
+Tests run on Tue Mar 06 12:10:15 2018
 
     Config - Configuration [test-config.cpp:40]
     ===========================================
@@ -180,9 +180,7 @@ Tests run on Tue Mar 06 12:04:31 2018
     ok: p_appended_rule->p_parent == &r
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
-
-    Post-link Rule [test-low-level-objects.cpp:224]
+    Post-link Rule [test-low-level-objects.cpp:223]
     ===============================================
     ok: def.p_rule == &rule
     ok: def.p_type == &type
@@ -204,7 +202,7 @@ Tests run on Tue Mar 06 12:04:31 2018
     ok: def.get_children()[0].max.as_int() == 303
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Rule::find_target_rule() [test-low-level-objects.cpp:290]
+    Rule::find_target_rule() [test-low-level-objects.cpp:289]
     =========================================================
       : p_g1r1->target_rule.rule_name = "g1r2"
       : p_g1r1->find_target_rule()
@@ -218,7 +216,7 @@ Tests run on Tue Mar 06 12:04:31 2018
     ok: p_g3r1->target_rule.p_rule == p_g4r2
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Grammar [test-low-level-objects.cpp:339]
+    Grammar [test-low-level-objects.cpp:338]
     ========================================
     ok: p_g->p_grammar_set == &gs
       #### Adding and accessing unaliased imports ####
@@ -259,7 +257,7 @@ Tests run on Tue Mar 06 12:04:31 2018
     ok: p_g->rules.size() == 1
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Grammar::find_rule() [test-low-level-objects.cpp:390]
+    Grammar::find_rule() [test-low-level-objects.cpp:389]
     =====================================================
     ok: p_g->find_rule( "r1" ) == p_r1
     ok: p_g->find_rule( "r2" ) == p_r2
@@ -269,7 +267,7 @@ Tests run on Tue Mar 06 12:04:31 2018
     ok: p_const_g->find_rule( "r3" ) == 0
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarSet::find_grammar() [test-low-level-objects.cpp:411]
+    GrammarSet::find_grammar() [test-low-level-objects.cpp:410]
     ===========================================================
     ok: gs.find_grammar( "g1" ) == p_g1
     ok: gs.find_grammar( "g2" ) == p_g2
@@ -2455,10 +2453,9 @@ jcr-version
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
 
-TODOs (3):
+TODOs (2):
 ------------------------
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:42]
-- Fix <Post-link Rule> tests to use heap [test-low-level-objects.cpp:223]
-- Test low level GrammarSet class [test-low-level-objects.cpp:429]
+- Test low level GrammarSet class [test-low-level-objects.cpp:428]
 
-0 error(s), 3 todo(s), 1904 test(s)
+0 error(s), 2 todo(s), 1903 test(s)

@@ -220,14 +220,13 @@ TFEATURE( "Rule" )
     TTEST( p_appended_rule->p_parent == &r );
 }
 
-TFEATURETODO( "Fix <Post-link Rule> tests to use heap" );
 TFEATURE( "Post-link Rule" )
 {
     // We set up values in this test that are inconsistent with a real application.
     // This is so we can verify that the correct instances are being accessed.
     GrammarSet gs;
     Grammar * p_g = gs.append_grammar();
-    Rule def( p_g, 100, 102 );
+    Rule def( p_g, 100, 102 );  // Can use a local rule here (rather than heap allocated) because we don't assign it to a Grammar's ownership
     def.rule_name = "def";
     def.repetition.min = 100;
     def.repetition.max = 101;
