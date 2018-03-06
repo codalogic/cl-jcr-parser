@@ -251,6 +251,13 @@ struct Rule : private detail::NonCopyable
             annotations.merge( p_type->annotations );
     }
 
+    const Rule * find_target_rule() const;
+    Rule * find_target_rule()
+    {
+        target_rule.p_rule = const_cast< Rule * >( static_cast< const Rule & >(*this).find_target_rule() );
+        return target_rule.p_rule;
+    }
+
     // These method access the relevant Rule after the linking operation
     const Repetition & get_repetition() const { return repetition; }
     const Annotations & get_annotations() const { return annotations; }

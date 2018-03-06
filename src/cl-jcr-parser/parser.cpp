@@ -3550,4 +3550,46 @@ std::string ValueConstraint::as_modifiers() const
     return m.string_value.substr( last + 1 );
 }
 
+//----------------------------------------------------------------------------
+//                           class Rule
+//----------------------------------------------------------------------------
+
+const Rule * Rule::find_target_rule() const
+{
+    if( target_rule.p_rule )
+        return target_rule.p_rule;
+
+    const Rule * p_rule;
+
+    if( target_rule.ruleset_id.empty() )
+    {
+        p_rule = p_grammar->find_rule( target_rule.rule_name );
+        if( p_rule )
+            return p_rule;
+        for( size_t i=0; i<p_grammar->unaliased_imports.size(); ++i )
+        {
+            const Grammar * p_g = p_grammar->p_grammar_set->find_grammar( p_grammar->unaliased_imports[i] );
+            if( p_g )
+            {
+                p_rule = p_g->find_rule( target_rule.rule_name );
+                if( p_rule )
+                    return p_rule;
+            }
+        }
+    }
+
+    else
+    {
+        const Grammar * p_g = p_grammar->p_grammar_set->find_grammar( target_rule.ruleset_id );
+        if( p_g )
+        {
+            p_rule = p_g->find_rule( target_rule.rule_name );
+            if( p_rule )
+                return p_rule;
+        }
+    }
+
+    return 0;
+}
+
 }   // namespace cljcr
