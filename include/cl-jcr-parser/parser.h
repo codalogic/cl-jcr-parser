@@ -251,6 +251,10 @@ struct Rule : private detail::NonCopyable
             annotations.merge( p_type->annotations );
     }
 
+    // find_target_rule() only resolves a rule to its named target
+    // (if present). Bear in mind, however, that rules can link to rules
+    // and then onto other rules, so find_target_rule() isn't the end of the
+    // story.
     const Rule * find_target_rule() const;
     Rule * find_target_rule()
     {

@@ -333,6 +333,10 @@ TFEATURE( "Rule::find_target_rule()" )
     TSETUP( p_g3r1->target_rule.ruleset_id = "g4" );
     TSETUP( p_g3r1->find_target_rule() );
     TTEST( p_g3r1->target_rule.p_rule == p_g4r2 );
+
+    // Test behaviour when target rule not named
+    TSETUP( p_g3r2->find_target_rule() );
+    TTEST( p_g3r2->target_rule.p_rule == p_g3r2 );
 }
 
 TFEATURE( "Grammar" )

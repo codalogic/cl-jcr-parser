@@ -3561,7 +3561,12 @@ const Rule * Rule::find_target_rule() const
 
     const Rule * p_rule;
 
-    if( target_rule.ruleset_id.empty() )
+    if( target_rule.rule_name.empty() )
+    {
+        return this;    // Resolve to self in the absence of a link
+    }
+
+    else if( target_rule.ruleset_id.empty() )
     {
         p_rule = p_grammar->find_rule( target_rule.rule_name );
         if( p_rule )
