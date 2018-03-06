@@ -63,7 +63,7 @@ class GrammarParser : public cl::dsl_pa
 {
 private:
     struct Members {
-        JCRParser * p_parent;
+        JCRParser * p_jcr_parser;
         GrammarSet * p_grammar_set;
         Grammar * p_grammar;
         cl::reader & r_reader;
@@ -73,12 +73,12 @@ private:
         Rule * p_rule;
 
         Members(
-            JCRParser * p_parent_in,
+            JCRParser * p_jcr_parser_in,
             cl::reader & r_reader_in,
             GrammarSet * p_grammar_set_in,
             Grammar * p_grammar_in )
             :
-            p_parent( p_parent_in ),
+            p_jcr_parser( p_jcr_parser_in ),
             p_grammar_set( p_grammar_set_in ),
             p_grammar( p_grammar_in ),
             r_reader( r_reader_in ),
@@ -110,7 +110,7 @@ private:
     };
 
 public:
-    GrammarParser( JCRParser * p_parent, cl::reader & r_reader, GrammarSet * p_grammar_set, Grammar * p_grammar );
+    GrammarParser( JCRParser * p_jcr_parser, cl::reader & r_reader, GrammarSet * p_grammar_set, Grammar * p_grammar );
     bool parse();
     JCRParser::Status status() const { return m.status; }
 
@@ -383,7 +383,7 @@ private:
 
     void report( const char * p_severity, const char * p_message )
     {
-        m.p_parent->report( m.r_reader.get_line_number(), m.r_reader.get_column_number(), p_severity, p_message );
+        m.p_jcr_parser->report( m.r_reader.get_line_number(), m.r_reader.get_column_number(), p_severity, p_message );
     }
 
     bool recover_to_eol()
@@ -407,13 +407,13 @@ private:
 };
 
 GrammarParser::GrammarParser(
-                        JCRParser * p_parent,
+                        JCRParser * p_jcr_parser,
                         cl::reader & r_reader,
                         GrammarSet * p_grammar_set,
                         Grammar * p_grammar )
     :
     cl::dsl_pa( r_reader ),
-    m( p_parent, r_reader, p_grammar_set, p_grammar )
+    m( p_jcr_parser, r_reader, p_grammar_set, p_grammar )
 {}
 
 class UnspecifiedRetreat : public std::exception {};
