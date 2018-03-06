@@ -1,4 +1,4 @@
-Tests table of contents generated on Tue Mar 06 14:09:40 2018
+Tests table of contents generated on Tue Mar 06 14:10:33 2018
 
 # test-config.cpp
 | Description | Line |
@@ -19,9 +19,9 @@ Tests table of contents generated on Tue Mar 06 14:09:40 2018
 | Rule | 198 |
 | Post-link Rule | 223 |
 | Rule::find_target_rule() | 289 |
-| Grammar | 342 |
-| Grammar::find_rule() | 393 |
-| GrammarSet::find_grammar() | 414 |
+| Grammar | 348 |
+| Grammar::find_rule() | 399 |
+| GrammarSet::find_grammar() | 420 |
 
 # test-main.cpp
 | Description | Line |

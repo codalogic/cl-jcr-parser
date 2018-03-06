@@ -1,4 +1,4 @@
-Tests run on Tue Mar 06 14:09:40 2018
+Tests run on Tue Mar 06 14:10:33 2018
 
     Config - Configuration [test-config.cpp:40]
     ===========================================
@@ -216,9 +216,12 @@ Tests run on Tue Mar 06 14:09:40 2018
     ok: p_g3r1->target_rule.p_rule == p_g4r2
     ok: p_g3r2->find_target_rule() == p_g3r2
     ok: p_g3r2->target_rule.p_rule == p_g3r2
+      : p_g1r2->target_rule.rule_name = "g1r1"
+    ok: p_const_g1r2->find_target_rule() == p_g1r1
+    ok: p_const_g1r2->target_rule.p_rule == 0
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Grammar [test-low-level-objects.cpp:342]
+    Grammar [test-low-level-objects.cpp:348]
     ========================================
     ok: p_g->p_grammar_set == &gs
       #### Adding and accessing unaliased imports ####
@@ -259,7 +262,7 @@ Tests run on Tue Mar 06 14:09:40 2018
     ok: p_g->rules.size() == 1
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Grammar::find_rule() [test-low-level-objects.cpp:393]
+    Grammar::find_rule() [test-low-level-objects.cpp:399]
     =====================================================
     ok: p_g->find_rule( "r1" ) == p_r1
     ok: p_g->find_rule( "r2" ) == p_r2
@@ -269,7 +272,7 @@ Tests run on Tue Mar 06 14:09:40 2018
     ok: p_const_g->find_rule( "r3" ) == 0
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    GrammarSet::find_grammar() [test-low-level-objects.cpp:414]
+    GrammarSet::find_grammar() [test-low-level-objects.cpp:420]
     ===========================================================
     ok: gs.find_grammar( "g1" ) == p_g1
     ok: gs.find_grammar( "g2" ) == p_g2
@@ -2458,6 +2461,6 @@ jcr-version
 TODOs (2):
 ------------------------
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:42]
-- Test low level GrammarSet class [test-low-level-objects.cpp:432]
+- Test low level GrammarSet class [test-low-level-objects.cpp:438]
 
-0 error(s), 2 todo(s), 1908 test(s)
+0 error(s), 2 todo(s), 1910 test(s)

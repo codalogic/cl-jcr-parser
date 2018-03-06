@@ -337,6 +337,12 @@ TFEATURE( "Rule::find_target_rule()" )
     // Test behaviour when target rule not named
     TTEST( p_g3r2->find_target_rule() == p_g3r2 );
     TTEST( p_g3r2->target_rule.p_rule == p_g3r2 );  // Check also stores result in target_rule.p_rule
+
+    // Test const case
+    TSETUP( p_g1r2->target_rule.rule_name = "g1r1" );
+    const Rule * p_const_g1r2 = p_g1r2;
+    TTEST( p_const_g1r2->find_target_rule() == p_g1r1 );
+    TTEST( p_const_g1r2->target_rule.p_rule == 0 ); // Const instance can't set target_rule.p_rule
 }
 
 TFEATURE( "Grammar" )
