@@ -320,23 +320,23 @@ TFEATURE( "Rule::find_target_rule()" )
 
     // Test no imports case
     TSETUP( p_g1r1->target_rule.rule_name = "g1r2" );
-    TSETUP( p_g1r1->find_target_rule() );
-    TTEST( p_g1r1->target_rule.p_rule == p_g1r2 );
+    TTEST( p_g1r1->find_target_rule() == p_g1r2 );
+    TTEST( p_g1r1->target_rule.p_rule == p_g1r2 );  // Check also stores result in target_rule.p_rule
 
     // Test unaliased imports case
     TSETUP( p_g2r1->target_rule.rule_name = "g3r2" );
-    TSETUP( p_g2r1->find_target_rule() );
-    TTEST( p_g2r1->target_rule.p_rule == p_g3r2 );
+    TTEST( p_g2r1->find_target_rule() == p_g3r2 );
+    TTEST( p_g2r1->target_rule.p_rule == p_g3r2 );  // Check also stores result in target_rule.p_rule
 
     // Test aliased imports case
     TSETUP( p_g3r1->target_rule.rule_name = "g4r2" );
     TSETUP( p_g3r1->target_rule.ruleset_id = "g4" );
-    TSETUP( p_g3r1->find_target_rule() );
-    TTEST( p_g3r1->target_rule.p_rule == p_g4r2 );
+    TTEST( p_g3r1->find_target_rule() == p_g4r2 );
+    TTEST( p_g3r1->target_rule.p_rule == p_g4r2 );  // Check also stores result in target_rule.p_rule
 
     // Test behaviour when target rule not named
-    TSETUP( p_g3r2->find_target_rule() );
-    TTEST( p_g3r2->target_rule.p_rule == p_g3r2 );
+    TTEST( p_g3r2->find_target_rule() == p_g3r2 );
+    TTEST( p_g3r2->target_rule.p_rule == p_g3r2 );  // Check also stores result in target_rule.p_rule
 }
 
 TFEATURE( "Grammar" )

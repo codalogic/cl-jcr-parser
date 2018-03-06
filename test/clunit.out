@@ -1,4 +1,4 @@
-Tests run on Tue Mar 06 14:03:11 2018
+Tests run on Tue Mar 06 14:09:40 2018
 
     Config - Configuration [test-config.cpp:40]
     ===========================================
@@ -205,16 +205,16 @@ Tests run on Tue Mar 06 14:03:11 2018
     Rule::find_target_rule() [test-low-level-objects.cpp:289]
     =========================================================
       : p_g1r1->target_rule.rule_name = "g1r2"
-      : p_g1r1->find_target_rule()
+    ok: p_g1r1->find_target_rule() == p_g1r2
     ok: p_g1r1->target_rule.p_rule == p_g1r2
       : p_g2r1->target_rule.rule_name = "g3r2"
-      : p_g2r1->find_target_rule()
+    ok: p_g2r1->find_target_rule() == p_g3r2
     ok: p_g2r1->target_rule.p_rule == p_g3r2
       : p_g3r1->target_rule.rule_name = "g4r2"
       : p_g3r1->target_rule.ruleset_id = "g4"
-      : p_g3r1->find_target_rule()
+    ok: p_g3r1->find_target_rule() == p_g4r2
     ok: p_g3r1->target_rule.p_rule == p_g4r2
-      : p_g3r2->find_target_rule()
+    ok: p_g3r2->find_target_rule() == p_g3r2
     ok: p_g3r2->target_rule.p_rule == p_g3r2
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
@@ -2460,4 +2460,4 @@ TODOs (2):
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:42]
 - Test low level GrammarSet class [test-low-level-objects.cpp:432]
 
-0 error(s), 2 todo(s), 1904 test(s)
+0 error(s), 2 todo(s), 1908 test(s)
