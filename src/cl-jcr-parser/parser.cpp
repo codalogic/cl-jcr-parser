@@ -3473,10 +3473,45 @@ private:
     } m;
 
 public:
-    Linker( JCRParser * p_parent, GrammarSet * p_grammar_set );
+    Linker( JCRParser * p_jcr_parser, GrammarSet * p_grammar_set )
+        : m( p_jcr_parser, p_grammar_set )
+    {}
     bool link();
+    bool link( Grammar * p_grammar );
     JCRParser::Status status() const { return m.status; }
+
+private:
+    void error( const Rule * p_rule, const char * p_message )
+    {
+        m.p_grammar_set->inc_error_count();
+        report( p_rule, p_message );
+        m.is_errored = true;
+    }
+    void error( const Rule * p_rule, const char * p_format, const clutils::str_args & r_arg_1 )
+    {
+        error( p_rule, expand( p_format, r_arg_1 ).c_str() );
+    }
+    void error( const Rule * p_rule, const char * p_format, const clutils::str_args & r_arg_1, const clutils::str_args & r_arg_2 )
+    {
+        error( p_rule, expand( p_format, r_arg_1, r_arg_2 ).c_str() );
+    }
+    void report( const Rule * p_rule, const char * p_message )
+    {
+        m.p_jcr_parser->report( p_rule->line_number, p_rule->column_number, "Error", p_message );
+    }
 };
+
+bool Linker::link()
+{
+    for( size_t i=0; i<m.p_grammar_set->size(); ++i )
+        link( &(*m.p_grammar_set)[i] );
+    return ! m.is_errored;
+}
+
+bool Linker::link( Grammar * p_grammar )
+{
+    return ! m.is_errored;
+}
 
 } // End of Anonymous namespace
 
