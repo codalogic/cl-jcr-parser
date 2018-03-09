@@ -3449,6 +3449,35 @@ std::string GrammarParser::error_token()    // Attempts to extract the token tha
     return token;
 }
 
+//----------------------------------------------------------------------------
+//                        Internal class Linker
+//----------------------------------------------------------------------------
+
+class Linker
+{
+private:
+    struct Members {
+        JCRParser * p_jcr_parser;
+        GrammarSet * p_grammar_set;
+        bool is_errored;
+        JCRParser::Status status;
+        Members(
+            JCRParser * p_jcr_parser_in,
+            GrammarSet * p_grammar_set_in )
+            :
+            p_jcr_parser( p_jcr_parser_in ),
+            p_grammar_set( p_grammar_set_in ),
+            is_errored( false ),
+            status( JCRParser::S_OK )
+        {}
+    } m;
+
+public:
+    Linker( JCRParser * p_parent, GrammarSet * p_grammar_set );
+    bool link();
+    JCRParser::Status status() const { return m.status; }
+};
+
 } // End of Anonymous namespace
 
 //----------------------------------------------------------------------------

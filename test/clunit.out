@@ -1,4 +1,4 @@
-Tests run on Tue Mar 06 18:44:54 2018
+Tests run on Tue Mar 06 18:46:36 2018
 
     Config - Configuration [test-config.cpp:40]
     ===========================================
@@ -280,6 +280,8 @@ Tests run on Tue Mar 06 18:44:54 2018
     ok: r_const_gs.find_grammar( "g1" ) == p_g1
     ok: r_const_gs.find_grammar( "g2" ) == p_g2
     ok: r_const_gs.find_grammar( "g3" ) == 0
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
@@ -2458,9 +2460,10 @@ jcr-version
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
 
-TODOs (2):
+TODOs (3):
 ------------------------
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:42]
-- Test low level GrammarSet class [test-low-level-objects.cpp:438]
+- Complete Linker class [test-low-level-objects.cpp:438]
+- Test low level GrammarSet class [test-low-level-objects.cpp:439]
 
-0 error(s), 2 todo(s), 1910 test(s)
+0 error(s), 3 todo(s), 1911 test(s)
