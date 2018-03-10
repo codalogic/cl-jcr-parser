@@ -3460,15 +3460,13 @@ private:
         JCRParser * p_jcr_parser;
         GrammarSet * p_grammar_set;
         bool is_errored;
-        JCRParser::Status status;
         Members(
             JCRParser * p_jcr_parser_in,
             GrammarSet * p_grammar_set_in )
             :
             p_jcr_parser( p_jcr_parser_in ),
             p_grammar_set( p_grammar_set_in ),
-            is_errored( false ),
-            status( JCRParser::S_OK )
+            is_errored( false )
         {}
     } m;
 
@@ -3478,7 +3476,6 @@ public:
     {}
     bool link();
     bool link( Grammar * p_grammar );
-    JCRParser::Status status() const { return m.status; }
 
 private:
     void error( const Rule * p_rule, const char * p_message )
