@@ -435,5 +435,4 @@ TFEATURE( "GrammarSet::find_grammar()" )
     TTEST( r_const_gs.find_grammar( "g3" ) == 0 );
 }
 
-TFEATURETODO( "Complete Linker class" );
 TFEATURETODO( "Test low level GrammarSet class" );

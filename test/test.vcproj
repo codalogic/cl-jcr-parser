@@ -183,6 +183,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\test-linking.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\test-low-level-objects.cpp"
 				>
 			</File>
