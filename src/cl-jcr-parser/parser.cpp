@@ -30,6 +30,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <algorithm>
 
 namespace cljcr {
 
@@ -3449,6 +3450,175 @@ std::string GrammarParser::error_token()    // Attempts to extract the token tha
     return token;
 }
 
+//----------------------------------------------------------------------------
+//                        Internal class Linker
+//----------------------------------------------------------------------------
+
+class Linker
+{
+private:
+    struct Members {
+        JCRParser * p_jcr_parser;
+        GrammarSet * p_grammar_set;
+        typedef std::vector< const Rule * > reported_rule_t;
+        reported_rule_t reported_rule;
+        bool is_errored;
+        Members(
+            JCRParser * p_jcr_parser_in,
+            GrammarSet * p_grammar_set_in )
+            :
+            p_jcr_parser( p_jcr_parser_in ),
+            p_grammar_set( p_grammar_set_in ),
+            is_errored( false )
+        {}
+    } m;
+
+    struct LoopDetector
+    {
+        LoopDetector * p_prev;
+        Rule * p_rule;
+
+        LoopDetector( Rule * p_rule_in )
+            : p_prev( 0 ), p_rule( p_rule_in )
+        {}
+        LoopDetector( LoopDetector * p_prev_in, Rule * p_rule_in )
+            : p_prev( p_prev_in ), p_rule( p_rule_in )
+        {}
+
+        bool is_looped() const
+        {
+            LoopDetector * p_loop_detector = p_prev;
+            while( p_loop_detector )
+                if( p_loop_detector->p_rule == p_rule )
+                    return true;
+            return false;
+        }
+    };
+
+    struct LinkResult
+    {
+        Rule * p_initial_rule;
+        Rule * p_member_rule;
+        Rule * p_type_rule;
+
+        LinkResult( Rule * p_rule_in ) : p_initial_rule( p_rule_in ), p_member_rule( p_rule_in ), p_type_rule( p_rule_in ) {}
+    };
+
+public:
+    Linker( JCRParser * p_jcr_parser, GrammarSet * p_grammar_set )
+        : m( p_jcr_parser, p_grammar_set )
+    {}
+    bool link();
+    bool link( Grammar * p_grammar );
+
+private:
+    void link_global_rules( Grammar * p_grammar );
+    void link_child_rules( Rule * p_rule );
+    void link_rule( Rule * p_rule );
+    void do_link( LinkResult * p_link_result, LoopDetector * p_loop_detector, Rule * p_source_rule );
+
+    void error( const Rule * p_rule, const char * p_message )
+    {
+        if( ! is_reported_rule( p_rule ) )
+        {
+            add_reported_rule( p_rule );
+            m.p_grammar_set->inc_error_count();
+            report( p_rule, p_message );
+            m.is_errored = true;
+        }
+    }
+    void error( const Rule * p_rule, const char * p_format, const clutils::str_args & r_arg_1 )
+    {
+        error( p_rule, expand( p_format, r_arg_1 ).c_str() );
+    }
+    void error( const Rule * p_rule, const char * p_format, const clutils::str_args & r_arg_1, const clutils::str_args & r_arg_2 )
+    {
+        error( p_rule, expand( p_format, r_arg_1, r_arg_2 ).c_str() );
+    }
+    void report( const Rule * p_rule, const char * p_message )
+    {
+        m.p_jcr_parser->report( p_rule->line_number, p_rule->column_number, "Error", p_message );
+    }
+
+    bool is_reported_rule( const Rule * p_rule ) const
+    {
+        return std::find( m.reported_rule.begin(), m.reported_rule.end(), p_rule ) != m.reported_rule.end();
+    }
+    void add_reported_rule( const Rule * p_rule ) { m.reported_rule.push_back( p_rule ); }
+};
+
+bool Linker::link()
+{
+    for( size_t i=0; i<m.p_grammar_set->size(); ++i )
+        link( &(*m.p_grammar_set)[i] );
+    return ! m.is_errored;
+}
+
+bool Linker::link( Grammar * p_grammar )
+{
+    link_global_rules( p_grammar );
+    return ! m.is_errored;
+}
+
+void Linker::link_global_rules( Grammar * p_grammar )
+{
+    for( size_t i=0; i<p_grammar->rules.size(); ++i )
+    {
+        link_rule( &p_grammar->rules[i] );
+        link_child_rules( &p_grammar->rules[i] );
+    }
+}
+
+void Linker::link_child_rules( Rule * p_rule )
+{
+    for( size_t i=0; i<p_rule->children.size(); ++i )
+    {
+        link_rule( &p_rule->children[i] );
+        link_child_rules( &p_rule->children[i] );
+    }
+}
+
+void Linker::link_rule( Rule * p_rule )
+{
+    LinkResult link_result( p_rule );
+    LoopDetector loop_detector( p_rule );
+    do_link( &link_result, &loop_detector, p_rule );
+    p_rule->p_rule = link_result.p_member_rule;
+    p_rule->p_type = link_result.p_type_rule;
+}
+
+void Linker::do_link( LinkResult * p_link_result, LoopDetector * p_loop_detector, Rule * p_source_rule )
+{
+    if( ! p_source_rule->target_rule.rule_name.empty() )
+    {
+        Rule * p_target_rule = p_source_rule->find_target_rule();
+        if( ! p_target_rule )
+        {
+            error( p_source_rule, "Unable to find Target rule '%0'", p_source_rule->target_rule );
+        }
+        else
+        {
+            LoopDetector loop_detector( p_loop_detector, p_target_rule );
+            if( loop_detector.is_looped() )
+            {
+                error( p_target_rule, "Target rule '%0' loops back to itself", p_target_rule->rule_name );
+            }
+            else
+            {
+                p_link_result->p_type_rule = p_target_rule;
+                if( p_target_rule->is_member_rule() )
+                {
+                    if( p_link_result->p_member_rule->is_member_rule() )
+                        error( p_link_result->p_member_rule, "Member rule links to Member rule '%0'", p_link_result->p_member_rule->target_rule );
+                    else
+                        p_link_result->p_member_rule = p_target_rule;
+                }
+                do_link( p_link_result, &loop_detector, p_target_rule );
+            }
+        }
+    }
+}
+
 } // End of Anonymous namespace
 
 //----------------------------------------------------------------------------
@@ -3548,6 +3718,19 @@ std::string ValueConstraint::as_modifiers() const
     if( last == std::string::npos )
         return "";
     return m.string_value.substr( last + 1 );
+}
+
+//----------------------------------------------------------------------------
+//                           class TargetRule
+//----------------------------------------------------------------------------
+
+std::ostream & operator << ( std::ostream & r_os, const TargetRule & r_tr )
+{
+    if( ! r_tr.ruleset_id.empty() )
+        r_os << "${" << r_tr.ruleset_id << "}." << r_tr.rule_name;
+    else
+        r_os << "$" << r_tr.rule_name;
+    return r_os;
 }
 
 //----------------------------------------------------------------------------

@@ -187,6 +187,8 @@ struct TargetRule
     TargetRule() : p_rule( 0 ) {}
 };
 
+std::ostream & operator << ( std::ostream & r_os, const TargetRule & r_tr );
+
 struct Grammar;
 
 struct Rule : private detail::NonCopyable
