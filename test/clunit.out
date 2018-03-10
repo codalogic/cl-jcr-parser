@@ -1,4 +1,4 @@
-Tests run on Tue Mar 06 18:44:54 2018
+Tests run on Sat Mar 10 13:55:29 2018
 
     Config - Configuration [test-config.cpp:40]
     ===========================================
@@ -2458,9 +2458,13 @@ jcr-version
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
 
-TODOs (2):
+TODOs (6):
 ------------------------
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:42]
 - Test low level GrammarSet class [test-low-level-objects.cpp:438]
+- Remove error_todo(), fatal_todo() [test-main.cpp:39]
+- Add source information to cl_reader class hierarchy (as virtual methods) [test-main.cpp:40]
+- Record JCR source information in Grammar class [test-main.cpp:41]
+- Change JCRParser class to use JCR source information in Grammar class when reporting errors [test-main.cpp:42]
 
-0 error(s), 2 todo(s), 1910 test(s)
+0 error(s), 6 todo(s), 1910 test(s)
