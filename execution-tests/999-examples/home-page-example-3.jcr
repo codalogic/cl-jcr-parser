@@ -1,0 +1,18 @@
+{
+   "Image" : {
+       $width,
+       $height,
+       "Title" : string,
+       "Thumbnail" : {
+           "Url" : uri,
+           $width,
+           $height
+       },
+       "Animated" : boolean,
+       "IDs" : [ $id * ]
+   }
+}
+
+$width = "Width" : 0..1280
+$height = "Height" : 0..1024
+$id = integer

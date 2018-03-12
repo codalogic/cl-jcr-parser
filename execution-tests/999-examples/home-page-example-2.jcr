@@ -1,0 +1,14 @@
+{
+   "Image" : {
+       "Width" : 0..1280,
+       "Height" : 0..1024,
+       "Title" : string,
+       "Thumbnail" : {
+           "Url" : uri,
+           "Width" : 0..1280,
+           "Height" : 0..1024
+       },
+       "Animated" : boolean,
+       "IDs" : [ integer * ]
+   }
+}
