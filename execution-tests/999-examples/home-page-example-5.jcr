@@ -1,17 +1,17 @@
 {
    "Image" : {
-       $width,
-       $height,
+       $dimensions,
        "Title" : string,
        "Thumbnail" : {
            "Url" : uri,
-           $width,
-           $height
+           $dimensions
        },
        "Animated" : boolean,
-       "IDs" : [ integer * ]
+       "IDs" : [ $id * ]
    }
 }
 
+$dimensions = ( $width, $height )
 $width = "Width" : 0..1280
 $height = "Height" : 0..1024
+$id = integer
