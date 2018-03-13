@@ -1,0 +1,5 @@
+#ruleset-id org.ietf.geometry
+
+$dimensions = ( $width, $height )
+$width = "Width" : 0..1280
+$height = "Height" : 0..1024

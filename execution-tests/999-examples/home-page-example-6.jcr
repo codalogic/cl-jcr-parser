@@ -1,0 +1,20 @@
+{
+    "Image" : {
+        $dimensions,
+        "Title" : string,
+        $thumbnail,
+        "Animated" : boolean,
+        "IDs" : [ $id * ]
+    }
+}
+
+$thumbnail =
+    "Thumbnail" : {
+        "Url" : uri,
+        $dimensions
+    }
+
+$dimensions = ( $width, $height )
+$width = "Width" : 0..1280
+$height = "Height" : 0..1024
+$id = integer
