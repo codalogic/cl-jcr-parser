@@ -485,7 +485,7 @@ private:
 
     bool escape()
     {
-        // escape           = %x5C              ; \
+        // escape           = %x5C              ; '\'
 
         return is_get_char( '\\' );
     }
@@ -634,8 +634,8 @@ struct writer_read_mode
 
 struct writer_skip_mode
 {
-    static void handle_char( std::string * p_output, char c ) {}
-    static void handle_string( std::string * p_output, const char * p_new ) {}
+    static void handle_char( std::string * /*p_output*/, char /*c*/ ) {}
+    static void handle_string( std::string * /*p_output*/, const char * /*p_new*/ ) {}
 };
 
 template< typename Twriter >

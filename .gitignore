@@ -40,3 +40,5 @@
 # Project specific ignores
 test/Reader-test-abc.txt
 fix-eol.*
+linux/
+

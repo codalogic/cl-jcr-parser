@@ -423,7 +423,10 @@ public:
     Status add_grammar( const char * p_rules, size_t size );
     Status link();
 
-    virtual void report( size_t line, size_t column, const char * p_severity, const char * p_message ) {}  // Inherit this class to get error message fed back to you
+    virtual void report( size_t line, size_t column, const char * p_severity, const char * p_message )  // Inherit this class to get error message fed back to you
+    {
+        (void)line; (void)column; (void)p_severity; (void)p_message; // Mark parameters as unused
+    }
 
 private:
     Status parse_grammar( cl::reader & reader );
@@ -436,7 +439,7 @@ public:
     virtual void report( size_t line, size_t column, const char * p_severity, const char * p_message )
     {
         std::cout << p_severity << ": " << " (line: " << line;
-        if( column != ~0 )
+        if( column != ~0U )
             std::cout << ", char: " << column;
         std::cout <<
                 "):\n" <<
@@ -461,7 +464,7 @@ public:
     virtual void report( size_t line, size_t column, const char * p_severity, const char * p_message )
     {
         std::cout << p_severity << ": " << m.file << " (line: " << line;
-        if( column != ~0 )
+        if( column != ~0U )
             std::cout << ", char: " << column;
         std::cout <<
                 "):\n" <<

@@ -1780,7 +1780,7 @@ int64 sized_int_max( int bits )
     return ~sized_int_min( bits );
 }
 
-uint64 sized_uint_min( int bits ) // For completeness
+uint64 sized_uint_min( int /*bits*/ ) // For completeness
 {
     return 0;
 }
@@ -2849,7 +2849,7 @@ bool GrammarParser::escape()
     /* ABNF:
     escape           = %x5C              ; \
     */
-    // %x5C              ; \
+    // %x5C              ; '\'
 
     return accumulate( '\\' );
 }
