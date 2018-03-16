@@ -3513,9 +3513,10 @@ public:
 
 private:
     void link_global_rules( Grammar * p_grammar );
+    void link_global_rule( Rule * p_global_rule );
+    void do_link( LinkResult * p_link_result, LoopDetector * p_loop_detector, Rule * p_global_rule );
     void link_child_rules( Rule * p_rule );
-    void link_rule( Rule * p_rule );
-    void do_link( LinkResult * p_link_result, LoopDetector * p_loop_detector, Rule * p_source_rule );
+    void link_child_rule( Rule * p_rule );
 
     void error( const Rule * p_rule, const char * p_message )
     {
@@ -3562,46 +3563,47 @@ bool Linker::link( Grammar * p_grammar )
 
 void Linker::link_global_rules( Grammar * p_grammar )
 {
+    // Link global rules to global rules first.  Then link any child rules to global rules.
+    // This will be more efficient, and the names for global rules will offer better error messages.
+
     for( size_t i=0; i<p_grammar->rules.size(); ++i )
     {
-        link_rule( &p_grammar->rules[i] );
+        link_global_rule( &p_grammar->rules[i] );
+    }
+    for( size_t i=0; i<p_grammar->rules.size(); ++i )
+    {
         link_child_rules( &p_grammar->rules[i] );
     }
 }
 
-void Linker::link_child_rules( Rule * p_rule )
+void Linker::link_global_rule( Rule * p_global_rule )
 {
-    for( size_t i=0; i<p_rule->children.size(); ++i )
-    {
-        link_rule( &p_rule->children[i] );
-        link_child_rules( &p_rule->children[i] );
-    }
+    LinkResult link_result( p_global_rule );
+    LoopDetector loop_detector( p_global_rule );
+    do_link( &link_result, &loop_detector, p_global_rule );
+    p_global_rule->p_rule = link_result.p_member_rule;
+    p_global_rule->p_type = link_result.p_type_rule;
 }
 
-void Linker::link_rule( Rule * p_rule )
+void Linker::do_link( LinkResult * p_link_result, LoopDetector * p_loop_detector, Rule * p_global_rule )
 {
-    LinkResult link_result( p_rule );
-    LoopDetector loop_detector( p_rule );
-    do_link( &link_result, &loop_detector, p_rule );
-    p_rule->p_rule = link_result.p_member_rule;
-    p_rule->p_type = link_result.p_type_rule;
-}
-
-void Linker::do_link( LinkResult * p_link_result, LoopDetector * p_loop_detector, Rule * p_source_rule )
-{
-    if( ! p_source_rule->target_rule.rule_name.empty() )
+    if( ! p_global_rule->target_rule.rule_name.empty() )
     {
-        Rule * p_target_rule = p_source_rule->find_target_rule();
+        Rule * p_target_rule = p_global_rule->find_target_rule();
         if( ! p_target_rule )
         {
-            error( p_source_rule, "Unable to find Target rule '%0'", p_source_rule->target_rule );
+            error( p_global_rule, "Unable to find Target rule '%0' for global rule '%1'",
+                    p_global_rule->target_rule,
+                    p_global_rule->get_rule_name() );
         }
         else
         {
             LoopDetector loop_detector( p_loop_detector, p_target_rule );
             if( loop_detector.is_looped() )
             {
-                error( p_target_rule, "Target rule '%0' loops back to itself", p_target_rule->rule_name );
+                error( p_target_rule, "Target rule '%0' loops back to itself when linking global rule '%1'",
+                        p_target_rule->rule_name,
+                        p_global_rule->get_rule_name() );
             }
             else
             {
@@ -3609,12 +3611,40 @@ void Linker::do_link( LinkResult * p_link_result, LoopDetector * p_loop_detector
                 if( p_target_rule->is_member_rule() )
                 {
                     if( p_link_result->p_member_rule->is_member_rule() )
-                        error( p_link_result->p_member_rule, "Member rule links to Member rule '%0'", p_link_result->p_member_rule->target_rule );
+                        error( p_link_result->p_member_rule, "Member rule links to Member rule '%0' when linking global rule '%1'",
+                                p_link_result->p_member_rule->target_rule,
+                                p_global_rule->get_rule_name() );
                     else
                         p_link_result->p_member_rule = p_target_rule;
                 }
                 do_link( p_link_result, &loop_detector, p_target_rule );
             }
+        }
+    }
+}
+
+void Linker::link_child_rules( Rule * p_rule )
+{
+    for( size_t i=0; i<p_rule->children.size(); ++i )
+    {
+        link_child_rule( &p_rule->children[i] );
+        link_child_rules( &p_rule->children[i] );
+    }
+}
+
+void Linker::link_child_rule( Rule * p_rule )
+{
+    if( ! p_rule->target_rule.rule_name.empty() )
+    {
+        Rule * p_target_rule = p_rule->find_target_rule();
+        if( ! p_target_rule )
+        {
+            error( p_rule, "Unable to find Target rule '%0'", p_rule->target_rule );
+        }
+        else
+        {
+            p_rule->p_rule = p_target_rule->p_rule;
+            p_rule->p_type = p_target_rule->p_type;
         }
     }
 }
