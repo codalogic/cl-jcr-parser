@@ -1,4 +1,4 @@
-Tests table of contents generated on Wed Mar 14 14:03:30 2018
+Tests table of contents generated on Fri Mar 16 20:06:07 2018
 
 # test-config.cpp
 | Description | Line |
@@ -9,6 +9,11 @@ Tests table of contents generated on Wed Mar 14 14:03:30 2018
 | Description | Line |
 |-------------|------|
 | GrammarSet TODOS | 40 |
+
+# test-linking.cpp
+| Description | Line |
+|-------------|------|
+| Global linking | 75 |
 
 # test-low-level-objects.cpp
 | Description | Line |
