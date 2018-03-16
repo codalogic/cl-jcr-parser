@@ -265,6 +265,7 @@ struct Rule : private detail::NonCopyable
     }
 
     // These method access the relevant Rule after the linking operation
+    const char * get_rule_name() const { return ! rule_name.empty() ? rule_name.c_str() : "<annoymous>"; }
     const Repetition & get_repetition() const { return repetition; }
     const Annotations & get_annotations() const { return annotations; }
     const MemberName & get_member_name() const { return p_rule->member_name; }
