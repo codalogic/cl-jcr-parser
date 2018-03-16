@@ -352,6 +352,9 @@ struct Grammar : private detail::NonCopyable
 
 struct GrammarSet : private detail::NonCopyable
 {
+public:
+    typedef uniq_ptr< GrammarSet >::type uniq_ptr;
+
 private:
     typedef clutils::ptr_vector< Grammar > container_t;
     struct Members {
