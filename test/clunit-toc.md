@@ -1,4 +1,4 @@
-Tests table of contents generated on Fri Mar 16 20:06:07 2018
+Tests table of contents generated on Fri Mar 16 20:11:02 2018
 
 # test-config.cpp
 | Description | Line |
@@ -13,7 +13,8 @@ Tests table of contents generated on Fri Mar 16 20:06:07 2018
 # test-linking.cpp
 | Description | Line |
 |-------------|------|
-| Global linking | 75 |
+| Linking Rule::find_target_rule() | 40 |
+| Global linking | 134 |
 
 # test-low-level-objects.cpp
 | Description | Line |
@@ -23,10 +24,9 @@ Tests table of contents generated on Fri Mar 16 20:06:07 2018
 | TargetRule | 191 |
 | Rule | 198 |
 | Post-link Rule | 223 |
-| Rule::find_target_rule() | 289 |
-| Grammar | 348 |
-| Grammar::find_rule() | 399 |
-| GrammarSet::find_grammar() | 420 |
+| Grammar | 289 |
+| Grammar::find_rule() | 340 |
+| GrammarSet::find_grammar() | 361 |
 
 # test-main.cpp
 | Description | Line |

@@ -37,6 +37,65 @@
 
 using namespace cljcr;
 
+TFEATURE( "Linking Rule::find_target_rule()" )
+{
+    GrammarSet gs;
+
+    Grammar * p_g1 = gs.append_grammar();
+    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r1->rule_name = "g1r1";
+    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r2->rule_name = "g1r2";
+
+    Grammar * p_g2 = gs.append_grammar();
+    p_g2->add_unaliased_import( "g3" );
+    Rule * p_g2r1 = p_g2->append_rule( Rule::uniq_ptr( new Rule( p_g2, 0, 0 ) ) );
+    p_g2r1->rule_name = "g2r1";
+    Rule * p_g2r2 = p_g2->append_rule( Rule::uniq_ptr( new Rule( p_g2, 0, 0 ) ) );
+    p_g2r2->rule_name = "g2r2";
+
+    Grammar * p_g3 = gs.append_grammar();
+    p_g3->ruleset_id = "g3";
+    // p_g3->add_aliased_import( "ag4", "g4" ); // Not needed - Aliases are mapped at parse time, and target_rule stores resultant ruleset_id
+    Rule * p_g3r1 = p_g3->append_rule( Rule::uniq_ptr( new Rule( p_g3, 0, 0 ) ) );
+    p_g3r1->rule_name = "g3r1";
+    Rule * p_g3r2 = p_g3->append_rule( Rule::uniq_ptr( new Rule( p_g3, 0, 0 ) ) );
+    p_g3r2->rule_name = "g3r2";
+
+    Grammar * p_g4 = gs.append_grammar();
+    p_g4->ruleset_id = "g4";
+    Rule * p_g4r1 = p_g4->append_rule( Rule::uniq_ptr( new Rule( p_g4, 0, 0 ) ) );
+    p_g4r1->rule_name = "g4r1";
+    Rule * p_g4r2 = p_g4->append_rule( Rule::uniq_ptr( new Rule( p_g4, 0, 0 ) ) );
+    p_g4r2->rule_name = "g4r2";
+
+    // Test no imports case
+    TSETUP( p_g1r1->target_rule.rule_name = "g1r2" );
+    TTEST( p_g1r1->find_target_rule() == p_g1r2 );
+    TTEST( p_g1r1->target_rule.p_rule == p_g1r2 );  // Check also stores result in target_rule.p_rule
+
+    // Test unaliased imports case
+    TSETUP( p_g2r1->target_rule.rule_name = "g3r2" );
+    TTEST( p_g2r1->find_target_rule() == p_g3r2 );
+    TTEST( p_g2r1->target_rule.p_rule == p_g3r2 );  // Check also stores result in target_rule.p_rule
+
+    // Test aliased imports case
+    TSETUP( p_g3r1->target_rule.rule_name = "g4r2" );
+    TSETUP( p_g3r1->target_rule.ruleset_id = "g4" );
+    TTEST( p_g3r1->find_target_rule() == p_g4r2 );
+    TTEST( p_g3r1->target_rule.p_rule == p_g4r2 );  // Check also stores result in target_rule.p_rule
+
+    // Test behaviour when target rule not named
+    TTEST( p_g3r2->find_target_rule() == p_g3r2 );
+    TTEST( p_g3r2->target_rule.p_rule == p_g3r2 );  // Check also stores result in target_rule.p_rule
+
+    // Test const case
+    TSETUP( p_g1r2->target_rule.rule_name = "g1r1" );
+    const Rule * p_const_g1r2 = p_g1r2;
+    TTEST( p_const_g1r2->find_target_rule() == p_g1r1 );
+    TTEST( p_const_g1r2->target_rule.p_rule == 0 ); // Const instance can't set target_rule.p_rule
+}
+
 GrammarSet::uniq_ptr create_grammar()
 {
     GrammarSet::uniq_ptr pu_gs( new GrammarSet );
