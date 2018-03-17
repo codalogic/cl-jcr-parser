@@ -1,0 +1,35 @@
+; the root of the JSON instance is an object
+; this root rule describes that object
+{
+
+    ; the object specification contains
+    ; one member specification
+    "Image" : {
+
+        ; $width and $height are defined below
+        %width,
+        $height,
+
+        ; "Title" member specification
+        "Title" :string,
+
+        ; "Thumbnail" member specification, which
+        ; defines an object
+        "Thumbnail":  {
+
+            ; $width and $height are re-used again
+            $width, $height,
+
+            "Url" :uri
+        },
+
+        ; "IDs" member that is an array of
+        ; one ore more integers
+        "IDs" : [ integer * ]
+
+    }
+}
+
+; The definitions of the rules $width and $height
+$width  = "Width" : 0..1280
+$height = "Height" : 0..1024
