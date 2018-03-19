@@ -198,7 +198,7 @@ TFEATURE( "TargetRule" )
 TFEATURE( "Rule" )
 {
     GrammarSet gs;
-    Grammar * p_g = gs.append_grammar();
+    Grammar * p_g = gs.append_grammar( "<local>" );
     Rule r( p_g, 100, 102 );
 
     TTEST( r.p_grammar == p_g );
@@ -225,7 +225,7 @@ TFEATURE( "Post-link Rule" )
     // We set up values in this test that are inconsistent with a real application.
     // This is so we can verify that the correct instances are being accessed.
     GrammarSet gs;
-    Grammar * p_g = gs.append_grammar();
+    Grammar * p_g = gs.append_grammar( "<local>" );
     Rule def( p_g, 100, 102 );  // Can use a local rule here (rather than heap allocated) because we don't assign it to a Grammar's ownership
     def.rule_name = "def";
     def.repetition.min = 100;
@@ -289,7 +289,7 @@ TFEATURE( "Post-link Rule" )
 TFEATURE( "Grammar" )
 {
     GrammarSet gs;
-    Grammar * p_g = gs.append_grammar();
+    Grammar * p_g = gs.append_grammar( "<local>" );
 
     TTEST( p_g->p_grammar_set == &gs );
 
@@ -340,7 +340,7 @@ TFEATURE( "Grammar" )
 TFEATURE( "Grammar::find_rule()" )
 {
     GrammarSet gs;
-    Grammar * p_g = gs.append_grammar();
+    Grammar * p_g = gs.append_grammar( "<local>" );
     Rule::uniq_ptr pu_r1( new Rule( p_g, 0, 0 ) );
     pu_r1->rule_name = "r1";
     Rule * p_r1 = p_g->append_rule( pu_r1 ); // pu_r1 releases ownership here
@@ -361,9 +361,9 @@ TFEATURE( "Grammar::find_rule()" )
 TFEATURE( "GrammarSet::find_grammar()" )
 {
     GrammarSet gs;
-    Grammar * p_g1 = gs.append_grammar();
+    Grammar * p_g1 = gs.append_grammar( "<local>" );
     p_g1->ruleset_id = "g1";
-    Grammar * p_g2 = gs.append_grammar();
+    Grammar * p_g2 = gs.append_grammar( "<local>" );
     p_g2->ruleset_id = "g2";
 
     TTEST( gs.find_grammar( "g1" ) == p_g1 );

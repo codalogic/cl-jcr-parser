@@ -37,7 +37,6 @@
 TFEATURE( "Miscellaneous TODOs" )
 {
     TTODO( "Add source information to cl_reader class hierarchy (as virtual methods)" );
-    TTODO( "Record JCR source information in Grammar class" );
     TTODO( "Change JCRParser class to use JCR source information in Grammar class when reporting errors" );
     TTODO( "Investigate changes needed to remove requirement for g++ -Wno-parentheses flag" );
 }

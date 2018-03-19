@@ -1,4 +1,4 @@
-Tests run on Mon Mar 19 10:00:24 2018
+Tests run on Mon Mar 19 10:32:02 2018
 
     Config - Configuration [test-config.cpp:40]
     ===========================================
@@ -2462,13 +2462,12 @@ jcr-version
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
 
-TODOs (6):
+TODOs (5):
 ------------------------
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:42]
 - Test low level GrammarSet class [test-low-level-objects.cpp:379]
 - Add source information to cl_reader class hierarchy (as virtual methods) [test-main.cpp:39]
-- Record JCR source information in Grammar class [test-main.cpp:40]
-- Change JCRParser class to use JCR source information in Grammar class when reporting errors [test-main.cpp:41]
-- Investigate changes needed to remove requirement for g++ -Wno-parentheses flag [test-main.cpp:42]
+- Change JCRParser class to use JCR source information in Grammar class when reporting errors [test-main.cpp:40]
+- Investigate changes needed to remove requirement for g++ -Wno-parentheses flag [test-main.cpp:41]
 
-0 error(s), 6 todo(s), 1911 test(s)
+0 error(s), 5 todo(s), 1911 test(s)

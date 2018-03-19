@@ -41,20 +41,20 @@ TFEATURE( "Linking Rule::find_target_rule()" )
 {
     GrammarSet gs;
 
-    Grammar * p_g1 = gs.append_grammar();
+    Grammar * p_g1 = gs.append_grammar( "<local>" );
     Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
     p_g1r1->rule_name = "g1r1";
     Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
     p_g1r2->rule_name = "g1r2";
 
-    Grammar * p_g2 = gs.append_grammar();
+    Grammar * p_g2 = gs.append_grammar( "<local>" );
     p_g2->add_unaliased_import( "g3" );
     Rule * p_g2r1 = p_g2->append_rule( Rule::uniq_ptr( new Rule( p_g2, 0, 0 ) ) );
     p_g2r1->rule_name = "g2r1";
     Rule * p_g2r2 = p_g2->append_rule( Rule::uniq_ptr( new Rule( p_g2, 0, 0 ) ) );
     p_g2r2->rule_name = "g2r2";
 
-    Grammar * p_g3 = gs.append_grammar();
+    Grammar * p_g3 = gs.append_grammar( "<local>" );
     p_g3->ruleset_id = "g3";
     // p_g3->add_aliased_import( "ag4", "g4" ); // Not needed - Aliases are mapped at parse time, and target_rule stores resultant ruleset_id
     Rule * p_g3r1 = p_g3->append_rule( Rule::uniq_ptr( new Rule( p_g3, 0, 0 ) ) );
@@ -62,7 +62,7 @@ TFEATURE( "Linking Rule::find_target_rule()" )
     Rule * p_g3r2 = p_g3->append_rule( Rule::uniq_ptr( new Rule( p_g3, 0, 0 ) ) );
     p_g3r2->rule_name = "g3r2";
 
-    Grammar * p_g4 = gs.append_grammar();
+    Grammar * p_g4 = gs.append_grammar( "<local>" );
     p_g4->ruleset_id = "g4";
     Rule * p_g4r1 = p_g4->append_rule( Rule::uniq_ptr( new Rule( p_g4, 0, 0 ) ) );
     p_g4r1->rule_name = "g4r1";
@@ -100,20 +100,20 @@ GrammarSet::uniq_ptr create_grammar()
 {
     GrammarSet::uniq_ptr pu_gs( new GrammarSet );
 
-    Grammar * p_g1 = pu_gs->append_grammar();
+    Grammar * p_g1 = pu_gs->append_grammar( "<local>" );
     Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
     p_g1r1->rule_name = "g1r1";
     Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
     p_g1r2->rule_name = "g1r2";
 
-    Grammar * p_g2 = pu_gs->append_grammar();
+    Grammar * p_g2 = pu_gs->append_grammar( "<local>" );
     p_g2->add_unaliased_import( "g3" );
     Rule * p_g2r1 = p_g2->append_rule( Rule::uniq_ptr( new Rule( p_g2, 0, 0 ) ) );
     p_g2r1->rule_name = "g2r1";
     Rule * p_g2r2 = p_g2->append_rule( Rule::uniq_ptr( new Rule( p_g2, 0, 0 ) ) );
     p_g2r2->rule_name = "g2r2";
 
-    Grammar * p_g3 = pu_gs->append_grammar();
+    Grammar * p_g3 = pu_gs->append_grammar( "<local>" );
     p_g3->ruleset_id = "g3";
     // p_g3->add_aliased_import( "ag4", "g4" ); // Not needed - Aliases are mapped at parse time, and target_rule stores resultant ruleset_id
     Rule * p_g3r1 = p_g3->append_rule( Rule::uniq_ptr( new Rule( p_g3, 0, 0 ) ) );
@@ -121,7 +121,7 @@ GrammarSet::uniq_ptr create_grammar()
     Rule * p_g3r2 = p_g3->append_rule( Rule::uniq_ptr( new Rule( p_g3, 0, 0 ) ) );
     p_g3r2->rule_name = "g3r2";
 
-    Grammar * p_g4 = pu_gs->append_grammar();
+    Grammar * p_g4 = pu_gs->append_grammar( "<local>" );
     p_g4->ruleset_id = "g4";
     Rule * p_g4r1 = p_g4->append_rule( Rule::uniq_ptr( new Rule( p_g4, 0, 0 ) ) );
     p_g4r1->rule_name = "g4r1";

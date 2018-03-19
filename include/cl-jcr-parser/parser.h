@@ -299,6 +299,7 @@ struct Grammar : private detail::NonCopyable
     typedef clutils::ptr_vector< Rule > rule_container_t;
 
     GrammarSet * p_grammar_set;
+    std::string jcr_source;
     std::string ruleset_id;
     std::vector< std::string > unaliased_imports;
     typedef std::string ruleset_id_alias_t;
@@ -307,7 +308,9 @@ struct Grammar : private detail::NonCopyable
     aliased_imports_t aliased_imports;
     rule_container_t rules;
 
-    Grammar( GrammarSet * p_grammar_set_in ) : p_grammar_set( p_grammar_set_in ) {}
+    Grammar( GrammarSet * p_grammar_set_in, std::string jcr_source_in )
+        : p_grammar_set( p_grammar_set_in ), jcr_source( jcr_source_in )
+    {}
 
     void add_unaliased_import( const std::string & r_import )
     {
@@ -370,9 +373,9 @@ public:
         m.grammars.push_back( pu_grammar.get() );
         return pu_grammar.release();
     }
-    Grammar * append_grammar()
+    Grammar * append_grammar( const std::string & jcr_source )
     {
-        return append( Grammar::uniq_ptr( new Grammar( this ) ) );
+        return append( Grammar::uniq_ptr( new Grammar( this, jcr_source ) ) );
     }
 
     void inc_error_count() { ++m.error_count; }
@@ -433,7 +436,7 @@ public:
     }
 
 private:
-    Status parse_grammar( cl::reader & reader );
+    Status parse_grammar( cl::reader & reader, const std::string & jcr_source );
 };
 
 class JCRParserWithReporter : public JCRParser

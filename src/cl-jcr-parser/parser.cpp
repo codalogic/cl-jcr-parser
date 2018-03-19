@@ -3662,21 +3662,21 @@ JCRParser::Status JCRParser::add_grammar( const char * p_file_name )
         return S_UNABLE_TO_OPEN_FILE;
     }
 
-    return parse_grammar( reader );
+    return parse_grammar( reader, p_file_name );
 }
 
 JCRParser::Status JCRParser::add_grammar( const std::string & rules )
 {
     cl::reader_string reader( rules );
 
-    return parse_grammar( reader );
+    return parse_grammar( reader, clutils::expand( "std::string @ ", (void *)&rules ) );
 }
 
 JCRParser::Status JCRParser::add_grammar( const char * p_rules, size_t size )
 {
     cl::reader_mem_buf reader( p_rules, size );
 
-    return parse_grammar( reader );
+    return parse_grammar( reader, clutils::expand( "const char * ", (void *)p_rules ) );
 }
 
 JCRParser::Status JCRParser::link()
@@ -3684,9 +3684,9 @@ JCRParser::Status JCRParser::link()
     return S_OK;
 }
 
-JCRParser::Status JCRParser::parse_grammar( cl::reader & reader )
+JCRParser::Status JCRParser::parse_grammar( cl::reader & reader, const std::string & jcr_source )
 {
-    GrammarParser parser( this, reader, m.p_grammar_set, m.p_grammar_set->append_grammar() );
+    GrammarParser parser( this, reader, m.p_grammar_set, m.p_grammar_set->append_grammar( jcr_source ) );
 
     parser.parse();
 
