@@ -75,7 +75,7 @@ bool capture_command_line( cljcr::Config * p_config, int argc, char ** argv )
 
 bool parse_config_jcrs( cljcr::GrammarSet * p_grammar_set, const cljcr::Config & r_config )
 {
-    cljcr::JCRFileParserWithReporter jcr_parser( p_grammar_set );
+    cljcr::JCRParserWithReporter jcr_parser( p_grammar_set );
     bool is_errored = false;
 
     for( size_t i = 0; i < r_config.jcr_size(); ++i )

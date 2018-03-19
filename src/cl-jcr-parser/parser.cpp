@@ -382,7 +382,7 @@ private:
 
     void report( const char * p_severity, const char * p_message )
     {
-        m.p_jcr_parser->report( m.r_reader.get_line_number(), m.r_reader.get_column_number(), p_severity, p_message );
+        m.p_jcr_parser->report( m.p_grammar->jcr_source, m.r_reader.get_line_number(), m.r_reader.get_column_number(), p_severity, p_message );
     }
 
     bool recover_to_eol()
@@ -3536,7 +3536,7 @@ private:
     }
     void report( const Rule * p_rule, const char * p_message )
     {
-        m.p_jcr_parser->report( p_rule->line_number, p_rule->column_number, "Error", p_message );
+        m.p_jcr_parser->report( p_rule->p_grammar->jcr_source, p_rule->line_number, p_rule->column_number, "Error", p_message );
     }
 
     bool is_reported_rule( const Rule * p_rule ) const

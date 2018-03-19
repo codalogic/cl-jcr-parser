@@ -430,9 +430,9 @@ public:
     Status add_grammar( const char * p_rules, size_t size );
     Status link();
 
-    virtual void report( size_t line, size_t column, const char * p_severity, const char * p_message )  // Inherit this class to get error message fed back to you
+    virtual void report( const std::string & source, size_t line, size_t column, const char * p_severity, const char * p_message )  // Inherit this class to get error message fed back to you
     {
-        (void)line; (void)column; (void)p_severity; (void)p_message; // Mark parameters as unused
+        (void)source; (void)line; (void)column; (void)p_severity; (void)p_message; // Mark parameters as unused
     }
 
 private:
@@ -443,34 +443,9 @@ class JCRParserWithReporter : public JCRParser
 {
 public:
     JCRParserWithReporter( GrammarSet * p_grammar_set ) : JCRParser( p_grammar_set ) {}
-    virtual void report( size_t line, size_t column, const char * p_severity, const char * p_message )
+    virtual void report( const std::string & source, size_t line, size_t column, const char * p_severity, const char * p_message )
     {
-        std::cout << p_severity << ": " << " (line: " << line;
-        if( column != ~0U )
-            std::cout << ", char: " << column;
-        std::cout <<
-                "):\n" <<
-                "      " << p_message << "\n";
-    }
-};
-
-class JCRFileParserWithReporter : public JCRParser
-{
-private:
-    struct Members {
-        std::string file;
-    } m;
-
-public:
-    JCRFileParserWithReporter( GrammarSet * p_grammar_set ) : JCRParser( p_grammar_set ) {}
-    JCRParser::Status add_grammar( const std::string & r_file )
-    {
-        m.file = r_file;
-        return JCRParser::add_grammar( m.file.c_str() );
-    }
-    virtual void report( size_t line, size_t column, const char * p_severity, const char * p_message )
-    {
-        std::cout << p_severity << ": " << m.file << " (line: " << line;
+        std::cout << p_severity << ": " << source << " (line: " << line;
         if( column != ~0U )
             std::cout << ", char: " << column;
         std::cout <<
