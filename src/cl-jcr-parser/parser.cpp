@@ -348,7 +348,6 @@ private:
     {
         return warning( expand( p_format, r_arg_1, r_arg_2 ).c_str() );
     }
-    #define error_todo error    // DEGUG - TODO - Review and replace allow messages in error_todo comments
     bool error( const char * p_message )
     {
         m.p_grammar_set->inc_error_count();
@@ -364,7 +363,6 @@ private:
     {
         return error( expand( p_format, r_arg_1, r_arg_2 ).c_str() );
     }
-    #define fatal_todo fatal    // DEGUG - TODO - Review and replace allow messages in fatal_todo comments
     bool fatal( const char * p_message )
     {
         m.p_grammar_set->inc_error_count();
