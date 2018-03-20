@@ -1,0 +1,3 @@
+Warning: 3-multi-line-directives/unknown-directive-with-utf-8-parameters-in-qstring.jcr (line: 1, char: 44):
+      Unknown directive: unknown-directive
+0 error(s), 1 warning(s)
