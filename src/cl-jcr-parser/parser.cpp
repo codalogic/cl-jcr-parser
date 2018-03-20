@@ -3438,6 +3438,13 @@ std::string GrammarParser::error_token()    // Attempts to extract the token tha
             token += current();
     }
 
+    else if( (current() & 0x80) != 0 )
+    {
+        // A UTF-8 character
+        while( (get() & 0x80) != 0 )
+            token += current();
+    }
+
     else
     {
         // Was probably some form of punctuation - already added to 'token' return value

@@ -1,4 +1,4 @@
-Tests run on Tue Mar 20 09:42:55 2018
+Tests run on Tue Mar 20 10:14:14 2018
 
     Config - Configuration [test-config.cpp:40]
     ===========================================
@@ -2462,12 +2462,11 @@ jcr-version
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
 
-TODOs (5):
+TODOs (4):
 ------------------------
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:42]
 - Test low level GrammarSet class [test-low-level-objects.cpp:379]
 - Investigate changes needed to remove requirement for g++ -Wno-parentheses flag [test-main.cpp:39]
 - Make sure UTF-8 characters in comments do not cause problems [test-main.cpp:40]
-- Modify GrammarParser::error_token() so it will grab whole UTF-8 characters [test-main.cpp:41]
 
-0 error(s), 5 todo(s), 1911 test(s)
+0 error(s), 4 todo(s), 1911 test(s)
