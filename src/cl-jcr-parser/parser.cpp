@@ -490,7 +490,7 @@ bool is_jcr_comment_char( char c )
 {
     // comment_char() = HTAB() / %x20-10FFFF
 
-    return c == '\t' || c >= 0x20;
+    return c == '\t' || c >= 0x20 || ((c & 0x80) != 0);
 }
 
 bool GrammarParser::comment_char()
