@@ -2886,7 +2886,7 @@ bool is_qstring_unescaped( char c )
 {
     // unescaped        = %x20-21 / %x23-5B / %x5D-10FFFF
 
-    return c >= 0x20 && c <= 0x21 || c >= 0x23 && c <= 0x5b || c >= 0x5d;
+    return c >= 0x20 && c <= 0x21 || c >= 0x23 && c <= 0x5b || c >= 0x5d || ((c & 0x80) != 0);
 }
 
 bool GrammarParser::unescaped()
