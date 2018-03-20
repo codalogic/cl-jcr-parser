@@ -1,1 +1,1 @@
-$my-rule =: @{ foo } integer
+$my-rule =: @{ foo } @{bar junk} integer

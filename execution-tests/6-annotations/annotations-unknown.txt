@@ -1,3 +1,5 @@
-Fatal: 6-annotations/annotations-unknown.jcr (line: 1, char: 19):
+Error: 6-annotations/annotations-unknown.jcr (line: 1, char: 19):
       Unknown <annotation>: 'foo'
-1 error(s), 0 warning(s)
+Error: 6-annotations/annotations-unknown.jcr (line: 1, char: 31):
+      Unknown <annotation>: 'bar'
+2 error(s), 0 warning(s)

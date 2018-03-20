@@ -1352,7 +1352,7 @@ bool GrammarParser::tbd_annotation()
     if( name_accumulator.get() == "id" || name_accumulator.get() == "assert" || name_accumulator.get() == "when" || name_accumulator.get() == "doc" )
         warning( "Unimplemented <annotation>: '%0'", name_accumulator.get() ); // See Leave_as_warning
     else if( ! name_accumulator.get().empty() )
-        fatal( "Unknown <annotation>: '%0'", name_accumulator.get() );
+        error( "Unknown <annotation>: '%0'", name_accumulator.get() );
     else
         fatal( "Expected <annotation> name. Got: '%0'", error_token() );
 
