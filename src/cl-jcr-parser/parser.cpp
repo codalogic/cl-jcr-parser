@@ -2945,7 +2945,7 @@ bool is_not_slash( char c )
     // not_slash() = HTAB() || CR() || LF() / %x20-2E / %x30-10FFFF
 
     return c == '\t' || c == '\r' || c == '\n' ||
-            c >= 0x20 && c <= 0x2e || c >= 0x30;
+            c >= 0x20 && c <= 0x2e || c >= 0x30 || ((c & 0x80) != 0);
 }
 
 bool GrammarParser::not_slash()
