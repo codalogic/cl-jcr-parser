@@ -37,4 +37,5 @@
 TFEATURE( "Miscellaneous TODOs" )
 {
     TTODO( "Investigate changes needed to remove requirement for g++ -Wno-parentheses flag" );
+    TTODO( "Make sure same error isn't reported more than once. This can happen due to repeated parsing of annotations. Maybe keep a std::set of reported errors" );
 }
