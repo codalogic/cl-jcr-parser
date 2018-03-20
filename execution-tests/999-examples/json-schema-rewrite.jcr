@@ -1,0 +1,8 @@
+#jcr-version 0.9
+; Product – A Product for Acme’s catalog
+{
+	"id" : integer, ; Unique identifier for the product
+	"name" : string, ; Name of the product
+	"price" : 0.0..,
+	"tags" : [ string + ] ?
+}

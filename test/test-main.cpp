@@ -37,4 +37,6 @@
 TFEATURE( "Miscellaneous TODOs" )
 {
     TTODO( "Investigate changes needed to remove requirement for g++ -Wno-parentheses flag" );
+    TTODO( "Make sure UTF-8 characters in comments do not cause problems" );
+    TTODO( "Modify GrammarParser::error_token() so it will grab whole UTF-8 characters" );
 }
