@@ -70,14 +70,23 @@ struct Annotations
     bool is_not;
     bool is_unordered;
     bool is_root;
+    bool is_exclude_min;
+    bool is_exclude_max;
+    bool is_defaulted;
+    std::string default_value;
 
-    Annotations() : is_not( false ), is_unordered( false ), is_root( false ) {}
-    void clear() { is_not = is_unordered = is_root = false; }
+    Annotations() { clear(); }
+    void clear() { is_not = is_unordered = is_root = is_exclude_min = is_exclude_max = is_defaulted = false; }
     bool merge( const Annotations & r_rhs )
     {
         is_not = ( is_not || r_rhs.is_not );
         is_unordered = ( is_unordered || r_rhs.is_unordered );
         is_root = ( is_root || r_rhs.is_root );
+        is_exclude_min = ( is_exclude_min || r_rhs.is_exclude_min );
+        is_exclude_max = ( is_exclude_max || r_rhs.is_exclude_max );
+        is_defaulted = ( is_defaulted || r_rhs.is_defaulted );
+        if( r_rhs.is_defaulted )
+            default_value = r_rhs.default_value;
         return true;
     }
 };

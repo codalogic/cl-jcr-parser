@@ -2654,6 +2654,82 @@ TFEATURE( "GrammarParser - Syntax parsing - annotations" )
                         "$my_rule = [ @{id type}@{assert $==/^\\w{1,4}$/ ; Must for 4 or less chars{}\n} string, float? ]\n" ) );
     TCALL( test_parsing_only(
                         "$my_rule=[@{not}string,float ]\n" ) );
+
+    {
+        TSETUP( ParserHarness ph( "$my_rule= @{exclude-min} 0..100\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TTEST( ph.grammar().rules[0].annotations.is_exclude_min );
+        TTEST( ! ph.grammar().rules[0].annotations.is_exclude_max );
+        TTEST( ! ph.grammar().rules[0].annotations.is_defaulted );
+    }
+
+    {
+        TSETUP( ParserHarness ph( "$my_rule= @{exclude-max} 0..100\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TTEST( ! ph.grammar().rules[0].annotations.is_exclude_min );
+        TTEST( ph.grammar().rules[0].annotations.is_exclude_max );
+        TTEST( ! ph.grammar().rules[0].annotations.is_defaulted );
+    }
+
+    {
+        TSETUP( ParserHarness ph( "$my_rule= @{exclude-min} @{exclude-max} 0..100\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TTEST( ph.grammar().rules[0].annotations.is_exclude_min );
+        TTEST( ph.grammar().rules[0].annotations.is_exclude_max );
+        TTEST( ! ph.grammar().rules[0].annotations.is_defaulted );
+    }
+
+    {
+        TSETUP( ParserHarness ph( "$my_rule= @{default false} boolean\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TTEST( ph.grammar().rules[0].annotations.is_defaulted );
+        TTEST( ph.grammar().rules[0].annotations.default_value == "false" );
+    }
+
+    {
+        TSETUP( ParserHarness ph( "$my_rule= @{default null} (null | boolean)\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TTEST( ph.grammar().rules[0].annotations.is_defaulted );
+        TTEST( ph.grammar().rules[0].annotations.default_value == "null" );
+    }
+
+    {
+        TSETUP( ParserHarness ph( "$my_rule= @{default true} boolean\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TTEST( ph.grammar().rules[0].annotations.is_defaulted );
+        TTEST( ph.grammar().rules[0].annotations.default_value == "true" );
+    }
+
+    {
+        TSETUP( ParserHarness ph( "$my_rule= @{default 10} 0..100\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TTEST( ph.grammar().rules[0].annotations.is_defaulted );
+        TTEST( ph.grammar().rules[0].annotations.default_value == "10" );
+    }
+
+    {
+        TSETUP( ParserHarness ph( "$my_rule= @{default 10.1} 0.0..100.0\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TTEST( ph.grammar().rules[0].annotations.is_defaulted );
+        TTEST( ph.grammar().rules[0].annotations.default_value == "10.1" );
+    }
+
+    {
+        TSETUP( ParserHarness ph( "$my_rule= @{default \"open\" } string\n" ) );
+        TCRITICALTEST( ph.status() == JCRParser::S_OK );
+        TCRITICALTEST( ph.grammar().rules.size() == 1 );
+        TTEST( ph.grammar().rules[0].annotations.is_defaulted );
+        TTEST( ph.grammar().rules[0].annotations.default_value == "\"open\"" );
+    }
+
     TCALL( test_parsing_bad_input(
                         "$my_rule=[@{unknown}string,float ]\n" ) );
 }

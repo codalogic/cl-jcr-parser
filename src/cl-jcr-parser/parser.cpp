@@ -6,7 +6,7 @@
 // this file, you can obtain one at http://opensource.org/licenses/LGPL-3.0.
 //----------------------------------------------------------------------------
 
-// Implements jcr-abnf - 2018-02-01
+// Implements jcr-abnf - 2018-03-22
 
 //----------------------------------------------------------------------------
 // Notes:
@@ -175,6 +175,10 @@ private:
     bool not_annotation( Annotations & );
     bool unordered_annotation( Annotations & );
     bool root_annotation( Annotations & );
+    bool exclude_min_annotation( Annotations & );
+    bool exclude_max_annotation( Annotations & );
+    bool default_annotation( Annotations & );
+    bool primitive_value();
     bool tbd_annotation();
     bool annotation_name();
     bool annotation_parameters();
@@ -290,8 +294,11 @@ private:
     bool boolean_kw();
     bool date_kw();
     bool datetime_kw();
+    bool default_kw();
     bool double_kw();
     bool email_kw();
+    bool exclude_max_kw();
+    bool exclude_min_kw();
     bool false_kw();
     bool float_kw();
     bool fqdn_kw();
@@ -397,6 +404,12 @@ private:
         while( skip_until( cl::alphabet_char( c ) ) )
         {}
         get();  // Chew the target character
+        return true;
+    }
+    bool recover_to_before( char c )
+    {
+        while( skip_until( cl::alphabet_char( c ) ) )
+        {}
         return true;
     }
     bool abandon_path()
@@ -1277,8 +1290,6 @@ bool GrammarParser::annotations( Annotations & r_annotations )
     */
     // *( "@{" && *sp_cmt() && annotation_set() && *sp_cmt() && "}" && *sp_cmt() )
 
-    // *( "@{" && *sp_cmt() && annotation_set() && *sp_cmt() && "}" && *sp_cmt() )
-
     while( fixed( "@{" ) )
     {
         star_sp_cmt() &&
@@ -1293,17 +1304,22 @@ bool GrammarParser::annotations( Annotations & r_annotations )
 
 bool GrammarParser::annotation_set( Annotations & r_annotations )
 {
-    /* ABNF:
+    /* ABNF: 
     annotation-set   = not-annotation / unordered-annotation /
-                   root-annotation / tbd-annotation
+                       root-annotation /
+                       exclude-min-annotation / exclude-max-annotation /
+                       default-annotation / tbd-annotation
     */
-    // not_annotation() || unordered_annotation() || root_annotation() || tbd_annotation()
+    // not_annotation() || unordered_annotation() || root_annotation() || exclude_min_annotation() || exclude_max_annotation() || default_annotation() || tbd_annotation()
 
     cl::locator loc( this );    // Current annotations don't benefit from rewind_on_reject(), but maintain the pattern for consistency and possible future proofing
 
     return rewind_on_reject( not_annotation( r_annotations ) ) ||
             rewind_on_reject( unordered_annotation( r_annotations ) ) ||
             rewind_on_reject( root_annotation( r_annotations ) ) ||
+            rewind_on_reject( exclude_min_annotation( r_annotations ) ) ||
+            rewind_on_reject( exclude_max_annotation( r_annotations ) ) ||
+            rewind_on_reject( default_annotation( r_annotations ) ) ||
             rewind_on_reject( tbd_annotation() ) ||
             fatal( "Unrecognised <annotation> format. Got: '%0'" );     // Calling fatal() will throw an exception
 }
@@ -1336,6 +1352,68 @@ bool GrammarParser::root_annotation( Annotations & r_annotations )
     // root_kw()
 
     return root_kw() && set( r_annotations.is_root, true );
+}
+
+bool GrammarParser::exclude_min_annotation( Annotations & r_annotations )
+{
+    /* ABNF: 
+    exclude-min-annotation = exclude-min-kw
+    */
+    // exclude_min_kw()
+
+    return exclude_min_kw() && set( r_annotations.is_exclude_min, true );
+}
+
+bool GrammarParser::exclude_max_annotation( Annotations & r_annotations )
+{
+    /* ABNF: 
+    exclude-max-annotation = exclude-max-kw
+    */
+    // exclude_max_kw()
+
+    return exclude_max_kw() && set( r_annotations.is_exclude_max, true );
+}
+
+bool GrammarParser::default_annotation( Annotations & r_annotations )
+{
+    /* ABNF: 
+    default-annotation = default-kw spaces primitive-value
+    */
+    // default_kw() && spaces() && primitive_value()
+
+    if( default_kw() )
+    {
+        cl::accumulator default_accumulator( this );
+
+         if( (spaces() || fatal( "Expected <spaces> after 'default' keyword in @{default} <annotation>. Got '%0'", error_token() )) &&
+                 (primitive_value() || fatal( "Expected <primitive-value> in @{default} <annotation>. Got '%0'", error_token() )) &&
+                 set( r_annotations.is_defaulted, true ) )
+        {
+            r_annotations.default_value = default_accumulator.get();
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+bool GrammarParser::primitive_value()
+{
+    /* ABNF: 
+    primitive-value  = false-value / null-type / true-value /
+                   float-value / integer-value / string-value
+    */
+    // false_value() || null_type() || true_value() || float_value() || integer_value() || string_value()
+
+    cl::locator loc( this );
+
+    return rewind_on_reject( false_kw() && accumulator_append( "false" ) ) ||
+            rewind_on_reject( null_kw() && accumulator_append( "null" ) ) ||
+            rewind_on_reject( true_kw() && accumulator_append( "true" ) ) ||
+            rewind_on_reject( float_num() ) ||
+            rewind_on_reject( integer() ) ||
+            rewind_on_reject( q_string() );
 }
 
 bool GrammarParser::tbd_annotation()
@@ -2680,8 +2758,10 @@ bool GrammarParser::float_num()
     // [ minus() ] && int() && frac() [ exp() ]
 
     cl::locator loc( this );
+    
+    cl::accumulator float_accumulator( this );
 
-    return optional( minus() ) && int_num() && frac() && optional( exp() ) || location_top( false );
+    return accumulate_atomic( optional( minus() ) && int_num() && frac() && optional( exp() ) || location_top( false ) );
 }
 
 bool GrammarParser::minus()
@@ -3070,6 +3150,16 @@ bool GrammarParser::datetime_kw()
     return fixed( "datetime" );
 }
 
+bool GrammarParser::default_kw()
+{
+    /* ABNF: 
+    default-kw       = %x64.65.66.61.75.6C.74          ; "default"
+    */
+    // %x64.65.66.61.75.6C.74          ; "default"
+
+    return fixed( "default" );
+}
+
 bool GrammarParser::double_kw()
 {
     /* ABNF:
@@ -3088,6 +3178,26 @@ bool GrammarParser::email_kw()
     // %x65.6D.61.69.6C                ; "email"
 
     return fixed( "email" );
+}
+
+bool GrammarParser::exclude_max_kw()
+{
+    /* ABNF: 
+    exclude-max-kw   = %x65.78.63.6C.75.64.65.2D.6D.61.78 ; "exclude-max"
+    */
+    // %x65.78.63.6C.75.64.65.2D.6D.61.78 ; "exclude-max"
+
+    return fixed( "exclude-max" );
+}
+
+bool GrammarParser::exclude_min_kw()
+{
+    /* ABNF: 
+    exclude-min-kw   = %x65.78.63.6C.75.64.65.2D.6D.69.6E ; "exclude-min"
+    */
+    // %x65.78.63.6C.75.64.65.2D.6D.69.6E ; "exclude-min"
+
+    return fixed( "exclude-min" );
 }
 
 bool GrammarParser::false_kw()
