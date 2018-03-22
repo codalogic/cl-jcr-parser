@@ -1,0 +1,9 @@
+Error: 6-annotations/annotations-unknown-2.jcr (line: 1, char: 21):
+      Unknown <annotation>: 'bar'
+Error: 6-annotations/annotations-unknown-2.jcr (line: 1, char: 21):
+      Unknown <annotation>: 'bar'
+Error: 6-annotations/annotations-unknown-2.jcr (line: 1, char: 21):
+      Unknown <annotation>: 'bar'
+Error: 6-annotations/annotations-unknown-2.jcr (line: 1, char: 21):
+      Unknown <annotation>: 'bar'
+4 error(s), 0 warning(s)
