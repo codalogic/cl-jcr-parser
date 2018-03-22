@@ -1407,13 +1407,14 @@ bool GrammarParser::primitive_value()
     // false_value() || null_type() || true_value() || float_value() || integer_value() || string_value()
 
     cl::locator loc( this );
+    cl::accumulator acc( this );
 
-    return rewind_on_reject( false_kw() && accumulator_append( "false" ) ) ||
-            rewind_on_reject( null_kw() && accumulator_append( "null" ) ) ||
-            rewind_on_reject( true_kw() && accumulator_append( "true" ) ) ||
-            rewind_on_reject( float_num() ) ||
-            rewind_on_reject( integer() ) ||
-            rewind_on_reject( q_string() );
+    return rewind_on_reject( accumulate_atomic( false_kw() && accumulator_append( "false" ) ) ) ||
+            rewind_on_reject( accumulate_atomic( null_kw() && accumulator_append( "null" ) ) ) ||
+            rewind_on_reject( accumulate_atomic( true_kw() && accumulator_append( "true" ) ) ) ||
+            rewind_on_reject( accumulate_atomic( float_num() ) ) ||
+            rewind_on_reject( accumulate_atomic( integer() ) ) ||
+            rewind_on_reject( accumulate_atomic( q_string() ) );
 }
 
 bool GrammarParser::tbd_annotation()
@@ -2759,9 +2760,7 @@ bool GrammarParser::float_num()
 
     cl::locator loc( this );
     
-    cl::accumulator float_accumulator( this );
-
-    return accumulate_atomic( optional( minus() ) && int_num() && frac() && optional( exp() ) || location_top( false ) );
+    return optional( minus() ) && int_num() && frac() && optional( exp() ) || location_top( false );
 }
 
 bool GrammarParser::minus()
@@ -3808,6 +3807,23 @@ JCRParser::Status JCRParser::parse_grammar( cl::reader & reader, const std::stri
     parser.parse();
 
     return parser.status();
+}
+
+//----------------------------------------------------------------------------
+//                           class JCRParserWithReporter
+//----------------------------------------------------------------------------
+
+void JCRParserWithReporter::report( const std::string & source, size_t line, size_t column, const char * p_severity, const char * p_message )
+{
+    std::ostringstream oss;
+    oss << p_severity << ": " << source << " (line: " << line;
+    if( column != ~0U )
+        oss << ", char: " << column;
+    oss <<
+            "):\n" <<
+            "      " << p_message << "\n";
+    std::string constructed_message = oss.str();
+    std::cout << constructed_message;
 }
 
 //----------------------------------------------------------------------------

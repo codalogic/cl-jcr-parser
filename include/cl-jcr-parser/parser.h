@@ -452,15 +452,7 @@ class JCRParserWithReporter : public JCRParser
 {
 public:
     JCRParserWithReporter( GrammarSet * p_grammar_set ) : JCRParser( p_grammar_set ) {}
-    virtual void report( const std::string & source, size_t line, size_t column, const char * p_severity, const char * p_message )
-    {
-        std::cout << p_severity << ": " << source << " (line: " << line;
-        if( column != ~0U )
-            std::cout << ", char: " << column;
-        std::cout <<
-                "):\n" <<
-                "      " << p_message << "\n";
-    }
+    virtual void report( const std::string & source, size_t line, size_t column, const char * p_severity, const char * p_message );
 };
 
 }   // namespace cljcr
