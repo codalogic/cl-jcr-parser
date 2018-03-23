@@ -1,3 +1,3 @@
-Fatal: 3-multi-line-directives/jcr-version-directive-bad-format-5.jcr (line: 1, char: 14):
+Fatal error: 3-multi-line-directives/jcr-version-directive-bad-format-5.jcr (line: 1, char: 14):
       Expected <major-version> in #jcr-directive. Got '.9.0'
 1 error(s), 0 warning(s)

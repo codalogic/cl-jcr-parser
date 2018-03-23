@@ -343,8 +343,7 @@ private:
 
     bool warning( const char * p_message )
     {
-        m.p_grammar_set->inc_warning_count();
-        report( "Warning", p_message );
+        report( Severity::WARNING, p_message );
         return true;
     }
     bool warning( const char * p_format, const clutils::str_args & r_arg_1 )
@@ -357,8 +356,7 @@ private:
     }
     bool error( const char * p_message )
     {
-        m.p_grammar_set->inc_error_count();
-        report( "Error", p_message );
+        report( Severity::ERROR, p_message );
         m.is_errored = true;
         return true;    // Return 'true', because if we are throwing an error it suggests we're on the right parse path, but have an invalid token.  And we'd usually want to recover from this with an && clause.
     }
@@ -372,8 +370,7 @@ private:
     }
     bool fatal( const char * p_message )
     {
-        m.p_grammar_set->inc_error_count();
-        report( "Fatal", p_message );
+        report( Severity::FATAL, p_message );
         m.is_errored = true;
         throw GrammarParserFatalError();
         return false;
@@ -387,9 +384,9 @@ private:
         return fatal( expand( p_format, r_arg_1, r_arg_2 ).c_str() );
     }
 
-    void report( const char * p_severity, const char * p_message )
+    void report( Severity severity, const char * p_message )
     {
-        m.p_jcr_parser->report( m.p_grammar->jcr_source, m.r_reader.get_line_number(), m.r_reader.get_column_number(), p_severity, p_message );
+        m.p_jcr_parser->report( m.p_grammar->jcr_source, m.r_reader.get_line_number(), m.r_reader.get_column_number(), severity, p_message );
     }
 
     bool recover_to_eol()
@@ -3652,7 +3649,7 @@ private:
     }
     void report( const Rule * p_rule, const char * p_message )
     {
-        m.p_jcr_parser->report( p_rule->p_grammar->jcr_source, p_rule->line_number, p_rule->column_number, "Error", p_message );
+        m.p_jcr_parser->report( p_rule->p_grammar->jcr_source, p_rule->line_number, p_rule->column_number, Severity::ERROR, p_message );
     }
 
     bool is_reported_rule( const Rule * p_rule ) const
@@ -3813,17 +3810,28 @@ JCRParser::Status JCRParser::parse_grammar( cl::reader & reader, const std::stri
 //                           class JCRParserWithReporter
 //----------------------------------------------------------------------------
 
-void JCRParserWithReporter::report( const std::string & source, size_t line, size_t column, const char * p_severity, const char * p_message )
+void JCRParserWithReporter::report( const std::string & source, size_t line, size_t column, Severity severity, const char * p_message )
 {
     std::ostringstream oss;
-    oss << p_severity << ": " << source << " (line: " << line;
+    oss << severity << ": " << source << " (line: " << line;
     if( column != ~0U )
         oss << ", char: " << column;
     oss <<
             "):\n" <<
             "      " << p_message << "\n";
     std::string constructed_message = oss.str();
-    std::cout << constructed_message;
+
+    if( reported_messages.find( constructed_message ) == reported_messages.end() )
+    {
+        std::cout << constructed_message;
+
+        if( severity == Severity::WARNING )
+            grammar_set()->inc_warning_count();
+        else
+            grammar_set()->inc_error_count();
+
+        reported_messages.insert( constructed_message );
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -1,3 +1,3 @@
-Fatal: 5-types/bad-sized-uint-too-small.jcr (line: 1, char: 7):
+Fatal error: 5-types/bad-sized-uint-too-small.jcr (line: 1, char: 7):
       Expected <rule-def> after '=' in rule definition. Got: 'uint-1'
 1 error(s), 0 warning(s)

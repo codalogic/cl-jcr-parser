@@ -1,3 +1,3 @@
-Fatal: 2-one-line-directives/jcr-version-directive-bad-format-2.jcr (line: 1, char: 17):
+Fatal error: 2-one-line-directives/jcr-version-directive-bad-format-2.jcr (line: 1, char: 17):
       Expected '.' after <major-version> in #jcr-directive. Got '<end-of-input>'
 1 error(s), 0 warning(s)

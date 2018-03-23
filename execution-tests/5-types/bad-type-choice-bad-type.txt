@@ -1,3 +1,3 @@
-Fatal: 5-types/bad-type-choice-bad-type.jcr (line: 1, char: 24):
+Fatal error: 5-types/bad-type-choice-bad-type.jcr (line: 1, char: 24):
       Expected <type-choice-item> after <choice-combiner> in <type-choice>. Got: 'intty'
 1 error(s), 0 warning(s)

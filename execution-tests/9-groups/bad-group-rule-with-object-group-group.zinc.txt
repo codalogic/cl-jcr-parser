@@ -1,3 +1,3 @@
-Fatal: 9-groups/bad-group-rule-with-object-group-group.jcr (line: 1, char: 36):
+Fatal error: 9-groups/bad-group-rule-with-object-group-group.jcr (line: 1, char: 36):
       Unexpected character in <group-rule> or <group-group>. Got: '&'
 1 error(s), 0 warning(s)

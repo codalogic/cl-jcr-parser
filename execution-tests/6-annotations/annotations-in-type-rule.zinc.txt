@@ -1,3 +1,3 @@
-Fatal: 6-annotations/annotations-in-type-rule.jcr (line: 1, char: 11):
+Fatal error: 6-annotations/annotations-in-type-rule.jcr (line: 1, char: 11):
       Expected <rule-def> after '=' in rule definition. Got: '@'
 1 error(s), 0 warning(s)

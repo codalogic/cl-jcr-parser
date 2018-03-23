@@ -1,4 +1,4 @@
-Tests run on Thu Mar 22 18:00:35 2018
+Tests run on Fri Mar 23 14:32:53 2018
 
     Config - Configuration [test-config.cpp:40]
     ===========================================
@@ -2510,11 +2510,10 @@ jcr-version
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
 
-TODOs (4):
+TODOs (3):
 ------------------------
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:42]
 - Test low level GrammarSet class [test-low-level-objects.cpp:379]
 - Investigate changes needed to remove requirement for g++ -Wno-parentheses flag [test-main.cpp:39]
-- Make sure same error isn't reported more than once. This can happen due to repeated parsing of annotations. Maybe keep a std::set of reported errors [test-main.cpp:40]
 
-0 error(s), 4 todo(s), 1950 test(s)
+0 error(s), 3 todo(s), 1950 test(s)

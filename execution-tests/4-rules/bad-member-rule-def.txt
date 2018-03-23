@@ -1,3 +1,3 @@
-Fatal: 4-rules/bad-member-rule-def.jcr (line: 1, char: 21):
+Fatal error: 4-rules/bad-member-rule-def.jcr (line: 1, char: 21):
       Expected <type-rule> after <member-name> "width". Got 'void'
 1 error(s), 0 warning(s)

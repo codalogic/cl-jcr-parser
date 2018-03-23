@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------------
-// Copyright (c) 2015-2017, Codalogic Ltd (http://www.codalogic.com)
+// Copyright (c) 2015-2018, Codalogic Ltd (http://www.codalogic.com)
 //
 // This Source Code is subject to the terms of the GNU LESSER GENERAL PUBLIC
 // LICENSE version 3. If a copy of the LGPLv3 was not distributed with
@@ -14,6 +14,7 @@
 #include <cassert>
 #include <memory>
 #include <map>
+#include <set>
 #include <string>
 #include <cstdlib>
 #include <iostream>
@@ -55,6 +56,45 @@ struct uniq_ptr
     typedef std::int64_t int64;
     typedef std::uint64_t uint64;
 #endif
+
+class Severity
+{
+public:
+    enum Type { WARNING, ERROR, FATAL };
+
+private:
+    Type value;
+
+public:
+    Severity() : value( WARNING ) {}
+    Severity( const Severity & r_rhs ) : value( r_rhs.value ) {}
+    Severity & operator = ( const Severity & r_rhs ) { value = r_rhs.value; return *this; }
+
+    Severity( Severity::Type e ) : value( e ) {}
+    Severity & operator = ( Severity::Type e ) { value = e; return *this; }
+
+    bool operator == ( const Severity & r_rhs ) const { return value == r_rhs.value; }
+    bool operator == ( Severity::Type e ) const { return value == e; }
+    bool operator != ( const Severity & r_rhs ) const { return value != r_rhs.value; }
+    bool operator != ( Severity::Type e ) const { return value != e; }
+
+    Severity::Type to_enum() const { return value; }
+    operator Severity::Type () const { return to_enum(); }
+
+    const char * to_s() const
+    {
+        switch( value )
+        {
+            case WARNING: return "Warning";
+            case ERROR: return "Error";
+            case FATAL: return "Fatal error";
+        }
+        return "<Error: invalid enum recorded>";
+    }
+    operator const char * () { return to_s(); }
+};
+
+inline std::ostream & operator << ( std::ostream & r_os, const Severity & r_v ) { r_os << r_v.to_s(); return r_os; }
 
 struct Repetition
 {
@@ -434,14 +474,15 @@ private:
 
 public:
     JCRParser( GrammarSet * p_grammar_set ) : m( p_grammar_set ) {}
+    GrammarSet * grammar_set() const { return m.p_grammar_set; }
     Status add_grammar( const char * p_file_name );
     Status add_grammar( const std::string & rules );
     Status add_grammar( const char * p_rules, size_t size );
     Status link();
 
-    virtual void report( const std::string & source, size_t line, size_t column, const char * p_severity, const char * p_message )  // Inherit this class to get error message fed back to you
+    virtual void report( const std::string & source, size_t line, size_t column, Severity severity, const char * p_message )  // Inherit this class to get error message fed back to you
     {
-        (void)source; (void)line; (void)column; (void)p_severity; (void)p_message; // Mark parameters as unused
+        (void)source; (void)line; (void)column; (void)severity; (void)p_message; // Mark parameters as unused
     }
 
 private:
@@ -450,9 +491,12 @@ private:
 
 class JCRParserWithReporter : public JCRParser
 {
+private:
+    std::set< std::string > reported_messages;
+
 public:
     JCRParserWithReporter( GrammarSet * p_grammar_set ) : JCRParser( p_grammar_set ) {}
-    virtual void report( const std::string & source, size_t line, size_t column, const char * p_severity, const char * p_message );
+    virtual void report( const std::string & source, size_t line, size_t column, Severity severity, const char * p_message );
 };
 
 }   // namespace cljcr
