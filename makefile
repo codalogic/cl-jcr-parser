@@ -29,7 +29,7 @@ fresh: clean all
 
 $(OUT_DIR)$(EXECUTABLE): $(MAINOBJ) $(COREOBJ)
 	$(CXX) -static -o $(OUT_DIR)$(EXECUTABLE) $(MAINOBJ) $(COREOBJ)
-	$(OUT_DIR)$(EXECUTABLE)
+	-$(OUT_DIR)$(EXECUTABLE)
 
 $(OUT_DIR)%.o : src/%.cpp
 	$(MKDIR_P) $(dir $@)
