@@ -1,4 +1,4 @@
-Tests run on Fri Mar 23 14:32:53 2018
+Tests run on Fri Mar 23 20:12:38 2018
 
     Config - Configuration [test-config.cpp:40]
     ===========================================
@@ -45,8 +45,22 @@ Tests run on Fri Mar 23 14:32:53 2018
     ok: p_const_g1r2->target_rule.p_rule == 0
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Global linking [test-linking.cpp:134]
+    Global linking [test-linking.cpp:135]
     =====================================
+    ok: jp.link( p_g1 ) == JCRParser::S_OK
+    ok: p_g1->rules[0].target_rule.p_rule == p_g1r2
+    ok: p_g1->rules[0].p_rule == p_g1r1
+    ok: p_g1->rules[0].p_type == p_g1r2
+    ok: jp.link( p_g1 ) == JCRParser::S_OK
+    ok: p_g1->rules[0].target_rule.p_rule == p_g1r2
+    ok: p_g1->rules[0].p_rule == p_g1r1
+    ok: p_g1->rules[0].p_type == p_g1r3
+    ok: jp.link( p_g1 ) == JCRParser::S_OK
+    ok: p_g1->rules[0].target_rule.p_rule == p_g1r2
+    ok: p_g1->rules[0].p_rule == p_g1r1
+    ok: p_g1->rules[0].p_type == p_g1r4
+    ok: jp.link( &(*pu_gs)[0] ) == JCRParser::S_OK
+    ok: (*pu_gs)[0].rules[0].target_rule.p_rule != 0
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
     ValueConstraint [test-low-level-objects.cpp:40]
@@ -2516,4 +2530,4 @@ TODOs (3):
 - Test low level GrammarSet class [test-low-level-objects.cpp:379]
 - Investigate changes needed to remove requirement for g++ -Wno-parentheses flag [test-main.cpp:39]
 
-0 error(s), 3 todo(s), 1950 test(s)
+0 error(s), 3 todo(s), 1964 test(s)

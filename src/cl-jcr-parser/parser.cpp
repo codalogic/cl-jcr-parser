@@ -3598,8 +3598,7 @@ private:
 
         bool is_looped() const
         {
-            LoopDetector * p_loop_detector = p_prev;
-            while( p_loop_detector )
+            for( LoopDetector * p_loop_detector = p_prev; p_loop_detector; p_loop_detector = p_loop_detector->p_prev )
                 if( p_loop_detector->p_rule == p_rule )
                     return true;
             return false;
@@ -3794,7 +3793,16 @@ JCRParser::Status JCRParser::add_grammar( const char * p_rules, size_t size )
 
 JCRParser::Status JCRParser::link()
 {
-    return S_OK;
+    Linker linker( this, m.p_grammar_set );
+
+    return linker.link() ? S_OK : S_ERROR;
+}
+
+JCRParser::Status JCRParser::link( Grammar * p_grammar )
+{
+    Linker linker( this, m.p_grammar_set );
+
+    return linker.link( p_grammar ) ? S_OK : S_ERROR;
 }
 
 JCRParser::Status JCRParser::parse_grammar( cl::reader & reader, const std::string & jcr_source )

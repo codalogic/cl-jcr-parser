@@ -1,4 +1,4 @@
-Tests table of contents generated on Fri Mar 23 14:32:53 2018
+Tests table of contents generated on Fri Mar 23 20:12:38 2018
 
 # test-config.cpp
 | Description | Line |
@@ -14,7 +14,7 @@ Tests table of contents generated on Fri Mar 23 14:32:53 2018
 | Description | Line |
 |-------------|------|
 | Linking Rule::find_target_rule() | 40 |
-| Global linking | 134 |
+| Global linking | 135 |
 
 # test-low-level-objects.cpp
 | Description | Line |

@@ -479,6 +479,7 @@ public:
     Status add_grammar( const std::string & rules );
     Status add_grammar( const char * p_rules, size_t size );
     Status link();
+    Status link( Grammar * p_grammar );
 
     virtual void report( const std::string & source, size_t line, size_t column, Severity severity, const char * p_message )  // Inherit this class to get error message fed back to you
     {
