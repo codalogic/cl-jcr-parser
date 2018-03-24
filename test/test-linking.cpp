@@ -424,3 +424,6 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
     }
 }
+
+TFEATURETODO( "Test linking across multiple grammars" )
+TFEATURETODO( "Check for duplicately (or multiply) named global rules" )

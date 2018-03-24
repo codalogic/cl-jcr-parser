@@ -1,4 +1,4 @@
-Tests run on Sat Mar 24 17:25:56 2018
+Tests run on Sat Mar 24 22:08:27 2018
 
     Config - Configuration [test-config.cpp:40]
     ===========================================
@@ -24,112 +24,6 @@ Tests run on Sat Mar 24 17:25:56 2018
 
     GrammarSet TODOS [test-grammar-set.cpp:40]
     ==========================================
-    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
-
-    Linking Rule::find_target_rule() [test-linking.cpp:78]
-    ======================================================
-      : p_g1r1->target_rule.rule_name = "g1r2"
-    ok: p_g1r1->find_target_rule() == p_g1r2
-    ok: p_g1r1->target_rule.p_rule == p_g1r2
-      : p_g2r1->target_rule.rule_name = "g3r2"
-    ok: p_g2r1->find_target_rule() == p_g3r2
-    ok: p_g2r1->target_rule.p_rule == p_g3r2
-      : p_g3r1->target_rule.rule_name = "g4r2"
-      : p_g3r1->target_rule.ruleset_id = "g4"
-    ok: p_g3r1->find_target_rule() == p_g4r2
-    ok: p_g3r1->target_rule.p_rule == p_g4r2
-    ok: p_g3r2->find_target_rule() == p_g3r2
-    ok: p_g3r2->target_rule.p_rule == p_g3r2
-      : p_g1r2->target_rule.rule_name = "g1r1"
-    ok: p_const_g1r2->find_target_rule() == p_g1r1
-    ok: p_const_g1r2->target_rule.p_rule == 0
-    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
-
-    Global linking - Local ruleset [test-linking.cpp:126]
-    =====================================================
-      #### One layer of lookup ####
-    ok: jp.link( p_g1 ) == JCRParser::S_OK
-    ok: p_g1->rules[0].target_rule.p_rule == p_g1r2
-    ok: p_g1->rules[0].p_rule == p_g1r1
-    ok: p_g1->rules[0].p_type == p_g1r2
-      #### Two layers of lookup ####
-    ok: jp.link( p_g1 ) == JCRParser::S_OK
-    ok: p_g1->rules[0].target_rule.p_rule == p_g1r2
-    ok: p_g1->rules[0].p_rule == p_g1r1
-    ok: p_g1->rules[0].p_type == p_g1r3
-      #### Three layers of lookup ####
-    ok: jp.link( p_g1 ) == JCRParser::S_OK
-    ok: p_g1->rules[0].target_rule.p_rule == p_g1r2
-    ok: p_g1->rules[0].p_rule == p_g1r1
-    ok: p_g1->rules[0].p_type == p_g1r4
-    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
-
-    Global linking - Local ruleset - with member rule [test-linking.cpp:178]
-    ========================================================================
-      #### One layer of lookup - member rule @ 2nd rule ####
-    ok: jp.link( p_g1 ) == JCRParser::S_OK
-    ok: p_g1->rules[0].target_rule.p_rule == p_g1r2
-    ok: p_g1->rules[0].p_rule == p_g1r2
-    ok: p_g1->rules[0].p_type == p_g1r2
-    ok: p_g1->rules[0].get_member_name().name() == "mg1r2"
-      #### Two layers of lookup - member rule @ 2nd rule ####
-    ok: jp.link( p_g1 ) == JCRParser::S_OK
-    ok: p_g1->rules[0].target_rule.p_rule == p_g1r2
-    ok: p_g1->rules[0].p_rule == p_g1r2
-    ok: p_g1->rules[0].p_type == p_g1r3
-    ok: p_g1->rules[0].get_member_name().name() == "mg1r2"
-      #### Two layers of lookup - member rule @ 3rd rule ####
-    ok: jp.link( p_g1 ) == JCRParser::S_OK
-    ok: p_g1->rules[0].target_rule.p_rule == p_g1r2
-    ok: p_g1->rules[0].p_rule == p_g1r3
-    ok: p_g1->rules[0].p_type == p_g1r3
-    ok: p_g1->rules[0].get_member_name().name() == "mg1r3"
-      #### Three layers of lookup - member rule @ 2nd rule ####
-    ok: jp.link( p_g1 ) == JCRParser::S_OK
-    ok: p_g1->rules[0].target_rule.p_rule == p_g1r2
-    ok: p_g1->rules[0].p_rule == p_g1r2
-    ok: p_g1->rules[0].p_type == p_g1r4
-    ok: p_g1->rules[0].get_member_name().name() == "mg1r2"
-      #### Three layers of lookup - member rule @ 3rd rule ####
-    ok: jp.link( p_g1 ) == JCRParser::S_OK
-    ok: p_g1->rules[0].target_rule.p_rule == p_g1r2
-    ok: p_g1->rules[0].p_rule == p_g1r3
-    ok: p_g1->rules[0].p_type == p_g1r4
-    ok: p_g1->rules[0].get_member_name().name() == "mg1r3"
-      #### Three layers of lookup - member rule @ 4th rule ####
-    ok: jp.link( p_g1 ) == JCRParser::S_OK
-    ok: p_g1->rules[0].target_rule.p_rule == p_g1r2
-    ok: p_g1->rules[0].p_rule == p_g1r4
-    ok: p_g1->rules[0].p_type == p_g1r4
-    ok: p_g1->rules[0].get_member_name().name() == "mg1r4"
-    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
-
-    Global linking - Local ruleset - with illegal multiple member rules [test-linking.cpp:286]
-    ==========================================================================================
-      #### Three layers of lookup - member name on 1st and 4th rule ####
-    ok: jp.link( p_g1 ) != JCRParser::S_OK
-      #### Three layers of lookup - member name on 2nd and 3rd rule ####
-    ok: jp.link( p_g1 ) != JCRParser::S_OK
-      #### Three layers of lookup - member name on 3rd and 4th rule ####
-    ok: jp.link( p_g1 ) != JCRParser::S_OK
-    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
-
-    Global linking - Local ruleset - with illegal loops [test-linking.cpp:332]
-    ==========================================================================
-      #### One layer of lookup - loop to self ####
-    ok: jp.link( p_g1 ) != JCRParser::S_OK
-      #### Two layers of lookup - loop to top ####
-    ok: jp.link( p_g1 ) != JCRParser::S_OK
-      #### Two layers of lookup - loopback to bottom ####
-    ok: jp.link( p_g1 ) != JCRParser::S_OK
-      #### Four layers of lookup - loopback to top ####
-    ok: jp.link( p_g1 ) != JCRParser::S_OK
-      #### Four layers of lookup - loopback to 2nd ####
-    ok: jp.link( p_g1 ) != JCRParser::S_OK
-      #### Four layers of lookup - loopback to 3rd ####
-    ok: jp.link( p_g1 ) != JCRParser::S_OK
-      #### Four layers of lookup - loopback to bottom ####
-    ok: jp.link( p_g1 ) != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
     ValueConstraint [test-low-level-objects.cpp:40]
@@ -2591,12 +2485,124 @@ jcr-version
  ####
     ok: status != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    Linking Rule::find_target_rule() [test-linking.cpp:78]
+    ======================================================
+      : p_g1r1->target_rule.rule_name = "g1r2"
+    ok: p_g1r1->find_target_rule() == p_g1r2
+    ok: p_g1r1->target_rule.p_rule == p_g1r2
+      : p_g2r1->target_rule.rule_name = "g3r2"
+    ok: p_g2r1->find_target_rule() == p_g3r2
+    ok: p_g2r1->target_rule.p_rule == p_g3r2
+      : p_g3r1->target_rule.rule_name = "g4r2"
+      : p_g3r1->target_rule.ruleset_id = "g4"
+    ok: p_g3r1->find_target_rule() == p_g4r2
+    ok: p_g3r1->target_rule.p_rule == p_g4r2
+    ok: p_g3r2->find_target_rule() == p_g3r2
+    ok: p_g3r2->target_rule.p_rule == p_g3r2
+      : p_g1r2->target_rule.rule_name = "g1r1"
+    ok: p_const_g1r2->find_target_rule() == p_g1r1
+    ok: p_const_g1r2->target_rule.p_rule == 0
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    Global linking - Local ruleset [test-linking.cpp:126]
+    =====================================================
+      #### One layer of lookup ####
+    ok: jp.link( p_g1 ) == JCRParser::S_OK
+    ok: p_g1->rules[0].target_rule.p_rule == p_g1r2
+    ok: p_g1->rules[0].p_rule == p_g1r1
+    ok: p_g1->rules[0].p_type == p_g1r2
+      #### Two layers of lookup ####
+    ok: jp.link( p_g1 ) == JCRParser::S_OK
+    ok: p_g1->rules[0].target_rule.p_rule == p_g1r2
+    ok: p_g1->rules[0].p_rule == p_g1r1
+    ok: p_g1->rules[0].p_type == p_g1r3
+      #### Three layers of lookup ####
+    ok: jp.link( p_g1 ) == JCRParser::S_OK
+    ok: p_g1->rules[0].target_rule.p_rule == p_g1r2
+    ok: p_g1->rules[0].p_rule == p_g1r1
+    ok: p_g1->rules[0].p_type == p_g1r4
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    Global linking - Local ruleset - with member rule [test-linking.cpp:178]
+    ========================================================================
+      #### One layer of lookup - member rule @ 2nd rule ####
+    ok: jp.link( p_g1 ) == JCRParser::S_OK
+    ok: p_g1->rules[0].target_rule.p_rule == p_g1r2
+    ok: p_g1->rules[0].p_rule == p_g1r2
+    ok: p_g1->rules[0].p_type == p_g1r2
+    ok: p_g1->rules[0].get_member_name().name() == "mg1r2"
+      #### Two layers of lookup - member rule @ 2nd rule ####
+    ok: jp.link( p_g1 ) == JCRParser::S_OK
+    ok: p_g1->rules[0].target_rule.p_rule == p_g1r2
+    ok: p_g1->rules[0].p_rule == p_g1r2
+    ok: p_g1->rules[0].p_type == p_g1r3
+    ok: p_g1->rules[0].get_member_name().name() == "mg1r2"
+      #### Two layers of lookup - member rule @ 3rd rule ####
+    ok: jp.link( p_g1 ) == JCRParser::S_OK
+    ok: p_g1->rules[0].target_rule.p_rule == p_g1r2
+    ok: p_g1->rules[0].p_rule == p_g1r3
+    ok: p_g1->rules[0].p_type == p_g1r3
+    ok: p_g1->rules[0].get_member_name().name() == "mg1r3"
+      #### Three layers of lookup - member rule @ 2nd rule ####
+    ok: jp.link( p_g1 ) == JCRParser::S_OK
+    ok: p_g1->rules[0].target_rule.p_rule == p_g1r2
+    ok: p_g1->rules[0].p_rule == p_g1r2
+    ok: p_g1->rules[0].p_type == p_g1r4
+    ok: p_g1->rules[0].get_member_name().name() == "mg1r2"
+      #### Three layers of lookup - member rule @ 3rd rule ####
+    ok: jp.link( p_g1 ) == JCRParser::S_OK
+    ok: p_g1->rules[0].target_rule.p_rule == p_g1r2
+    ok: p_g1->rules[0].p_rule == p_g1r3
+    ok: p_g1->rules[0].p_type == p_g1r4
+    ok: p_g1->rules[0].get_member_name().name() == "mg1r3"
+      #### Three layers of lookup - member rule @ 4th rule ####
+    ok: jp.link( p_g1 ) == JCRParser::S_OK
+    ok: p_g1->rules[0].target_rule.p_rule == p_g1r2
+    ok: p_g1->rules[0].p_rule == p_g1r4
+    ok: p_g1->rules[0].p_type == p_g1r4
+    ok: p_g1->rules[0].get_member_name().name() == "mg1r4"
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    Global linking - Local ruleset - with illegal multiple member rules [test-linking.cpp:286]
+    ==========================================================================================
+      #### Three layers of lookup - member name on 1st and 4th rule ####
+    ok: jp.link( p_g1 ) != JCRParser::S_OK
+      #### Three layers of lookup - member name on 2nd and 3rd rule ####
+    ok: jp.link( p_g1 ) != JCRParser::S_OK
+      #### Three layers of lookup - member name on 3rd and 4th rule ####
+    ok: jp.link( p_g1 ) != JCRParser::S_OK
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    Global linking - Local ruleset - with illegal loops [test-linking.cpp:332]
+    ==========================================================================
+      #### One layer of lookup - loop to self ####
+    ok: jp.link( p_g1 ) != JCRParser::S_OK
+      #### Two layers of lookup - loop to top ####
+    ok: jp.link( p_g1 ) != JCRParser::S_OK
+      #### Two layers of lookup - loopback to bottom ####
+    ok: jp.link( p_g1 ) != JCRParser::S_OK
+      #### Four layers of lookup - loopback to top ####
+    ok: jp.link( p_g1 ) != JCRParser::S_OK
+      #### Four layers of lookup - loopback to 2nd ####
+    ok: jp.link( p_g1 ) != JCRParser::S_OK
+      #### Four layers of lookup - loopback to 3rd ####
+    ok: jp.link( p_g1 ) != JCRParser::S_OK
+      #### Four layers of lookup - loopback to bottom ####
+    ok: jp.link( p_g1 ) != JCRParser::S_OK
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
 
-TODOs (3):
+TODOs (5):
 ------------------------
 - Implement and test GrammarSet::link() [test-grammar-set.cpp:42]
 - Test low level GrammarSet class [test-low-level-objects.cpp:379]
 - Investigate changes needed to remove requirement for g++ -Wno-parentheses flag [test-main.cpp:39]
+- Test linking across multiple grammars [test-linking.cpp:428]
+- Check for duplicately (or multiply) named global rules [test-linking.cpp:429]
 
-0 error(s), 3 todo(s), 2005 test(s)
+0 error(s), 5 todo(s), 2007 test(s)

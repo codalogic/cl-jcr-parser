@@ -1,4 +1,4 @@
-Tests table of contents generated on Sat Mar 24 17:25:56 2018
+Tests table of contents generated on Sat Mar 24 22:08:27 2018
 
 # test-config.cpp
 | Description | Line |
@@ -9,15 +9,6 @@ Tests table of contents generated on Sat Mar 24 17:25:56 2018
 | Description | Line |
 |-------------|------|
 | GrammarSet TODOS | 40 |
-
-# test-linking.cpp
-| Description | Line |
-|-------------|------|
-| Linking Rule::find_target_rule() | 78 |
-| Global linking - Local ruleset | 126 |
-| Global linking - Local ruleset - with member rule | 178 |
-| Global linking - Local ruleset - with illegal multiple member rules | 286 |
-| Global linking - Local ruleset - with illegal loops | 332 |
 
 # test-low-level-objects.cpp
 | Description | Line |
@@ -55,3 +46,12 @@ Tests table of contents generated on Sat Mar 24 17:25:56 2018
 | GrammarParser - Syntax parsing - group | 2173 |
 | GrammarParser - Syntax parsing - repetition | 2352 |
 | GrammarParser - Syntax parsing - annotations | 2639 |
+
+# test-linking.cpp
+| Description | Line |
+|-------------|------|
+| Linking Rule::find_target_rule() | 78 |
+| Global linking - Local ruleset | 126 |
+| Global linking - Local ruleset - with member rule | 178 |
+| Global linking - Local ruleset - with illegal multiple member rules | 286 |
+| Global linking - Local ruleset - with illegal loops | 332 |
