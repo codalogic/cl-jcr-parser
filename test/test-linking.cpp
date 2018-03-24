@@ -37,6 +37,25 @@
 
 using namespace cljcr;
 
+class RuleMaker // To facilitate making rules for testing
+{
+    // Usage: Rule * p_rule = RuleMaker( p_grammar ).rule_name( "Foo" ).target_rule_name( "Bar" ).rule();
+
+private:
+    Rule * p_rule;
+
+public:
+    RuleMaker( Grammar * p_grammar ) : p_rule( p_grammar->append_rule( Rule::uniq_ptr( new Rule( p_grammar, 0, 0 ) ) ) ) {}
+    RuleMaker( Rule * p_rule_in ) : p_rule( p_rule_in ) {}  // For an already created rule
+
+    Rule * rule() { return p_rule; }
+
+    RuleMaker & rule_name( const char * p_name ) { p_rule->rule_name = p_name; return *this; }
+    RuleMaker & member_name( const char * p_name ) { p_rule->member_name.set_literal( p_name ); return *this; }
+    RuleMaker & target_rule_name( const char * p_name ) { p_rule->target_rule.rule_name = p_name; return *this; }
+    RuleMaker & target_ruleset_id( const char * p_name ) { p_rule->target_rule.ruleset_id = p_name; return *this; }
+};
+
 TFEATURE( "Linking Rule::find_target_rule()" )
 {
     GrammarSet gs;
