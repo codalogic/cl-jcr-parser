@@ -39,7 +39,7 @@ using namespace cljcr;
 
 class RuleMaker // To facilitate making rules for testing
 {
-    // Usage: Rule * p_rule = RuleMaker( p_grammar ).rule_name( "Foo" ).target_rule_name( "Bar" ).rule();
+    // Usage: Rule * p_rule = RuleMaker( p_grammar ).rule_name( "Foo" ).target_rule_name( "Bar" );
 
 private:
     Rule * p_rule;
@@ -49,6 +49,7 @@ public:
     RuleMaker( Rule * p_rule_in ) : p_rule( p_rule_in ) {}  // For an already created rule
 
     Rule * rule() { return p_rule; }
+    operator Rule * () { return rule(); }
 
     RuleMaker & rule_name( const char * p_name ) { p_rule->rule_name = p_name; return *this; }
     RuleMaker & member_name( const char * p_name ) { p_rule->member_name.set_literal( p_name ); return *this; }
@@ -225,8 +226,8 @@ TFEATURE( "Global linking - Local ruleset - with member rule" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
-    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).                           member_name( "mg1r2" ).rule();
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).                           member_name( "mg1r2" );
 
     JCRParser jp( &gs );
     
@@ -241,9 +242,9 @@ TFEATURE( "Global linking - Local ruleset - with member rule" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
-    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).member_name( "mg1r2" ).rule();
-    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).                           rule();
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).member_name( "mg1r2" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" );
 
     JCRParser jp( &gs );
     
@@ -258,9 +259,9 @@ TFEATURE( "Global linking - Local ruleset - with member rule" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
-    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).rule();
-    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).                           member_name( "mg1r3" ).rule();
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).                           member_name( "mg1r3" );
 
     JCRParser jp( &gs );
     
@@ -275,10 +276,10 @@ TFEATURE( "Global linking - Local ruleset - with member rule" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
-    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).member_name( "mg1r2" ).rule();
-    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" ).rule();
-    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).                           rule();
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).member_name( "mg1r2" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" );
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" );
 
     JCRParser jp( &gs );
     
@@ -293,10 +294,10 @@ TFEATURE( "Global linking - Local ruleset - with member rule" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
-    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).rule();
-    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" ).member_name( "mg1r3" ).rule();
-    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).                           rule();
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" ).member_name( "mg1r3" );
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" );
 
     JCRParser jp( &gs );
     
@@ -311,10 +312,10 @@ TFEATURE( "Global linking - Local ruleset - with member rule" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
-    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).rule();
-    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" ).rule();
-    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).                           member_name( "mg1r4" ).rule();
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" );
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).                           member_name( "mg1r4" );
 
     JCRParser jp( &gs );
     
@@ -333,10 +334,10 @@ TFEATURE( "Global linking - Local ruleset - with illegal multiple member rules" 
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).member_name( "mg1r1" ).rule();
-    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).rule();
-    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" ).rule();
-    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).                           member_name( "mg1r4" ).rule();
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).member_name( "mg1r1" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" );
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).                           member_name( "mg1r4" );
 
     JCRParser jp( &gs );
     
@@ -347,10 +348,10 @@ TFEATURE( "Global linking - Local ruleset - with illegal multiple member rules" 
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
-    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).member_name( "mg1r2" ).rule();
-    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" ).member_name( "mg1r3" ).rule();
-    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).                           rule();
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).member_name( "mg1r2" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" ).member_name( "mg1r3" );
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" );
 
     JCRParser jp( &gs );
     
@@ -361,10 +362,10 @@ TFEATURE( "Global linking - Local ruleset - with illegal multiple member rules" 
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
-    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).rule();
-    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" ).member_name( "mg1r3" ).rule();
-    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).                           member_name( "mg1r4" ).rule();
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" ).member_name( "mg1r3" );
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).                           member_name( "mg1r4" );
 
     JCRParser jp( &gs );
     
@@ -379,8 +380,8 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r1" ).rule();
-    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).rule();
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r1" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" );
 
     JCRParser jp( &gs );
     
@@ -391,8 +392,8 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
-    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r1" ).rule();
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r1" );
 
     JCRParser jp( &gs );
     
@@ -403,8 +404,8 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
-    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r2" ).rule();
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r2" );
 
     JCRParser jp( &gs );
     
@@ -415,10 +416,10 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
-    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).rule();
-    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" ).rule();
-    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).target_rule_name( "g1r1" ).rule();
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" );
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).target_rule_name( "g1r1" );
 
     JCRParser jp( &gs );
     
@@ -429,10 +430,10 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
-    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).rule();
-    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" ).rule();
-    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).target_rule_name( "g1r2" ).rule();
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" );
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).target_rule_name( "g1r2" );
 
     JCRParser jp( &gs );
     
@@ -443,10 +444,10 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
-    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).rule();
-    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" ).rule();
-    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).target_rule_name( "g1r3" ).rule();
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" );
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).target_rule_name( "g1r3" );
 
     JCRParser jp( &gs );
     
@@ -457,10 +458,10 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
-    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).rule();
-    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" ).rule();
-    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).target_rule_name( "g1r4" ).rule();
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" );
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).target_rule_name( "g1r4" );
 
     JCRParser jp( &gs );
     
