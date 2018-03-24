@@ -45,14 +45,14 @@ private:
     Grammar * p_grammar;
 
 public:
-    GrammarMaker( GrammarSet & r_grammar_set, const char * p_source ) : p_grammar( r_grammar_set.append_grammar( p_source ) ) {}
+    GrammarMaker( GrammarSet & r_grammar_set ) : p_grammar( r_grammar_set.append_grammar( "<locally generated test>" ) ) {}
     GrammarMaker( Grammar * p_grammar_in ) : p_grammar( p_grammar_in ) {}  // For an already created grammar
 
     Grammar * grammar() { return p_grammar; }
     operator Grammar * () { return grammar(); }
 
-    GrammarMaker & id( const char * p_name ) { p_grammar->ruleset_id = p_name; return *this; }
-    GrammarMaker & import( const char * p_name ) { p_grammar->add_unaliased_import( p_name ); return *this; }
+    GrammarMaker & ruleset_id( const char * p_name ) { p_grammar->ruleset_id = p_name; return *this; }
+    GrammarMaker & unaliased_import( const char * p_name ) { p_grammar->add_unaliased_import( p_name ); return *this; }
 };
 
 class RuleMaker // To facilitate making rules for testing
@@ -79,33 +79,22 @@ TFEATURE( "Linking Rule::find_target_rule()" )
 {
     GrammarSet gs;
 
-    Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r1->rule_name = "g1r1";
-    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r2->rule_name = "g1r2";
+    Grammar * p_g1 = GrammarMaker( gs );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" );
 
-    Grammar * p_g2 = gs.append_grammar( "<local>" );
-    p_g2->add_unaliased_import( "g3" );
-    Rule * p_g2r1 = p_g2->append_rule( Rule::uniq_ptr( new Rule( p_g2, 0, 0 ) ) );
-    p_g2r1->rule_name = "g2r1";
-    Rule * p_g2r2 = p_g2->append_rule( Rule::uniq_ptr( new Rule( p_g2, 0, 0 ) ) );
-    p_g2r2->rule_name = "g2r2";
+    Grammar * p_g2 = GrammarMaker( gs ).unaliased_import( "g3" );
+    Rule * p_g2r1 = RuleMaker( p_g2 ).rule_name( "g2r1" );
+    Rule * p_g2r2 = RuleMaker( p_g2 ).rule_name( "g2r2" );
 
-    Grammar * p_g3 = gs.append_grammar( "<local>" );
-    p_g3->ruleset_id = "g3";
+    Grammar * p_g3 = GrammarMaker( gs ).ruleset_id( "g3" );
     // p_g3->add_aliased_import( "ag4", "g4" ); // Not needed - Aliases are mapped at parse time, and target_rule stores resultant ruleset_id
-    Rule * p_g3r1 = p_g3->append_rule( Rule::uniq_ptr( new Rule( p_g3, 0, 0 ) ) );
-    p_g3r1->rule_name = "g3r1";
-    Rule * p_g3r2 = p_g3->append_rule( Rule::uniq_ptr( new Rule( p_g3, 0, 0 ) ) );
-    p_g3r2->rule_name = "g3r2";
+    Rule * p_g3r1 = RuleMaker( p_g3 ).rule_name( "g3r1" );
+    Rule * p_g3r2 = RuleMaker( p_g3 ).rule_name( "g3r2" );
 
-    Grammar * p_g4 = gs.append_grammar( "<local>" );
-    p_g4->ruleset_id = "g4";
-    Rule * p_g4r1 = p_g4->append_rule( Rule::uniq_ptr( new Rule( p_g4, 0, 0 ) ) );
-    p_g4r1->rule_name = "g4r1";
-    Rule * p_g4r2 = p_g4->append_rule( Rule::uniq_ptr( new Rule( p_g4, 0, 0 ) ) );
-    p_g4r2->rule_name = "g4r2";
+    Grammar * p_g4 = GrammarMaker( gs ).ruleset_id( "g4" );
+    Rule * p_g4r1 = RuleMaker( p_g4 ).rule_name( "g4r1" );
+    Rule * p_g4r2 = RuleMaker( p_g4 ).rule_name( "g4r2" );
 
     // Test no imports case
     TSETUP( p_g1r1->target_rule.rule_name = "g1r2" );
@@ -140,7 +129,7 @@ TFEATURE( "Global linking - Local ruleset" )
     TDOC( "One layer of lookup" );
     GrammarSet gs;
 
-    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Grammar * p_g1 = GrammarMaker( gs );
     Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
     Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" );
 
@@ -155,7 +144,7 @@ TFEATURE( "Global linking - Local ruleset" )
     TDOC( "Two layers of lookup" );
     GrammarSet gs;
 
-    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Grammar * p_g1 = GrammarMaker( gs );
     Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
     Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" );
     Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" );
@@ -171,7 +160,7 @@ TFEATURE( "Global linking - Local ruleset" )
     TDOC( "Three layers of lookup" );
     GrammarSet gs;
 
-    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Grammar * p_g1 = GrammarMaker( gs );
     Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
     Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" );
     Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" );
@@ -192,7 +181,7 @@ TFEATURE( "Global linking - Local ruleset - with member rule" )
     TDOC( "One layer of lookup - member rule @ 2nd rule" );
     GrammarSet gs;
 
-    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Grammar * p_g1 = GrammarMaker( gs );
     Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
     Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).                           member_name( "mg1r2" );
 
@@ -208,7 +197,7 @@ TFEATURE( "Global linking - Local ruleset - with member rule" )
     TDOC( "Two layers of lookup - member rule @ 2nd rule" );
     GrammarSet gs;
 
-    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Grammar * p_g1 = GrammarMaker( gs );
     Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
     Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).member_name( "mg1r2" );
     Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" );
@@ -225,7 +214,7 @@ TFEATURE( "Global linking - Local ruleset - with member rule" )
     TDOC( "Two layers of lookup - member rule @ 3rd rule" );
     GrammarSet gs;
 
-    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Grammar * p_g1 = GrammarMaker( gs );
     Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
     Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" );
     Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).                           member_name( "mg1r3" );
@@ -242,7 +231,7 @@ TFEATURE( "Global linking - Local ruleset - with member rule" )
     TDOC( "Three layers of lookup - member rule @ 2nd rule" );
     GrammarSet gs;
 
-    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Grammar * p_g1 = GrammarMaker( gs );
     Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
     Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).member_name( "mg1r2" );
     Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" );
@@ -260,7 +249,7 @@ TFEATURE( "Global linking - Local ruleset - with member rule" )
     TDOC( "Three layers of lookup - member rule @ 3rd rule" );
     GrammarSet gs;
 
-    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Grammar * p_g1 = GrammarMaker( gs );
     Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
     Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" );
     Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" ).member_name( "mg1r3" );
@@ -278,7 +267,7 @@ TFEATURE( "Global linking - Local ruleset - with member rule" )
     TDOC( "Three layers of lookup - member rule @ 4th rule" );
     GrammarSet gs;
 
-    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Grammar * p_g1 = GrammarMaker( gs );
     Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
     Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" );
     Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" );
@@ -300,7 +289,7 @@ TFEATURE( "Global linking - Local ruleset - with illegal multiple member rules" 
     TDOC( "Three layers of lookup - member name on 1st and 4th rule" );
     GrammarSet gs;
 
-    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Grammar * p_g1 = GrammarMaker( gs );
     Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).member_name( "mg1r1" );
     Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" );
     Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" );
@@ -314,7 +303,7 @@ TFEATURE( "Global linking - Local ruleset - with illegal multiple member rules" 
     TDOC( "Three layers of lookup - member name on 2nd and 3rd rule" );
     GrammarSet gs;
 
-    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Grammar * p_g1 = GrammarMaker( gs );
     Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
     Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).member_name( "mg1r2" );
     Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" ).member_name( "mg1r3" );
@@ -328,7 +317,7 @@ TFEATURE( "Global linking - Local ruleset - with illegal multiple member rules" 
     TDOC( "Three layers of lookup - member name on 3rd and 4th rule" );
     GrammarSet gs;
 
-    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Grammar * p_g1 = GrammarMaker( gs );
     Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
     Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" );
     Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" ).member_name( "mg1r3" );
@@ -346,7 +335,7 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     TDOC( "One layer of lookup - loop to self" );
     GrammarSet gs;
 
-    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Grammar * p_g1 = GrammarMaker( gs );
     Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r1" );
     Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" );
 
@@ -358,7 +347,7 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     TDOC( "Two layers of lookup - loop to top" );
     GrammarSet gs;
 
-    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Grammar * p_g1 = GrammarMaker( gs );
     Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
     Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r1" );
 
@@ -370,7 +359,7 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     TDOC( "Two layers of lookup - loopback to bottom" );
     GrammarSet gs;
 
-    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Grammar * p_g1 = GrammarMaker( gs );
     Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
     Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r2" );
 
@@ -382,7 +371,7 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     TDOC( "Four layers of lookup - loopback to top" );
     GrammarSet gs;
 
-    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Grammar * p_g1 = GrammarMaker( gs );
     Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
     Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" );
     Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" );
@@ -396,7 +385,7 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     TDOC( "Four layers of lookup - loopback to 2nd" );
     GrammarSet gs;
 
-    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Grammar * p_g1 = GrammarMaker( gs );
     Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
     Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" );
     Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" );
@@ -410,7 +399,7 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     TDOC( "Four layers of lookup - loopback to 3rd" );
     GrammarSet gs;
 
-    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Grammar * p_g1 = GrammarMaker( gs );
     Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
     Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" );
     Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" );
@@ -424,7 +413,7 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     TDOC( "Four layers of lookup - loopback to bottom" );
     GrammarSet gs;
 
-    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Grammar * p_g1 = GrammarMaker( gs );
     Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
     Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" );
     Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" );

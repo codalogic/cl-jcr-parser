@@ -1,4 +1,4 @@
-Tests run on Sat Mar 24 15:06:54 2018
+Tests run on Sat Mar 24 17:25:56 2018
 
     Config - Configuration [test-config.cpp:40]
     ===========================================
@@ -26,7 +26,7 @@ Tests run on Sat Mar 24 15:06:54 2018
     ==========================================
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Linking Rule::find_target_rule() [test-linking.cpp:60]
+    Linking Rule::find_target_rule() [test-linking.cpp:78]
     ======================================================
       : p_g1r1->target_rule.rule_name = "g1r2"
     ok: p_g1r1->find_target_rule() == p_g1r2
@@ -45,7 +45,7 @@ Tests run on Sat Mar 24 15:06:54 2018
     ok: p_const_g1r2->target_rule.p_rule == 0
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Global linking - Local ruleset [test-linking.cpp:119]
+    Global linking - Local ruleset [test-linking.cpp:126]
     =====================================================
       #### One layer of lookup ####
     ok: jp.link( p_g1 ) == JCRParser::S_OK
@@ -64,7 +64,7 @@ Tests run on Sat Mar 24 15:06:54 2018
     ok: p_g1->rules[0].p_type == p_g1r4
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Global linking - Local ruleset - with member rule [test-linking.cpp:171]
+    Global linking - Local ruleset - with member rule [test-linking.cpp:178]
     ========================================================================
       #### One layer of lookup - member rule @ 2nd rule ####
     ok: jp.link( p_g1 ) == JCRParser::S_OK
@@ -104,7 +104,7 @@ Tests run on Sat Mar 24 15:06:54 2018
     ok: p_g1->rules[0].get_member_name().name() == "mg1r4"
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Global linking - Local ruleset - with illegal multiple member rules [test-linking.cpp:279]
+    Global linking - Local ruleset - with illegal multiple member rules [test-linking.cpp:286]
     ==========================================================================================
       #### Three layers of lookup - member name on 1st and 4th rule ####
     ok: jp.link( p_g1 ) != JCRParser::S_OK
@@ -114,7 +114,7 @@ Tests run on Sat Mar 24 15:06:54 2018
     ok: jp.link( p_g1 ) != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Global linking - Local ruleset - with illegal loops [test-linking.cpp:325]
+    Global linking - Local ruleset - with illegal loops [test-linking.cpp:332]
     ==========================================================================
       #### One layer of lookup - loop to self ####
     ok: jp.link( p_g1 ) != JCRParser::S_OK
