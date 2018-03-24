@@ -132,10 +132,10 @@ GrammarSet::uniq_ptr create_grammar()
     return pu_gs;
 }
 
-TFEATURE( "Global linking" )
+TFEATURE( "Global linking - Local ruleset" )
 {
     {
-    // One layer of lookup
+    TDOC( "One layer of lookup" );
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
@@ -153,7 +153,7 @@ TFEATURE( "Global linking" )
     TTEST( p_g1->rules[0].p_type == p_g1r2 );
     }
     {
-    // Two layers of lookup
+    TDOC( "Two layers of lookup" );
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
@@ -174,7 +174,7 @@ TFEATURE( "Global linking" )
     TTEST( p_g1->rules[0].p_type == p_g1r3 );
     }
     {
-    // Three layers of lookup
+    TDOC( "Three layers of lookup" );
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
@@ -197,12 +197,364 @@ TFEATURE( "Global linking" )
     TTEST( p_g1->rules[0].p_rule == p_g1r1 );   // Points to self
     TTEST( p_g1->rules[0].p_type == p_g1r4 );
     }
+}
+
+TFEATURE( "Global linking - Local ruleset - with member rule" )
+{
     {
-    GrammarSet::uniq_ptr pu_gs( create_grammar() );
+    TDOC( "One layer of lookup - member rule @ 2nd rule" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r1->rule_name = "g1r1";
+    p_g1r1->target_rule.rule_name = "g1r2";
+    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r2->rule_name = "g1r2";
+    p_g1r2->member_name.set_literal( "mg1r2" );
+
+    JCRParser jp( &gs );
     
-    JCRParser jp( pu_gs.get() );
+    TCRITICALTEST( jp.link( p_g1 ) == JCRParser::S_OK );
+    TTEST( p_g1->rules[0].target_rule.p_rule == p_g1r2 );
+    TTEST( p_g1->rules[0].p_rule == p_g1r2 );
+    TTEST( p_g1->rules[0].p_type == p_g1r2 );
+    TTEST( p_g1->rules[0].get_member_name().name() == "mg1r2" );
+    }
+    {
+    TDOC( "Two layers of lookup - member rule @ 2nd rule" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r1->rule_name = "g1r1";
+    p_g1r1->target_rule.rule_name = "g1r2";
+    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r2->rule_name = "g1r2";
+    p_g1r2->member_name.set_literal( "mg1r2" );
+    p_g1r2->target_rule.rule_name = "g1r3";
+    Rule * p_g1r3 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r3->rule_name = "g1r3";
+
+    JCRParser jp( &gs );
     
-    TCRITICALTEST( jp.link( &(*pu_gs)[0] ) == JCRParser::S_OK );
-    TTEST( (*pu_gs)[0].rules[0].target_rule.p_rule != 0 );
+    TCRITICALTEST( jp.link( p_g1 ) == JCRParser::S_OK );
+    TTEST( p_g1->rules[0].target_rule.p_rule == p_g1r2 );
+    TTEST( p_g1->rules[0].p_rule == p_g1r2 );
+    TTEST( p_g1->rules[0].p_type == p_g1r3 );
+    TTEST( p_g1->rules[0].get_member_name().name() == "mg1r2" );
+    }
+    {
+    TDOC( "Two layers of lookup - member rule @ 3rd rule" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r1->rule_name = "g1r1";
+    p_g1r1->target_rule.rule_name = "g1r2";
+    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r2->rule_name = "g1r2";
+    p_g1r2->target_rule.rule_name = "g1r3";
+    Rule * p_g1r3 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r3->rule_name = "g1r3";
+    p_g1r3->member_name.set_literal( "mg1r3" );
+
+    JCRParser jp( &gs );
+    
+    TCRITICALTEST( jp.link( p_g1 ) == JCRParser::S_OK );
+    TTEST( p_g1->rules[0].target_rule.p_rule == p_g1r2 );
+    TTEST( p_g1->rules[0].p_rule == p_g1r3 );
+    TTEST( p_g1->rules[0].p_type == p_g1r3 );
+    TTEST( p_g1->rules[0].get_member_name().name() == "mg1r3" );
+    }
+    {
+    TDOC( "Three layers of lookup - member rule @ 2nd rule" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r1->rule_name = "g1r1";
+    p_g1r1->target_rule.rule_name = "g1r2";
+    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r2->rule_name = "g1r2";
+    p_g1r2->target_rule.rule_name = "g1r3";
+    p_g1r2->member_name.set_literal( "mg1r2" );
+    Rule * p_g1r3 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r3->rule_name = "g1r3";
+    p_g1r3->target_rule.rule_name = "g1r4";
+    Rule * p_g1r4 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r4->rule_name = "g1r4";
+
+    JCRParser jp( &gs );
+    
+    TCRITICALTEST( jp.link( p_g1 ) == JCRParser::S_OK );
+    TTEST( p_g1->rules[0].target_rule.p_rule == p_g1r2 );
+    TTEST( p_g1->rules[0].p_rule == p_g1r2 );
+    TTEST( p_g1->rules[0].p_type == p_g1r4 );
+    TTEST( p_g1->rules[0].get_member_name().name() == "mg1r2" );
+    }
+    {
+    TDOC( "Three layers of lookup - member rule @ 3rd rule" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r1->rule_name = "g1r1";
+    p_g1r1->target_rule.rule_name = "g1r2";
+    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r2->rule_name = "g1r2";
+    p_g1r2->target_rule.rule_name = "g1r3";
+    Rule * p_g1r3 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r3->rule_name = "g1r3";
+    p_g1r3->target_rule.rule_name = "g1r4";
+    p_g1r3->member_name.set_literal( "mg1r3" );
+    Rule * p_g1r4 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r4->rule_name = "g1r4";
+
+    JCRParser jp( &gs );
+    
+    TCRITICALTEST( jp.link( p_g1 ) == JCRParser::S_OK );
+    TTEST( p_g1->rules[0].target_rule.p_rule == p_g1r2 );
+    TTEST( p_g1->rules[0].p_rule == p_g1r3 );
+    TTEST( p_g1->rules[0].p_type == p_g1r4 );
+    TTEST( p_g1->rules[0].get_member_name().name() == "mg1r3" );
+    }
+    {
+    TDOC( "Three layers of lookup - member rule @ 4th rule" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r1->rule_name = "g1r1";
+    p_g1r1->target_rule.rule_name = "g1r2";
+    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r2->rule_name = "g1r2";
+    p_g1r2->target_rule.rule_name = "g1r3";
+    Rule * p_g1r3 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r3->rule_name = "g1r3";
+    p_g1r3->target_rule.rule_name = "g1r4";
+    Rule * p_g1r4 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r4->rule_name = "g1r4";
+    p_g1r4->member_name.set_literal( "mg1r4" );
+
+    JCRParser jp( &gs );
+    
+    TCRITICALTEST( jp.link( p_g1 ) == JCRParser::S_OK );
+    TTEST( p_g1->rules[0].target_rule.p_rule == p_g1r2 );
+    TTEST( p_g1->rules[0].p_rule == p_g1r4 );
+    TTEST( p_g1->rules[0].p_type == p_g1r4 );
+    TTEST( p_g1->rules[0].get_member_name().name() == "mg1r4" );
+    }
+}
+
+TFEATURE( "Global linking - Local ruleset - with illegal multiple member rules" )
+{
+    {
+    TDOC( "Three layers of lookup - member name on 1st and 4th rule" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r1->rule_name = "g1r1";
+    p_g1r1->target_rule.rule_name = "g1r2";
+    p_g1r1->member_name.set_literal( "mg1r1" );
+    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r2->rule_name = "g1r2";
+    p_g1r2->target_rule.rule_name = "g1r3";
+    Rule * p_g1r3 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r3->rule_name = "g1r3";
+    p_g1r3->target_rule.rule_name = "g1r4";
+    Rule * p_g1r4 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r4->rule_name = "g1r4";
+    p_g1r4->member_name.set_literal( "mg1r4" );
+
+    JCRParser jp( &gs );
+    
+    TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
+    }
+    {
+    TDOC( "Three layers of lookup - member name on 2nd and 3rd rule" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r1->rule_name = "g1r1";
+    p_g1r1->target_rule.rule_name = "g1r2";
+    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r2->rule_name = "g1r2";
+    p_g1r2->target_rule.rule_name = "g1r3";
+    p_g1r2->member_name.set_literal( "mg1r2" );
+    Rule * p_g1r3 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r3->rule_name = "g1r3";
+    p_g1r3->target_rule.rule_name = "g1r4";
+    p_g1r3->member_name.set_literal( "mg1r3" );
+    Rule * p_g1r4 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r4->rule_name = "g1r4";
+
+    JCRParser jp( &gs );
+    
+    TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
+    }
+    {
+    TDOC( "Three layers of lookup - member name on 3rd and 4th rule" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r1->rule_name = "g1r1";
+    p_g1r1->target_rule.rule_name = "g1r2";
+    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r2->rule_name = "g1r2";
+    p_g1r2->target_rule.rule_name = "g1r3";
+    Rule * p_g1r3 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r3->rule_name = "g1r3";
+    p_g1r3->target_rule.rule_name = "g1r4";
+    p_g1r3->member_name.set_literal( "mg1r3" );
+    Rule * p_g1r4 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r4->rule_name = "g1r4";
+    p_g1r4->member_name.set_literal( "mg1r4" );
+
+    JCRParser jp( &gs );
+    
+    TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
+    }
+}
+
+TFEATURE( "Global linking - Local ruleset - with illegal loops" )
+{
+    {
+    TDOC( "One layer of lookup - loop to self" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r1->rule_name = "g1r1";
+    p_g1r1->target_rule.rule_name = "g1r1";     // Link to self
+    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r2->rule_name = "g1r2";
+
+    JCRParser jp( &gs );
+    
+    TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
+    }
+    {
+    TDOC( "Two layers of lookup - loop to top" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r1->rule_name = "g1r1";
+    p_g1r1->target_rule.rule_name = "g1r2";
+    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r2->rule_name = "g1r2";
+    p_g1r2->target_rule.rule_name = "g1r1";
+
+    JCRParser jp( &gs );
+    
+    TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
+    }
+    {
+    TDOC( "Two layers of lookup - loopback to bottom" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r1->rule_name = "g1r1";
+    p_g1r1->target_rule.rule_name = "g1r2";
+    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r2->rule_name = "g1r2";
+    p_g1r2->target_rule.rule_name = "g1r2";
+
+    JCRParser jp( &gs );
+    
+    TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
+    }
+    {
+    TDOC( "Four layers of lookup - loopback to top" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r1->rule_name = "g1r1";
+    p_g1r1->target_rule.rule_name = "g1r2";
+    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r2->rule_name = "g1r2";
+    p_g1r2->target_rule.rule_name = "g1r3";
+    Rule * p_g1r3 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r3->rule_name = "g1r3";
+    p_g1r3->target_rule.rule_name = "g1r4";
+    Rule * p_g1r4 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r4->rule_name = "g1r4";
+    p_g1r4->target_rule.rule_name = "g1r1";
+
+    JCRParser jp( &gs );
+    
+    TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
+    }
+    {
+    TDOC( "Four layers of lookup - loopback to 2nd" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r1->rule_name = "g1r1";
+    p_g1r1->target_rule.rule_name = "g1r2";
+    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r2->rule_name = "g1r2";
+    p_g1r2->target_rule.rule_name = "g1r3";
+    Rule * p_g1r3 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r3->rule_name = "g1r3";
+    p_g1r3->target_rule.rule_name = "g1r4";
+    Rule * p_g1r4 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r4->rule_name = "g1r4";
+    p_g1r4->target_rule.rule_name = "g1r2";
+
+    JCRParser jp( &gs );
+    
+    TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
+    }
+    {
+    TDOC( "Four layers of lookup - loopback to 3rd" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r1->rule_name = "g1r1";
+    p_g1r1->target_rule.rule_name = "g1r2";
+    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r2->rule_name = "g1r2";
+    p_g1r2->target_rule.rule_name = "g1r3";
+    Rule * p_g1r3 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r3->rule_name = "g1r3";
+    p_g1r3->target_rule.rule_name = "g1r4";
+    Rule * p_g1r4 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r4->rule_name = "g1r4";
+    p_g1r4->target_rule.rule_name = "g1r3";
+
+    JCRParser jp( &gs );
+    
+    TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
+    }
+    {
+    TDOC( "Four layers of lookup - loopback to bottom" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = gs.append_grammar( "<local>" );
+    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r1->rule_name = "g1r1";
+    p_g1r1->target_rule.rule_name = "g1r2";
+    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r2->rule_name = "g1r2";
+    p_g1r2->target_rule.rule_name = "g1r3";
+    Rule * p_g1r3 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r3->rule_name = "g1r3";
+    p_g1r3->target_rule.rule_name = "g1r4";
+    Rule * p_g1r4 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
+    p_g1r4->rule_name = "g1r4";
+    p_g1r4->target_rule.rule_name = "g1r4";
+
+    JCRParser jp( &gs );
+    
+    TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
     }
 }

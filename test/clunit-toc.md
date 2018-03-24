@@ -1,4 +1,4 @@
-Tests table of contents generated on Fri Mar 23 20:12:38 2018
+Tests table of contents generated on Sat Mar 24 13:56:49 2018
 
 # test-config.cpp
 | Description | Line |
@@ -14,7 +14,10 @@ Tests table of contents generated on Fri Mar 23 20:12:38 2018
 | Description | Line |
 |-------------|------|
 | Linking Rule::find_target_rule() | 40 |
-| Global linking | 135 |
+| Global linking - Local ruleset | 135 |
+| Global linking - Local ruleset - with member rule | 202 |
+| Global linking - Local ruleset - with illegal multiple member rules | 350 |
+| Global linking - Local ruleset - with illegal loops | 423 |
 
 # test-low-level-objects.cpp
 | Description | Line |
