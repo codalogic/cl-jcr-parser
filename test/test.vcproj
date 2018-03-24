@@ -179,10 +179,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\test-grammar-set.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\test-linking.cpp"
 				>
 			</File>
