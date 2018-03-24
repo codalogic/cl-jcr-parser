@@ -116,42 +116,6 @@ TFEATURE( "Linking Rule::find_target_rule()" )
     TTEST( p_const_g1r2->target_rule.p_rule == 0 ); // Const instance can't set target_rule.p_rule
 }
 
-GrammarSet::uniq_ptr create_grammar()
-{
-    GrammarSet::uniq_ptr pu_gs( new GrammarSet );
-
-    Grammar * p_g1 = pu_gs->append_grammar( "<local 1>" );
-    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r1->rule_name = "g1r1";
-    p_g1r1->target_rule.rule_name = "g1r2";
-    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r2->rule_name = "g1r2";
-
-    Grammar * p_g2 = pu_gs->append_grammar( "<local 2>" );
-    p_g2->add_unaliased_import( "g3" );
-    Rule * p_g2r1 = p_g2->append_rule( Rule::uniq_ptr( new Rule( p_g2, 0, 0 ) ) );
-    p_g2r1->rule_name = "g2r1";
-    Rule * p_g2r2 = p_g2->append_rule( Rule::uniq_ptr( new Rule( p_g2, 0, 0 ) ) );
-    p_g2r2->rule_name = "g2r2";
-
-    Grammar * p_g3 = pu_gs->append_grammar( "<local 3>" );
-    p_g3->ruleset_id = "g3";
-    // p_g3->add_aliased_import( "ag4", "g4" ); // Not needed - Aliases are mapped at parse time, and target_rule stores resultant ruleset_id
-    Rule * p_g3r1 = p_g3->append_rule( Rule::uniq_ptr( new Rule( p_g3, 0, 0 ) ) );
-    p_g3r1->rule_name = "g3r1";
-    Rule * p_g3r2 = p_g3->append_rule( Rule::uniq_ptr( new Rule( p_g3, 0, 0 ) ) );
-    p_g3r2->rule_name = "g3r2";
-
-    Grammar * p_g4 = pu_gs->append_grammar( "<local 4>" );
-    p_g4->ruleset_id = "g4";
-    Rule * p_g4r1 = p_g4->append_rule( Rule::uniq_ptr( new Rule( p_g4, 0, 0 ) ) );
-    p_g4r1->rule_name = "g4r1";
-    Rule * p_g4r2 = p_g4->append_rule( Rule::uniq_ptr( new Rule( p_g4, 0, 0 ) ) );
-    p_g4r2->rule_name = "g4r2";
-
-    return pu_gs;
-}
-
 TFEATURE( "Global linking - Local ruleset" )
 {
     {
@@ -159,11 +123,8 @@ TFEATURE( "Global linking - Local ruleset" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r1->rule_name = "g1r1";
-    p_g1r1->target_rule.rule_name = "g1r2";
-    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r2->rule_name = "g1r2";
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" );
 
     JCRParser jp( &gs );
     
@@ -177,14 +138,9 @@ TFEATURE( "Global linking - Local ruleset" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r1->rule_name = "g1r1";
-    p_g1r1->target_rule.rule_name = "g1r2";
-    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r2->rule_name = "g1r2";
-    p_g1r2->target_rule.rule_name = "g1r3";
-    Rule * p_g1r3 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r3->rule_name = "g1r3";
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" );
 
     JCRParser jp( &gs );
     
@@ -198,17 +154,10 @@ TFEATURE( "Global linking - Local ruleset" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r1->rule_name = "g1r1";
-    p_g1r1->target_rule.rule_name = "g1r2";
-    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r2->rule_name = "g1r2";
-    p_g1r2->target_rule.rule_name = "g1r3";
-    Rule * p_g1r3 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r3->rule_name = "g1r3";
-    p_g1r3->target_rule.rule_name = "g1r4";
-    Rule * p_g1r4 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r4->rule_name = "g1r4";
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" );
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" );
 
     JCRParser jp( &gs );
     
