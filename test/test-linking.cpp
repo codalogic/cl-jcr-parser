@@ -225,12 +225,8 @@ TFEATURE( "Global linking - Local ruleset - with member rule" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r1->rule_name = "g1r1";
-    p_g1r1->target_rule.rule_name = "g1r2";
-    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r2->rule_name = "g1r2";
-    p_g1r2->member_name.set_literal( "mg1r2" );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).                           member_name( "mg1r2" ).rule();
 
     JCRParser jp( &gs );
     
@@ -245,15 +241,9 @@ TFEATURE( "Global linking - Local ruleset - with member rule" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r1->rule_name = "g1r1";
-    p_g1r1->target_rule.rule_name = "g1r2";
-    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r2->rule_name = "g1r2";
-    p_g1r2->member_name.set_literal( "mg1r2" );
-    p_g1r2->target_rule.rule_name = "g1r3";
-    Rule * p_g1r3 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r3->rule_name = "g1r3";
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).member_name( "mg1r2" ).rule();
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).                           rule();
 
     JCRParser jp( &gs );
     
@@ -268,15 +258,9 @@ TFEATURE( "Global linking - Local ruleset - with member rule" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r1->rule_name = "g1r1";
-    p_g1r1->target_rule.rule_name = "g1r2";
-    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r2->rule_name = "g1r2";
-    p_g1r2->target_rule.rule_name = "g1r3";
-    Rule * p_g1r3 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r3->rule_name = "g1r3";
-    p_g1r3->member_name.set_literal( "mg1r3" );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).rule();
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).                           member_name( "mg1r3" ).rule();
 
     JCRParser jp( &gs );
     
@@ -291,18 +275,10 @@ TFEATURE( "Global linking - Local ruleset - with member rule" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r1->rule_name = "g1r1";
-    p_g1r1->target_rule.rule_name = "g1r2";
-    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r2->rule_name = "g1r2";
-    p_g1r2->target_rule.rule_name = "g1r3";
-    p_g1r2->member_name.set_literal( "mg1r2" );
-    Rule * p_g1r3 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r3->rule_name = "g1r3";
-    p_g1r3->target_rule.rule_name = "g1r4";
-    Rule * p_g1r4 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r4->rule_name = "g1r4";
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).member_name( "mg1r2" ).rule();
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" ).rule();
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).                           rule();
 
     JCRParser jp( &gs );
     
@@ -317,18 +293,10 @@ TFEATURE( "Global linking - Local ruleset - with member rule" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r1->rule_name = "g1r1";
-    p_g1r1->target_rule.rule_name = "g1r2";
-    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r2->rule_name = "g1r2";
-    p_g1r2->target_rule.rule_name = "g1r3";
-    Rule * p_g1r3 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r3->rule_name = "g1r3";
-    p_g1r3->target_rule.rule_name = "g1r4";
-    p_g1r3->member_name.set_literal( "mg1r3" );
-    Rule * p_g1r4 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r4->rule_name = "g1r4";
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).rule();
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" ).member_name( "mg1r3" ).rule();
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).                           rule();
 
     JCRParser jp( &gs );
     
@@ -343,18 +311,10 @@ TFEATURE( "Global linking - Local ruleset - with member rule" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r1->rule_name = "g1r1";
-    p_g1r1->target_rule.rule_name = "g1r2";
-    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r2->rule_name = "g1r2";
-    p_g1r2->target_rule.rule_name = "g1r3";
-    Rule * p_g1r3 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r3->rule_name = "g1r3";
-    p_g1r3->target_rule.rule_name = "g1r4";
-    Rule * p_g1r4 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r4->rule_name = "g1r4";
-    p_g1r4->member_name.set_literal( "mg1r4" );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).rule();
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" ).rule();
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).                           member_name( "mg1r4" ).rule();
 
     JCRParser jp( &gs );
     
@@ -373,19 +333,10 @@ TFEATURE( "Global linking - Local ruleset - with illegal multiple member rules" 
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r1->rule_name = "g1r1";
-    p_g1r1->target_rule.rule_name = "g1r2";
-    p_g1r1->member_name.set_literal( "mg1r1" );
-    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r2->rule_name = "g1r2";
-    p_g1r2->target_rule.rule_name = "g1r3";
-    Rule * p_g1r3 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r3->rule_name = "g1r3";
-    p_g1r3->target_rule.rule_name = "g1r4";
-    Rule * p_g1r4 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r4->rule_name = "g1r4";
-    p_g1r4->member_name.set_literal( "mg1r4" );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).member_name( "mg1r1" ).rule();
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).rule();
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" ).rule();
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).                           member_name( "mg1r4" ).rule();
 
     JCRParser jp( &gs );
     
@@ -396,19 +347,10 @@ TFEATURE( "Global linking - Local ruleset - with illegal multiple member rules" 
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r1->rule_name = "g1r1";
-    p_g1r1->target_rule.rule_name = "g1r2";
-    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r2->rule_name = "g1r2";
-    p_g1r2->target_rule.rule_name = "g1r3";
-    p_g1r2->member_name.set_literal( "mg1r2" );
-    Rule * p_g1r3 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r3->rule_name = "g1r3";
-    p_g1r3->target_rule.rule_name = "g1r4";
-    p_g1r3->member_name.set_literal( "mg1r3" );
-    Rule * p_g1r4 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r4->rule_name = "g1r4";
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).member_name( "mg1r2" ).rule();
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" ).member_name( "mg1r3" ).rule();
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).                           rule();
 
     JCRParser jp( &gs );
     
@@ -419,19 +361,10 @@ TFEATURE( "Global linking - Local ruleset - with illegal multiple member rules" 
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r1->rule_name = "g1r1";
-    p_g1r1->target_rule.rule_name = "g1r2";
-    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r2->rule_name = "g1r2";
-    p_g1r2->target_rule.rule_name = "g1r3";
-    Rule * p_g1r3 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r3->rule_name = "g1r3";
-    p_g1r3->target_rule.rule_name = "g1r4";
-    p_g1r3->member_name.set_literal( "mg1r3" );
-    Rule * p_g1r4 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r4->rule_name = "g1r4";
-    p_g1r4->member_name.set_literal( "mg1r4" );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).rule();
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" ).member_name( "mg1r3" ).rule();
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).                           member_name( "mg1r4" ).rule();
 
     JCRParser jp( &gs );
     
@@ -446,11 +379,8 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r1->rule_name = "g1r1";
-    p_g1r1->target_rule.rule_name = "g1r1";     // Link to self
-    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r2->rule_name = "g1r2";
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r1" ).rule();
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).rule();
 
     JCRParser jp( &gs );
     
@@ -461,12 +391,8 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r1->rule_name = "g1r1";
-    p_g1r1->target_rule.rule_name = "g1r2";
-    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r2->rule_name = "g1r2";
-    p_g1r2->target_rule.rule_name = "g1r1";
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r1" ).rule();
 
     JCRParser jp( &gs );
     
@@ -477,12 +403,8 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r1->rule_name = "g1r1";
-    p_g1r1->target_rule.rule_name = "g1r2";
-    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r2->rule_name = "g1r2";
-    p_g1r2->target_rule.rule_name = "g1r2";
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r2" ).rule();
 
     JCRParser jp( &gs );
     
@@ -493,18 +415,10 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r1->rule_name = "g1r1";
-    p_g1r1->target_rule.rule_name = "g1r2";
-    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r2->rule_name = "g1r2";
-    p_g1r2->target_rule.rule_name = "g1r3";
-    Rule * p_g1r3 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r3->rule_name = "g1r3";
-    p_g1r3->target_rule.rule_name = "g1r4";
-    Rule * p_g1r4 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r4->rule_name = "g1r4";
-    p_g1r4->target_rule.rule_name = "g1r1";
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).rule();
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" ).rule();
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).target_rule_name( "g1r1" ).rule();
 
     JCRParser jp( &gs );
     
@@ -515,18 +429,10 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r1->rule_name = "g1r1";
-    p_g1r1->target_rule.rule_name = "g1r2";
-    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r2->rule_name = "g1r2";
-    p_g1r2->target_rule.rule_name = "g1r3";
-    Rule * p_g1r3 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r3->rule_name = "g1r3";
-    p_g1r3->target_rule.rule_name = "g1r4";
-    Rule * p_g1r4 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r4->rule_name = "g1r4";
-    p_g1r4->target_rule.rule_name = "g1r2";
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).rule();
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" ).rule();
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).target_rule_name( "g1r2" ).rule();
 
     JCRParser jp( &gs );
     
@@ -537,18 +443,10 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r1->rule_name = "g1r1";
-    p_g1r1->target_rule.rule_name = "g1r2";
-    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r2->rule_name = "g1r2";
-    p_g1r2->target_rule.rule_name = "g1r3";
-    Rule * p_g1r3 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r3->rule_name = "g1r3";
-    p_g1r3->target_rule.rule_name = "g1r4";
-    Rule * p_g1r4 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r4->rule_name = "g1r4";
-    p_g1r4->target_rule.rule_name = "g1r3";
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).rule();
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" ).rule();
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).target_rule_name( "g1r3" ).rule();
 
     JCRParser jp( &gs );
     
@@ -559,18 +457,10 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     GrammarSet gs;
 
     Grammar * p_g1 = gs.append_grammar( "<local>" );
-    Rule * p_g1r1 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r1->rule_name = "g1r1";
-    p_g1r1->target_rule.rule_name = "g1r2";
-    Rule * p_g1r2 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r2->rule_name = "g1r2";
-    p_g1r2->target_rule.rule_name = "g1r3";
-    Rule * p_g1r3 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r3->rule_name = "g1r3";
-    p_g1r3->target_rule.rule_name = "g1r4";
-    Rule * p_g1r4 = p_g1->append_rule( Rule::uniq_ptr( new Rule( p_g1, 0, 0 ) ) );
-    p_g1r4->rule_name = "g1r4";
-    p_g1r4->target_rule.rule_name = "g1r4";
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" ).rule();
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).rule();
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" ).rule();
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).target_rule_name( "g1r4" ).rule();
 
     JCRParser jp( &gs );
     
