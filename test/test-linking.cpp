@@ -37,6 +37,24 @@
 
 using namespace cljcr;
 
+class GrammarMaker // To facilitate making grammars for testing
+{
+    // Usage: Grammar * p_grammar = GrammarMaker( p_grammar_set, p_source ).id( "Foo" ).import( "Bar" ).import( "Baz" );
+
+private:
+    Grammar * p_grammar;
+
+public:
+    GrammarMaker( GrammarSet & r_grammar_set, const char * p_source ) : p_grammar( r_grammar_set.append_grammar( p_source ) ) {}
+    GrammarMaker( Grammar * p_grammar_in ) : p_grammar( p_grammar_in ) {}  // For an already created grammar
+
+    Grammar * grammar() { return p_grammar; }
+    operator Grammar * () { return grammar(); }
+
+    GrammarMaker & id( const char * p_name ) { p_grammar->ruleset_id = p_name; return *this; }
+    GrammarMaker & import( const char * p_name ) { p_grammar->add_unaliased_import( p_name ); return *this; }
+};
+
 class RuleMaker // To facilitate making rules for testing
 {
     // Usage: Rule * p_rule = RuleMaker( p_grammar ).rule_name( "Foo" ).target_rule_name( "Bar" );
