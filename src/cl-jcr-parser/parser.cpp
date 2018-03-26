@@ -3622,6 +3622,7 @@ public:
     bool link( Grammar * p_grammar );
 
 private:
+    void check_for_duplicate_ruleset_ids();
     void check_for_duplicate_rule_names( Grammar * p_grammar );
     void link_global_rules( Grammar * p_grammar );
     void link_global_rule( Rule * p_global_rule );
@@ -3661,9 +3662,14 @@ private:
 
 bool Linker::link()
 {
+    check_for_duplicate_ruleset_ids();
     for( size_t i=0; i<m.p_grammar_set->size(); ++i )
         link( &(*m.p_grammar_set)[i] );
     return ! m.is_errored;
+}
+
+void Linker::check_for_duplicate_ruleset_ids()
+{
 }
 
 bool Linker::link( Grammar * p_grammar )
