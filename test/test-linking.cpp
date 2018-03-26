@@ -123,6 +123,92 @@ TFEATURE( "Linking Rule::find_target_rule()" )
     TTEST( p_const_g1r2->target_rule.p_rule == 0 ); // Const instance can't set target_rule.p_rule
 }
 
+TFEATURE( "Global linking - Check for duplicate rules" )
+{
+    {
+    TDOC( "No duplication" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "r1" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "r2" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "r3" );
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "r4" );
+
+    JCRParser jp( &gs );
+    
+    TCRITICALTEST( jp.link( p_g1 ) == JCRParser::S_OK );
+    }
+    {
+    TDOC( "Bottom name duplicates top name - 2 rules" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "r1" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "r1" );
+
+    JCRParser jp( &gs );
+    
+    TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
+    }
+    {
+    TDOC( "Bottom name duplicates top name - 4 rules" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "r1" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "r2" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "r3" );
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "r1" );
+
+    JCRParser jp( &gs );
+    
+    TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
+    }
+    {
+    TDOC( "3rd name duplicates 2nd name" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "r1" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "r2" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "r2" );
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "r4" );
+
+    JCRParser jp( &gs );
+    
+    TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
+    }
+    {
+    TDOC( "Bottom name duplicates 2nd name" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "r1" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "r2" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "r3" );
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "r2" );
+
+    JCRParser jp( &gs );
+    
+    TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
+    }
+    {
+    TDOC( "Bottom name duplicates 3rd name" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "r1" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "r2" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "r3" );
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "r3" );
+
+    JCRParser jp( &gs );
+    
+    TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
+    }
+}
+
 TFEATURE( "Global linking - Local ruleset" )
 {
     {
@@ -426,4 +512,5 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
 }
 
 TFEATURETODO( "Test linking across multiple grammars" )
-TFEATURETODO( "Check for duplicately (or multiply) named global rules" )
+TFEATURETODO( "Check for duplicately (or multiply) named grammar ruleset-ids" )
+TFEATURETODO( "Test trying to link to undefined rule names" )

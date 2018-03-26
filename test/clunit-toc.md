@@ -1,4 +1,4 @@
-Tests table of contents generated on Sat Mar 24 22:15:09 2018
+Tests table of contents generated on Mon Mar 26 10:52:29 2018
 
 # test-config.cpp
 | Description | Line |
@@ -9,10 +9,11 @@ Tests table of contents generated on Sat Mar 24 22:15:09 2018
 | Description | Line |
 |-------------|------|
 | Linking Rule::find_target_rule() | 78 |
-| Global linking - Local ruleset | 126 |
-| Global linking - Local ruleset - with member rule | 178 |
-| Global linking - Local ruleset - with illegal multiple member rules | 286 |
-| Global linking - Local ruleset - with illegal loops | 332 |
+| Global linking - Check for duplicate rules | 126 |
+| Global linking - Local ruleset | 212 |
+| Global linking - Local ruleset - with member rule | 264 |
+| Global linking - Local ruleset - with illegal multiple member rules | 372 |
+| Global linking - Local ruleset - with illegal loops | 418 |
 
 # test-low-level-objects.cpp
 | Description | Line |

@@ -3622,6 +3622,7 @@ public:
     bool link( Grammar * p_grammar );
 
 private:
+    void check_for_duplicate_rule_names( Grammar * p_grammar );
     void link_global_rules( Grammar * p_grammar );
     void link_global_rule( Rule * p_global_rule );
     void do_link( LinkResult * p_link_result, LoopDetector * p_loop_detector, Rule * p_global_rule );
@@ -3667,8 +3668,27 @@ bool Linker::link()
 
 bool Linker::link( Grammar * p_grammar )
 {
+    check_for_duplicate_rule_names( p_grammar );
     link_global_rules( p_grammar );
     return ! m.is_errored;
+}
+
+void Linker::check_for_duplicate_rule_names( Grammar * p_grammar )
+{
+    for( size_t i=0; i<p_grammar->rules.size(); ++i )
+    {
+        Rule * p_rule_under_test = &(p_grammar->rules[i]);
+        for( size_t j=i+1; j<p_grammar->rules.size(); ++j )
+        {
+            Rule * p_possible_duplicate = &(p_grammar->rules[j]);
+            if( p_rule_under_test->rule_name == p_possible_duplicate->rule_name )
+                error( p_rule_under_test,
+                        "Duplicate <rule-name> '%0' found at (line: '%1', char: '%2')",
+                        clutils::str_args( p_rule_under_test->rule_name ) <<
+                            p_possible_duplicate->line_number <<
+                            p_possible_duplicate->column_number );
+        }
+    }
 }
 
 void Linker::link_global_rules( Grammar * p_grammar )
