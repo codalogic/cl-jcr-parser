@@ -3571,8 +3571,6 @@ private:
     struct Members {
         JCRParser * p_jcr_parser;
         GrammarSet * p_grammar_set;
-        typedef std::vector< const Rule * > reported_rule_t;
-        reported_rule_t reported_rule;
         bool is_errored;
         Members(
             JCRParser * p_jcr_parser_in,
@@ -3632,13 +3630,9 @@ private:
 
     void error( const Rule * p_rule, const char * p_message )
     {
-        if( ! is_reported_rule( p_rule ) )
-        {
-            add_reported_rule( p_rule );
-            m.p_grammar_set->inc_error_count();
-            report( p_rule, p_message );
-            m.is_errored = true;
-        }
+        m.p_grammar_set->inc_error_count();
+        report( p_rule, p_message );
+        m.is_errored = true;
     }
     void error( const Rule * p_rule, const char * p_format, const clutils::str_args & r_arg_1 )
     {
@@ -3652,12 +3646,6 @@ private:
     {
         m.p_jcr_parser->report( p_rule->p_grammar->jcr_source, p_rule->line_number, p_rule->column_number, Severity::ERROR, p_message );
     }
-
-    bool is_reported_rule( const Rule * p_rule ) const
-    {
-        return std::find( m.reported_rule.begin(), m.reported_rule.end(), p_rule ) != m.reported_rule.end();
-    }
-    void add_reported_rule( const Rule * p_rule ) { m.reported_rule.push_back( p_rule ); }
 };
 
 bool Linker::link()
