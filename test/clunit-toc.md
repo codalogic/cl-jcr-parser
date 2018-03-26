@@ -1,4 +1,4 @@
-Tests table of contents generated on Mon Mar 26 10:57:52 2018
+Tests table of contents generated on Mon Mar 26 11:03:19 2018
 
 # test-config.cpp
 | Description | Line |
@@ -14,6 +14,7 @@ Tests table of contents generated on Mon Mar 26 10:57:52 2018
 | Global linking - Local ruleset - with member rule | 264 |
 | Global linking - Local ruleset - with illegal multiple member rules | 372 |
 | Global linking - Local ruleset - with illegal loops | 418 |
+| Global link - to undefined rule names | 514 |
 
 # test-low-level-objects.cpp
 | Description | Line |
