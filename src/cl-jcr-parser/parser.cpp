@@ -3630,8 +3630,7 @@ private:
 
     void error( const Rule * p_rule, const char * p_message )
     {
-        m.p_grammar_set->inc_error_count();
-        report( p_rule, p_message );
+        report( p_rule, Severity::ERROR, p_message );
         m.is_errored = true;
     }
     void error( const Rule * p_rule, const char * p_format, const clutils::str_args & r_arg_1 )
@@ -3642,9 +3641,23 @@ private:
     {
         error( p_rule, expand( p_format, r_arg_1, r_arg_2 ).c_str() );
     }
-    void report( const Rule * p_rule, const char * p_message )
+    void report( const Rule * p_rule, Severity severity, const char * p_message )
     {
-        m.p_jcr_parser->report( p_rule->p_grammar->jcr_source, p_rule->line_number, p_rule->column_number, Severity::ERROR, p_message );
+        m.p_jcr_parser->report( p_rule->p_grammar->jcr_source, p_rule->line_number, p_rule->column_number, severity, p_message );
+    }
+
+    void error( const Grammar * p_grammar, const char * p_message )
+    {
+        report( p_grammar, Severity::ERROR, p_message );
+        m.is_errored = true;
+    }
+    void error( const Grammar * p_grammar, const char * p_format, const clutils::str_args & r_arg_1 )
+    {
+        error( p_grammar, expand( p_format, r_arg_1 ).c_str() );
+    }
+    void report( const Grammar * p_grammar, Severity severity, const char * p_message )
+    {
+        m.p_jcr_parser->report( p_grammar->jcr_source, severity, p_message );
     }
 };
 
