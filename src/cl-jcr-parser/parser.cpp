@@ -1121,14 +1121,14 @@ bool GrammarParser::member_rule_or_string_type_ambiguity_hack()
     if( annotations( rule_annotations ) && member_name_spec() )
     {
         star_sp_cmt();
-        
+
         if( is_get_char( ':' ) )
         {
             // It's a member-rule
             star_sp_cmt() &&
             (type_rule() || fatal( "Expected <type-rule> after <member-name> %0. Got '%1'", m.p_rule->member_name, error_token() ) );
         }
-        
+
         else
         {
             // It's a string type
@@ -1301,7 +1301,7 @@ bool GrammarParser::annotations( Annotations & r_annotations )
 
 bool GrammarParser::annotation_set( Annotations & r_annotations )
 {
-    /* ABNF: 
+    /* ABNF:
     annotation-set   = not-annotation / unordered-annotation /
                        root-annotation /
                        exclude-min-annotation / exclude-max-annotation /
@@ -1353,7 +1353,7 @@ bool GrammarParser::root_annotation( Annotations & r_annotations )
 
 bool GrammarParser::exclude_min_annotation( Annotations & r_annotations )
 {
-    /* ABNF: 
+    /* ABNF:
     exclude-min-annotation = exclude-min-kw
     */
     // exclude_min_kw()
@@ -1363,7 +1363,7 @@ bool GrammarParser::exclude_min_annotation( Annotations & r_annotations )
 
 bool GrammarParser::exclude_max_annotation( Annotations & r_annotations )
 {
-    /* ABNF: 
+    /* ABNF:
     exclude-max-annotation = exclude-max-kw
     */
     // exclude_max_kw()
@@ -1373,7 +1373,7 @@ bool GrammarParser::exclude_max_annotation( Annotations & r_annotations )
 
 bool GrammarParser::default_annotation( Annotations & r_annotations )
 {
-    /* ABNF: 
+    /* ABNF:
     default-annotation = default-kw spaces primitive-value
     */
     // default_kw() && spaces() && primitive_value()
@@ -1397,7 +1397,7 @@ bool GrammarParser::default_annotation( Annotations & r_annotations )
 
 bool GrammarParser::primitive_value()
 {
-    /* ABNF: 
+    /* ABNF:
     primitive-value  = false-value / null-type / true-value /
                    float-value / integer-value / string-value
     */
@@ -2756,7 +2756,7 @@ bool GrammarParser::float_num()
     // [ minus() ] && int() && frac() [ exp() ]
 
     cl::locator loc( this );
-    
+
     return optional( minus() ) && int_num() && frac() && optional( exp() ) || location_top( false );
 }
 
@@ -2992,7 +2992,7 @@ bool GrammarParser::regex()
         {}
 
         (accumulate( '/' ) && optional( regex_modifiers() )) || fatal( "Error reading regular expression. Got: '%0'", re_accumulator.get() );
-        
+
         re_accumulator.append_to_previous();
 
         return true;
@@ -3148,7 +3148,7 @@ bool GrammarParser::datetime_kw()
 
 bool GrammarParser::default_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     default-kw       = %x64.65.66.61.75.6C.74          ; "default"
     */
     // %x64.65.66.61.75.6C.74          ; "default"
@@ -3178,7 +3178,7 @@ bool GrammarParser::email_kw()
 
 bool GrammarParser::exclude_max_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     exclude-max-kw   = %x65.78.63.6C.75.64.65.2D.6D.61.78 ; "exclude-max"
     */
     // %x65.78.63.6C.75.64.65.2D.6D.61.78 ; "exclude-max"
@@ -3188,7 +3188,7 @@ bool GrammarParser::exclude_max_kw()
 
 bool GrammarParser::exclude_min_kw()
 {
-    /* ABNF: 
+    /* ABNF:
     exclude-min-kw   = %x65.78.63.6C.75.64.65.2D.6D.69.6E ; "exclude-min"
     */
     // %x65.78.63.6C.75.64.65.2D.6D.69.6E ; "exclude-min"

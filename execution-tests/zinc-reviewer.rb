@@ -110,16 +110,16 @@ class ZincReviewer
         @test_status[@index][:is_zinc_match] = @test_status[@index][:is_zinc_present] = false
         load_view @index
     end
-    
+
     def read_test_status
         @test_status = JCRGlobber.new.run
     end
-    
+
     def show_first_file
         @index = 0
         load_view @index
     end
-    
+
     def load_view n
         @file_label.text "File #{n+1}: #{@test_status[n][:jcr]}"
         @jcr_text.clear.insert 1.0, File.read( @test_status[n][:jcr] )
