@@ -136,7 +136,7 @@ TFEATURE( "Global linking - Check for duplicate rules" )
     Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "r4" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) == JCRParser::S_OK );
     }
     {
@@ -148,7 +148,7 @@ TFEATURE( "Global linking - Check for duplicate rules" )
     Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "r1" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
     }
     {
@@ -162,7 +162,7 @@ TFEATURE( "Global linking - Check for duplicate rules" )
     Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "r1" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
     }
     {
@@ -176,7 +176,7 @@ TFEATURE( "Global linking - Check for duplicate rules" )
     Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "r4" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
     }
     {
@@ -190,7 +190,7 @@ TFEATURE( "Global linking - Check for duplicate rules" )
     Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "r2" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
     }
     {
@@ -204,7 +204,7 @@ TFEATURE( "Global linking - Check for duplicate rules" )
     Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "r3" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
     }
 }
@@ -220,7 +220,7 @@ TFEATURE( "Global linking - Local ruleset" )
     Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) == JCRParser::S_OK );
     TTEST( p_g1->rules[0].target_rule.p_rule == p_g1r2 );
     TTEST( p_g1->rules[0].p_rule == p_g1r1 );   // Points to self
@@ -236,7 +236,7 @@ TFEATURE( "Global linking - Local ruleset" )
     Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) == JCRParser::S_OK );
     TTEST( p_g1->rules[0].target_rule.p_rule == p_g1r2 );
     TTEST( p_g1->rules[0].p_rule == p_g1r1 );   // Points to self
@@ -253,7 +253,7 @@ TFEATURE( "Global linking - Local ruleset" )
     Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) == JCRParser::S_OK );
     TTEST( p_g1->rules[0].target_rule.p_rule == p_g1r2 );
     TTEST( p_g1->rules[0].p_rule == p_g1r1 );   // Points to self
@@ -272,7 +272,7 @@ TFEATURE( "Global linking - Local ruleset - with member rule" )
     Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).                           member_name( "mg1r2" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) == JCRParser::S_OK );
     TTEST( p_g1->rules[0].target_rule.p_rule == p_g1r2 );
     TTEST( p_g1->rules[0].p_rule == p_g1r2 );
@@ -289,7 +289,7 @@ TFEATURE( "Global linking - Local ruleset - with member rule" )
     Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) == JCRParser::S_OK );
     TTEST( p_g1->rules[0].target_rule.p_rule == p_g1r2 );
     TTEST( p_g1->rules[0].p_rule == p_g1r2 );
@@ -306,7 +306,7 @@ TFEATURE( "Global linking - Local ruleset - with member rule" )
     Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).                           member_name( "mg1r3" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) == JCRParser::S_OK );
     TTEST( p_g1->rules[0].target_rule.p_rule == p_g1r2 );
     TTEST( p_g1->rules[0].p_rule == p_g1r3 );
@@ -324,7 +324,7 @@ TFEATURE( "Global linking - Local ruleset - with member rule" )
     Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) == JCRParser::S_OK );
     TTEST( p_g1->rules[0].target_rule.p_rule == p_g1r2 );
     TTEST( p_g1->rules[0].p_rule == p_g1r2 );
@@ -342,7 +342,7 @@ TFEATURE( "Global linking - Local ruleset - with member rule" )
     Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) == JCRParser::S_OK );
     TTEST( p_g1->rules[0].target_rule.p_rule == p_g1r2 );
     TTEST( p_g1->rules[0].p_rule == p_g1r3 );
@@ -360,7 +360,7 @@ TFEATURE( "Global linking - Local ruleset - with member rule" )
     Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).                           member_name( "mg1r4" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) == JCRParser::S_OK );
     TTEST( p_g1->rules[0].target_rule.p_rule == p_g1r2 );
     TTEST( p_g1->rules[0].p_rule == p_g1r4 );
@@ -382,7 +382,7 @@ TFEATURE( "Global linking - Local ruleset - with illegal multiple member rules" 
     Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).                           member_name( "mg1r4" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
     }
     {
@@ -396,7 +396,7 @@ TFEATURE( "Global linking - Local ruleset - with illegal multiple member rules" 
     Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
     }
     {
@@ -410,7 +410,7 @@ TFEATURE( "Global linking - Local ruleset - with illegal multiple member rules" 
     Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).                           member_name( "mg1r4" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
     }
 }
@@ -426,7 +426,7 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
     }
     {
@@ -438,7 +438,7 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r1" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
     }
     {
@@ -450,7 +450,7 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r2" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
     }
     {
@@ -464,7 +464,7 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).target_rule_name( "g1r1" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
     }
     {
@@ -478,7 +478,7 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).target_rule_name( "g1r2" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
     }
     {
@@ -492,7 +492,7 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).target_rule_name( "g1r3" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
     }
     {
@@ -506,7 +506,7 @@ TFEATURE( "Global linking - Local ruleset - with illegal loops" )
     Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).target_rule_name( "g1r4" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
     }
 }
@@ -524,7 +524,7 @@ TFEATURE( "Global link - to undefined rule names" )
     Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
     }
     {
@@ -538,10 +538,102 @@ TFEATURE( "Global link - to undefined rule names" )
     Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" );
 
     JCRParser jp( &gs );
-    
+
     TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
     }
 }
 
+TFEATURE( "Multiple grammar linking - Check for duplicately (or multiply) named grammar ruleset-ids" )
+{
+    {
+    TDOC( "Mustn't complain about no grammars" );
+    GrammarSet gs;
+
+    JCRParser jp( &gs );
+
+    TCRITICALTEST( jp.link() == JCRParser::S_OK );
+    }
+    {
+    TDOC( "Mustn't complain about a single grammar" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs );
+
+    JCRParser jp( &gs );
+
+    TCRITICALTEST( jp.link() == JCRParser::S_OK );
+    }
+    {
+    TDOC( "Multiple annoymous ruleset-ids is OK - 2 grammars" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs );
+    Grammar * p_g2 = GrammarMaker( gs );
+
+    JCRParser jp( &gs );
+
+    TCRITICALTEST( jp.link() == JCRParser::S_OK );
+    }
+    {
+    TDOC( "Multiple annoymous ruleset-ids is OK - 3 grammars" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs );
+    Grammar * p_g2 = GrammarMaker( gs );
+    Grammar * p_g3 = GrammarMaker( gs );
+
+    JCRParser jp( &gs );
+
+    TCRITICALTEST( jp.link() == JCRParser::S_OK );
+    }
+    {
+    TDOC( "Grammars with different ruleset-ids is OK" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs );
+    Grammar * p_g2 = GrammarMaker( gs ).ruleset_id( "g2" );
+    Grammar * p_g3 = GrammarMaker( gs ).ruleset_id( "g3" );
+
+    JCRParser jp( &gs );
+
+    TCRITICALTEST( jp.link() == JCRParser::S_OK );
+    }
+    {
+    TDOC( "Must error with multiple grammars with same ruleset-id - test 1" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs ).ruleset_id( "g1" );
+    Grammar * p_g2 = GrammarMaker( gs ).ruleset_id( "g1" );
+    Grammar * p_g3 = GrammarMaker( gs );
+
+    JCRParser jp( &gs );
+
+    TCRITICALTEST( jp.link() != JCRParser::S_OK );
+    }
+    {
+    TDOC( "Must error with multiple grammars with same ruleset-id - test 2" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs ).ruleset_id( "g1" );
+    Grammar * p_g2 = GrammarMaker( gs );
+    Grammar * p_g3 = GrammarMaker( gs ).ruleset_id( "g1" );
+
+    JCRParser jp( &gs );
+
+    TCRITICALTEST( jp.link() != JCRParser::S_OK );
+    }
+    {
+    TDOC( "Must error with multiple grammars with same ruleset-id - test 3" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs );
+    Grammar * p_g2 = GrammarMaker( gs ).ruleset_id( "g2" );
+    Grammar * p_g3 = GrammarMaker( gs ).ruleset_id( "g2" );
+
+    JCRParser jp( &gs );
+
+    TCRITICALTEST( jp.link() != JCRParser::S_OK );
+    }
+}
+
 TFEATURETODO( "Test linking across multiple grammars" )
-TFEATURETODO( "Check for duplicately (or multiply) named grammar ruleset-ids" )

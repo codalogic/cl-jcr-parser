@@ -3655,6 +3655,10 @@ private:
     {
         error( p_grammar, expand( p_format, r_arg_1 ).c_str() );
     }
+    void error( const Grammar * p_grammar, const char * p_format, const clutils::str_args & r_arg_1, const clutils::str_args & r_arg_2 )
+    {
+        error( p_grammar, expand( p_format, r_arg_1, r_arg_2 ).c_str() );
+    }
     void report( const Grammar * p_grammar, Severity severity, const char * p_message )
     {
         m.p_jcr_parser->report( p_grammar->jcr_source, severity, p_message );
@@ -3671,6 +3675,22 @@ bool Linker::link()
 
 void Linker::check_for_duplicate_ruleset_ids()
 {
+    for( size_t i=0; i<m.p_grammar_set->size(); ++i )
+    {
+        Grammar * p_grammar_under_test = &(*m.p_grammar_set)[i];
+        if( ! p_grammar_under_test->ruleset_id.empty() )
+        {
+            for( size_t j=i+1; j<m.p_grammar_set->size(); ++j )
+            {
+                Grammar * p_possible_duplicate = &(*m.p_grammar_set)[j];
+                if( p_grammar_under_test->ruleset_id == p_possible_duplicate->ruleset_id )
+                    error( p_grammar_under_test,
+                            "Duplicate <ruleset-id> '%0' found in source '%1'",
+                            p_grammar_under_test->ruleset_id,
+                            p_possible_duplicate->jcr_source );
+            }
+        }
+    }
 }
 
 bool Linker::link( Grammar * p_grammar )

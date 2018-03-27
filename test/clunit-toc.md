@@ -1,4 +1,4 @@
-Tests table of contents generated on Tue Mar 27 14:06:56 2018
+Tests table of contents generated on Tue Mar 27 14:27:50 2018
 
 # test-config.cpp
 | Description | Line |
@@ -15,6 +15,7 @@ Tests table of contents generated on Tue Mar 27 14:06:56 2018
 | Global linking - Local ruleset - with illegal multiple member rules | 372 |
 | Global linking - Local ruleset - with illegal loops | 418 |
 | Global link - to undefined rule names | 514 |
+| Multiple grammar linking - Check for duplicately (or multiply) named grammar ruleset-ids | 546 |
 
 # test-low-level-objects.cpp
 | Description | Line |
