@@ -3835,12 +3835,15 @@ JCRParser::Status JCRParser::parse_grammar( cl::reader & reader, const std::stri
 void JCRParserWithReporter::report( const std::string & source, size_t line, size_t column, Severity severity, const char * p_message )
 {
     std::ostringstream oss;
-    oss << severity << ": " << source << " (line: " << line;
-    if( column != ~0U )
-        oss << ", char: " << column;
-    oss <<
-            "):\n" <<
-            "      " << p_message << "\n";
+    oss << severity << ": " << source;
+    if( line != ~0U )
+    {
+        oss << " (line: " << line;
+        if( column != ~0U )
+            oss << ", char: " << column;
+        oss << ")";
+    }
+    oss << ":\n      " << p_message << "\n";
     std::string constructed_message = oss.str();
 
     if( reported_messages.find( constructed_message ) == reported_messages.end() )

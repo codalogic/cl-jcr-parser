@@ -485,6 +485,14 @@ public:
     {
         (void)source; (void)line; (void)column; (void)severity; (void)p_message; // Mark parameters as unused
     }
+    void report( const std::string & source, size_t line, Severity severity, const char * p_message )  // Inherit this class to get error message fed back to you
+    {
+        report( source, line, ~0U, severity, p_message );
+    }
+    void report( const std::string & source, Severity severity, const char * p_message )  // Inherit this class to get error message fed back to you
+    {
+        report( source, ~0U, ~0U, severity, p_message );
+    }
 
 private:
     Status parse_grammar( cl::reader & reader, const std::string & jcr_source );
