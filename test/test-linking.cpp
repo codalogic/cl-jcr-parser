@@ -428,6 +428,20 @@ TFEATURE( "Global linking - Local ruleset - with illegal multiple member rules" 
 
     TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
     }
+    {
+    TDOC( "Three layers of lookup - member name on 2nd and 4th rule" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g1r2" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g1r3" ).member_name( "mg1r2" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).target_rule_name( "g1r4" );
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).                           member_name( "mg1r4" );
+
+    JCRParser jp( &gs );
+
+    TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
+    }
 }
 
 TFEATURE( "Global linking - Local ruleset - with illegal loops" )

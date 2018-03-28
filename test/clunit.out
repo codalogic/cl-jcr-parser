@@ -1,4 +1,4 @@
-Tests run on Wed Mar 28 14:33:05 2018
+Tests run on Wed Mar 28 14:34:22 2018
 
     Config - Configuration [test-config.cpp:40]
     ===========================================
@@ -124,9 +124,11 @@ Tests run on Wed Mar 28 14:33:05 2018
     ok: jp.link( p_g1 ) != JCRParser::S_OK
       #### Three layers of lookup - member name on 3rd and 4th rule ####
     ok: jp.link( p_g1 ) != JCRParser::S_OK
+      #### Three layers of lookup - member name on 2nd and 4th rule ####
+    ok: jp.link( p_g1 ) != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Global linking - Local ruleset - with illegal loops [test-linking.cpp:433]
+    Global linking - Local ruleset - with illegal loops [test-linking.cpp:447]
     ==========================================================================
       #### One layer of lookup - loop to self ####
     ok: jp.link( p_g1 ) != JCRParser::S_OK
@@ -144,7 +146,7 @@ Tests run on Wed Mar 28 14:33:05 2018
     ok: jp.link( p_g1 ) != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Global link - to undefined rule names [test-linking.cpp:529]
+    Global link - to undefined rule names [test-linking.cpp:543]
     ============================================================
       #### First rule linking to undefined rule ####
     ok: jp.link( p_g1 ) != JCRParser::S_OK
@@ -152,7 +154,7 @@ Tests run on Wed Mar 28 14:33:05 2018
     ok: jp.link( p_g1 ) != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Multiple grammar linking - Check for duplicately (or multiply) named grammar ruleset-ids [test-linking.cpp:561]
+    Multiple grammar linking - Check for duplicately (or multiply) named grammar ruleset-ids [test-linking.cpp:575]
     ===============================================================================================================
       #### Mustn't complain about no grammars ####
     ok: jp.link() == JCRParser::S_OK
@@ -172,7 +174,7 @@ Tests run on Wed Mar 28 14:33:05 2018
     ok: jp.link() != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Multiple grammar linking - global rule linking [test-linking.cpp:654]
+    Multiple grammar linking - global rule linking [test-linking.cpp:668]
     =====================================================================
       #### Unaliased imports - first ruleset doing linking ####
     ok: jp.link() == JCRParser::S_OK
@@ -210,7 +212,7 @@ Tests run on Wed Mar 28 14:33:05 2018
     ok: p_g2r2->p_type == p_g3r1
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Child linking - single grammar [test-linking.cpp:768]
+    Child linking - single grammar [test-linking.cpp:782]
     =====================================================
       #### One child, one layer of nesting ####
     ok: jp.link( p_g1 ) == JCRParser::S_OK
@@ -237,7 +239,7 @@ Tests run on Wed Mar 28 14:33:05 2018
     ok: p_g1r1c3c2->p_type == p_g1r5
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
-    Child linking - single grammar - with member names [test-linking.cpp:855]
+    Child linking - single grammar - with member names [test-linking.cpp:869]
     =========================================================================
       #### Three children, one layer of nesting ####
     ok: jp.link( p_g1 ) == JCRParser::S_OK
@@ -2718,9 +2720,9 @@ jcr-version
 
 TODOs (4):
 ------------------------
-- Add linking execution tests [test-linking.cpp:924]
+- Add linking execution tests [test-linking.cpp:938]
 - Test low level GrammarSet class [test-low-level-objects.cpp:379]
 - Investigate changes needed to remove requirement for g++ -Wno-parentheses flag [test-main.cpp:39]
 - Update copyright dates! [test-main.cpp:40]
 
-0 error(s), 4 todo(s), 2084 test(s)
+0 error(s), 4 todo(s), 2085 test(s)
