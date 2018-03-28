@@ -1,11 +1,11 @@
-Tests table of contents generated on Wed Mar 28 14:41:03 2018
-
 # test-config.cpp
+
 | Description | Line |
 |-------------|------|
 | Config - Configuration | 40 |
 
 # test-linking.cpp
+
 | Description | Line |
 |-------------|------|
 | Linking Rule::find_target_rule() | 93 |
@@ -22,6 +22,7 @@ Tests table of contents generated on Wed Mar 28 14:41:03 2018
 | Child linking - multiple grammars | 938 |
 
 # test-low-level-objects.cpp
+
 | Description | Line |
 |-------------|------|
 | ValueConstraint | 40 |
@@ -34,11 +35,13 @@ Tests table of contents generated on Wed Mar 28 14:41:03 2018
 | GrammarSet::find_grammar() | 361 |
 
 # test-main.cpp
+
 | Description | Line |
 |-------------|------|
 | Miscellaneous TODOs | 37 |
 
 # test-parsing-only.cpp
+
 | Description | Line |
 |-------------|------|
 | GrammarParser - Syntax parsing with no semantic interpretation - comments | 62 |

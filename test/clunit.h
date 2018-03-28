@@ -209,32 +209,31 @@ private:
     class singleton
     {
     private:
-        bool is_first_tout;
+        bool is_first_section;
         bool is_new_tout_section;
         bool is_new_print_all_section;
         int n_tests;
         int n_errors;
         int n_forced_fails_invoked;
         int n_forced_fails_occurred;
-        bool is_first_ttoc;
         const char * p_current_test_file;
         fixed_size_log todo_log;
 
         job_list & get_jobs();
         std::ostream & tout();
         std::ostream & ttocout();
+        std::ostream & ttodoout();
 
     public:
         singleton()
             :
-            is_first_tout( true ),
+            is_first_section( true ),
             is_new_tout_section( false ),
             is_new_print_all_section( false ),
             n_tests( 0 ),
             n_errors( 0 ),
             n_forced_fails_invoked( 0 ),
             n_forced_fails_occurred( 0 ),
-            is_first_ttoc( true ),
             p_current_test_file( 0 ),
             todo_log( 10000 )
         {}
@@ -263,10 +262,12 @@ private:
         {
             if( ! p_current_test_file || strcmp( p_current_test_file, file ) != 0 )
             {
-                ttocout() << "\n";
-                ttocout() << "# " << file_base( file ) << "\n";
-                ttocout() << "| Description | Line |\n";
-                ttocout() << "|-------------|------|\n";
+                if( p_current_test_file )   // if( we've already output data )
+                    ttocout() << "\n";
+                ttocout() << "# " << file_base( file ) << "\n" <<   // # at start of line makes a heading in a .md file
+                             "\n" <<
+                             "| Description | Line |\n" <<
+                             "|-------------|------|\n";
                 p_current_test_file = file;
             }
             ttocout() << "| " << what << " | " << line << " |\n";
@@ -364,7 +365,9 @@ private:
 
                 try
                 {
-                    is_new_tout_section = is_new_print_all_section = true;
+                    if( ! is_first_section )
+                        is_new_tout_section = is_new_print_all_section = true;
+                    is_first_section = false;
                     if( job->p_description )
                         tbegin( job->p_description, job->p_file, job->line );
                     job->job();
@@ -396,12 +399,13 @@ private:
             {
                 std::ostringstream todo_report;
                 todo_report <<
-                        "\nTODOs (" <<
+                        "TODOs (" <<
                         todo_log.size() <<
                         "):\n------------------------\n" <<
                         todo_log.get() <<
                         "\n";
-                print_to_all_outputs( todo_report.str() );
+                print_to_all_outputs( std::string( "\n" ) + todo_report.str() );
+                ttodoout() << todo_report.str();
             }
             std::ostringstream summary;
             summary <<
@@ -508,12 +512,6 @@ public:
 #else
         static std::ofstream os( "clunit.out" );
 #endif
-        if( is_first_tout )
-        {
-            time_t t=time(NULL);
-            os << "Tests run on " << ctime(&t);
-            is_first_tout = false;
-        }
         if( is_new_tout_section )
         {
             is_new_tout_section = false;
@@ -524,12 +522,11 @@ public:
     std::ostream & clunit::singleton::ttocout()
     {
         static std::ofstream os( "clunit-toc.md" );
-        if( is_first_ttoc )
-        {
-            time_t t=time(NULL);
-            os << "Tests table of contents generated on " << ctime(&t);
-            is_first_ttoc = false;
-        }
+        return os;
+    }
+    std::ostream & clunit::singleton::ttodoout()
+    {
+        static std::ofstream os( "clunit-todo.out" );
         return os;
     }
 #endif
