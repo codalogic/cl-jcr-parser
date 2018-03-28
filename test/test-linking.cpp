@@ -37,42 +37,57 @@
 
 using namespace cljcr;
 
-class GrammarMaker // To facilitate making grammars for testing
+class GrammarModifier // To facilitate modifying already created grammars
 {
-    // Usage: Grammar * p_grammar = GrammarMaker( p_grammar_set, p_source ).id( "Foo" ).import( "Bar" ).import( "Baz" );
+    // Usage: GrammarModifier( p_grammar ).id( "Foo" ).import( "Bar" ).import( "Baz" );
 
 private:
     Grammar * p_grammar;
 
 public:
-    GrammarMaker( GrammarSet & r_grammar_set ) : p_grammar( r_grammar_set.append_grammar( "<locally generated test>" ) ) {}
-    GrammarMaker( Grammar * p_grammar_in ) : p_grammar( p_grammar_in ) {}  // For an already created grammar
+    GrammarModifier( Grammar * p_grammar_in ) : p_grammar( p_grammar_in ) {}  // For an already created grammar
 
     Grammar * grammar() { return p_grammar; }
     operator Grammar * () { return grammar(); }
 
-    GrammarMaker & ruleset_id( const char * p_name ) { p_grammar->ruleset_id = p_name; return *this; }
-    GrammarMaker & unaliased_import( const char * p_name ) { p_grammar->add_unaliased_import( p_name ); return *this; }
+    GrammarModifier & ruleset_id( const char * p_name ) { p_grammar->ruleset_id = p_name; return *this; }
+    GrammarModifier & unaliased_import( const char * p_name ) { p_grammar->add_unaliased_import( p_name ); return *this; }
 };
 
-class RuleMaker // To facilitate making rules for testing
+class GrammarMaker : public GrammarModifier // To facilitate making grammars for testing
 {
-    // Usage: Rule * p_rule = RuleMaker( p_grammar ).rule_name( "Foo" ).target_rule_name( "Bar" );
+    // Usage: Grammar * p_grammar = GrammarMaker( p_grammar_set ).id( "Foo" ).import( "Bar" ).import( "Baz" );
+
+public:
+    GrammarMaker( GrammarSet & r_grammar_set ) : GrammarModifier( r_grammar_set.append_grammar( "<locally generated test>" ) ) {}
+};
+
+class RuleModifier // To facilitate modifying already created rules
+{
+    // Usage: RuleModifier( p_rule ).rule_name( "Foo" ).target_rule_name( "Bar" );
 
 private:
     Rule * p_rule;
 
 public:
-    RuleMaker( Grammar * p_grammar ) : p_rule( p_grammar->append_rule( Rule::uniq_ptr( new Rule( p_grammar, 0, 0 ) ) ) ) {}
-    RuleMaker( Rule * p_rule_in ) : p_rule( p_rule_in ) {}  // For an already created rule
+    RuleModifier( Rule * p_rule_in ) : p_rule( p_rule_in ) {}
 
     Rule * rule() { return p_rule; }
     operator Rule * () { return rule(); }
 
-    RuleMaker & rule_name( const char * p_name ) { p_rule->rule_name = p_name; return *this; }
-    RuleMaker & member_name( const char * p_name ) { p_rule->member_name.set_literal( p_name ); return *this; }
-    RuleMaker & target_rule_name( const char * p_name ) { p_rule->target_rule.rule_name = p_name; return *this; }
-    RuleMaker & target_ruleset_id( const char * p_name ) { p_rule->target_rule.ruleset_id = p_name; return *this; }
+    RuleModifier & rule_name( const char * p_name ) { p_rule->rule_name = p_name; return *this; }
+    RuleModifier & member_name( const char * p_name ) { p_rule->member_name.set_literal( p_name ); return *this; }
+    RuleModifier & target_rule_name( const char * p_name ) { p_rule->target_rule.rule_name = p_name; return *this; }
+    RuleModifier & target_ruleset_id( const char * p_name ) { p_rule->target_rule.ruleset_id = p_name; return *this; }
+};
+
+class RuleMaker : public RuleModifier // To facilitate making rules for testing
+{
+    // Usage: Rule * p_rule = RuleMaker( p_grammar ).rule_name( "Foo" ).target_rule_name( "Bar" );
+
+public:
+    RuleMaker( Grammar * p_grammar ) : RuleModifier( p_grammar->append_rule( Rule::uniq_ptr( new Rule( p_grammar, 0, 0 ) ) ) ) {}
+    RuleMaker( Rule * p_parent_rule ) : RuleModifier( p_parent_rule->append_child_rule( Rule::uniq_ptr( new Rule( p_parent_rule->p_grammar, 0, 0 ) ) ) ) {}
 };
 
 TFEATURE( "Linking Rule::find_target_rule()" )
@@ -750,5 +765,160 @@ TFEATURE( "Multiple grammar linking - global rule linking" )
     }
 }
 
-TFEATURETODO( "Test linking child rules" )
+TFEATURE( "Child linking - single grammar" )
+{
+    {
+    TDOC( "One child, one layer of nesting" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" );
+        Rule * p_g1r1c1 = RuleMaker( p_g1r1 ).target_rule_name( "g1r3" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" );
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" );
+
+    JCRParser jp( &gs );
+
+    TCRITICALTEST( jp.link( p_g1 ) == JCRParser::S_OK );
+    TTEST( p_g1r1c1->target_rule.p_rule == p_g1r3 );
+    TTEST( p_g1r1c1->p_rule == p_g1r1c1 );   // Points to self
+    TTEST( p_g1r1c1->p_type == p_g1r3 );
+    }
+    {
+    TDOC( "Three children, one layer of nesting" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" );
+        Rule * p_g1r1c1 = RuleMaker( p_g1r1 );
+        Rule * p_g1r1c2 = RuleMaker( p_g1r1 );
+        Rule * p_g1r1c3 = RuleMaker( p_g1r1 ).target_rule_name( "g1r3" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" );
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" );
+
+    JCRParser jp( &gs );
+
+    TCRITICALTEST( jp.link( p_g1 ) == JCRParser::S_OK );
+    TTEST( p_g1r1c3->target_rule.p_rule == p_g1r3 );
+    TTEST( p_g1r1c3->p_rule == p_g1r1c3 );   // Points to self
+    TTEST( p_g1r1c3->p_type == p_g1r3 );
+    }
+    {
+    TDOC( "One child, two layers of nesting" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" );
+        Rule * p_g1r1c1 = RuleMaker( p_g1r1 );
+            Rule * p_g1r1c1c1 = RuleMaker( p_g1r1c1 ).target_rule_name( "g1r3" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" );
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" );
+
+    JCRParser jp( &gs );
+
+    TCRITICALTEST( jp.link( p_g1 ) == JCRParser::S_OK );
+    TTEST( p_g1r1c1c1->target_rule.p_rule == p_g1r3 );
+    TTEST( p_g1r1c1c1->p_rule == p_g1r1c1c1 );   // Points to self
+    TTEST( p_g1r1c1c1->p_type == p_g1r3 );
+    }
+    {
+    TDOC( "Three children, one layer of nesting" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" );
+        Rule * p_g1r1c1 = RuleMaker( p_g1r1 );
+        Rule * p_g1r1c2 = RuleMaker( p_g1r1 );
+        Rule * p_g1r1c3 = RuleMaker( p_g1r1 );
+            Rule * p_g1r1c3c1 = RuleMaker( p_g1r1c3 ).target_rule_name( "g1r3" );
+            Rule * p_g1r1c3c2 = RuleMaker( p_g1r1c3 ).target_rule_name( "g1r4" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" );
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).target_rule_name( "g1r5" );
+    Rule * p_g1r5 = RuleMaker( p_g1 ).rule_name( "g1r5" );
+
+    JCRParser jp( &gs );
+
+    TCRITICALTEST( jp.link( p_g1 ) == JCRParser::S_OK );
+    TTEST( p_g1r1c3c1->target_rule.p_rule == p_g1r3 );
+    TTEST( p_g1r1c3c1->p_rule == p_g1r1c3c1 );   // Points to self
+    TTEST( p_g1r1c3c1->p_type == p_g1r3 );
+    TTEST( p_g1r1c3c2->target_rule.p_rule == p_g1r4 );
+    TTEST( p_g1r1c3c2->p_rule == p_g1r1c3c2 );   // Points to self
+    TTEST( p_g1r1c3c2->p_type == p_g1r5 );
+    }
+}
+
+TFEATURE( "Child linking - single grammar - with member names" )
+{
+    {
+    TDOC( "Three children, one layer of nesting" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" );
+        Rule * p_g1r1c1 = RuleMaker( p_g1r1 );
+        Rule * p_g1r1c2 = RuleMaker( p_g1r1 );
+        Rule * p_g1r1c3 = RuleMaker( p_g1r1 );
+            Rule * p_g1r1c3c1 = RuleMaker( p_g1r1c3 ).target_rule_name( "g1r3" );
+            Rule * p_g1r1c3c2 = RuleMaker( p_g1r1c3 ).target_rule_name( "g1r4" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).member_name( "mg1r3" );
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).member_name( "mg1r4" ).target_rule_name( "g1r5" );
+    Rule * p_g1r5 = RuleMaker( p_g1 ).rule_name( "g1r5" );
+
+    JCRParser jp( &gs );
+
+    TCRITICALTEST( jp.link( p_g1 ) == JCRParser::S_OK );
+    TTEST( p_g1r1c3c1->target_rule.p_rule == p_g1r3 );
+    TTEST( p_g1r1c3c1->p_rule == p_g1r3 );
+    TTEST( p_g1r1c3c1->p_type == p_g1r3 );
+    TTEST( p_g1r1c3c2->target_rule.p_rule == p_g1r4 );
+    TTEST( p_g1r1c3c2->p_rule == p_g1r4 );
+    TTEST( p_g1r1c3c2->p_type == p_g1r5 );
+    }
+    {
+    TDOC( "Must error if child is a member rule, and also links to a member rule" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" );
+        Rule * p_g1r1c1 = RuleMaker( p_g1r1 );
+        Rule * p_g1r1c2 = RuleMaker( p_g1r1 );
+        Rule * p_g1r1c3 = RuleMaker( p_g1r1 );
+            Rule * p_g1r1c3c1 = RuleMaker( p_g1r1c3 ).member_name( "mg1r1c3" ).target_rule_name( "g1r3" );
+            Rule * p_g1r1c3c2 = RuleMaker( p_g1r1c3 );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" ).member_name( "mg1r3" );
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" );
+
+    JCRParser jp( &gs );
+
+    TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
+    }
+    {
+    TDOC( "Must error if child links to rules that have multiple member names" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" );
+        Rule * p_g1r1c1 = RuleMaker( p_g1r1 );
+        Rule * p_g1r1c2 = RuleMaker( p_g1r1 );
+        Rule * p_g1r1c3 = RuleMaker( p_g1r1 );
+            Rule * p_g1r1c3c1 = RuleMaker( p_g1r1c3 );
+            Rule * p_g1r1c3c2 = RuleMaker( p_g1r1c3 ).target_rule_name( "g1r4" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" );
+    Rule * p_g1r3 = RuleMaker( p_g1 ).rule_name( "g1r3" );
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" ).member_name( "mg1r4" ).target_rule_name( "g1r5" );
+    Rule * p_g1r5 = RuleMaker( p_g1 ).rule_name( "g1r5" ).member_name( "mg1r3" );
+
+    JCRParser jp( &gs );
+
+    TCRITICALTEST( jp.link( p_g1 ) != JCRParser::S_OK );
+    }
+}
+
 TFEATURETODO( "Add linking execution tests" )

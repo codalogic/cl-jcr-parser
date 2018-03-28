@@ -1,4 +1,4 @@
-Tests table of contents generated on Wed Mar 28 13:15:29 2018
+Tests table of contents generated on Wed Mar 28 14:33:05 2018
 
 # test-config.cpp
 | Description | Line |
@@ -8,15 +8,17 @@ Tests table of contents generated on Wed Mar 28 13:15:29 2018
 # test-linking.cpp
 | Description | Line |
 |-------------|------|
-| Linking Rule::find_target_rule() | 78 |
-| Global linking - Check for duplicate rules | 126 |
-| Global linking - Local ruleset | 212 |
-| Global linking - Local ruleset - with member rule | 264 |
-| Global linking - Local ruleset - with illegal multiple member rules | 372 |
-| Global linking - Local ruleset - with illegal loops | 418 |
-| Global link - to undefined rule names | 514 |
-| Multiple grammar linking - Check for duplicately (or multiply) named grammar ruleset-ids | 546 |
-| Multiple grammar linking - global rule linking | 639 |
+| Linking Rule::find_target_rule() | 93 |
+| Global linking - Check for duplicate rules | 141 |
+| Global linking - Local ruleset | 227 |
+| Global linking - Local ruleset - with member rule | 279 |
+| Global linking - Local ruleset - with illegal multiple member rules | 387 |
+| Global linking - Local ruleset - with illegal loops | 433 |
+| Global link - to undefined rule names | 529 |
+| Multiple grammar linking - Check for duplicately (or multiply) named grammar ruleset-ids | 561 |
+| Multiple grammar linking - global rule linking | 654 |
+| Child linking - single grammar | 768 |
+| Child linking - single grammar - with member names | 855 |
 
 # test-low-level-objects.cpp
 | Description | Line |

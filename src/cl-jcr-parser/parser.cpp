@@ -3800,8 +3800,15 @@ void Linker::link_child_rule( Rule * p_rule )
         }
         else
         {
-            p_rule->p_rule = p_target_rule->p_rule;
             p_rule->p_type = p_target_rule->p_type;
+            if( p_target_rule->is_member_rule() )
+            {
+                if( p_rule->is_member_rule() )
+                    error( p_rule, "Member rule links to Member rule '%0'",
+                            p_rule->target_rule );
+                else
+            p_rule->p_rule = p_target_rule->p_rule;
+            }
         }
     }
 }
