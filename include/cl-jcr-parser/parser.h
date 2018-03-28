@@ -27,6 +27,10 @@ namespace cl { class reader; }
 
 namespace cljcr {
 
+//----------------------------------------------------------------------------
+//                          Utility classes
+//----------------------------------------------------------------------------
+
 namespace detail {
 class NonCopyable   // Avoid requiring inclusion of boost for this
 {
@@ -95,6 +99,10 @@ public:
 };
 
 inline std::ostream & operator << ( std::ostream & r_os, const Severity & r_v ) { r_os << r_v.to_s(); return r_os; }
+
+//----------------------------------------------------------------------------
+//                   Classes representing JCR constructs
+//----------------------------------------------------------------------------
 
 struct Repetition
 {
