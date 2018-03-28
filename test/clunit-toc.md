@@ -1,4 +1,4 @@
-Tests table of contents generated on Wed Mar 28 14:34:22 2018
+Tests table of contents generated on Wed Mar 28 14:41:03 2018
 
 # test-config.cpp
 | Description | Line |
@@ -19,6 +19,7 @@ Tests table of contents generated on Wed Mar 28 14:34:22 2018
 | Multiple grammar linking - global rule linking | 668 |
 | Child linking - single grammar | 782 |
 | Child linking - single grammar - with member names | 869 |
+| Child linking - multiple grammars | 938 |
 
 # test-low-level-objects.cpp
 | Description | Line |

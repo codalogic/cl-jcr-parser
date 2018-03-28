@@ -935,4 +935,52 @@ TFEATURE( "Child linking - single grammar - with member names" )
     }
 }
 
+TFEATURE( "Child linking - multiple grammars" )
+{
+    {
+    TDOC( "Unaliased import" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs ).unaliased_import( "g2" );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" );
+        Rule * p_g1r1c1 = RuleMaker( p_g1r1 );
+            Rule * p_g1r1c1c1 = RuleMaker( p_g1r1c1 ).target_rule_name( "g2r2" );
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" );
+
+    Grammar * p_g2 = GrammarMaker( gs ).ruleset_id( "g2" );
+    Rule * p_g2r1 = RuleMaker( p_g2 ).rule_name( "g2r1" );
+    Rule * p_g2r2 = RuleMaker( p_g2 ).rule_name( "g2r2" );
+    Rule * p_g2r3 = RuleMaker( p_g2 ).rule_name( "g2r3" );
+
+    JCRParser jp( &gs );
+
+    TCRITICALTEST( jp.link( p_g1 ) == JCRParser::S_OK );
+    TTEST( p_g1r1c1c1->target_rule.p_rule == p_g2r2 );
+    TTEST( p_g1r1c1c1->p_rule == p_g1r1c1c1 );   // Points to self
+    TTEST( p_g1r1c1c1->p_type == p_g2r2 );
+    }
+    {
+    TDOC( "Aliased import" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" );
+        Rule * p_g1r1c1 = RuleMaker( p_g1r1 );
+            Rule * p_g1r1c1c1 = RuleMaker( p_g1r1c1 ).target_ruleset_id( "g2" ).target_rule_name( "g2r2" );
+    Rule * p_g1r4 = RuleMaker( p_g1 ).rule_name( "g1r4" );
+
+    Grammar * p_g2 = GrammarMaker( gs ).ruleset_id( "g2" );
+    Rule * p_g2r1 = RuleMaker( p_g2 ).rule_name( "g2r1" );
+    Rule * p_g2r2 = RuleMaker( p_g2 ).rule_name( "g2r2" );
+    Rule * p_g2r3 = RuleMaker( p_g2 ).rule_name( "g2r3" );
+
+    JCRParser jp( &gs );
+
+    TCRITICALTEST( jp.link( p_g1 ) == JCRParser::S_OK );
+    TTEST( p_g1r1c1c1->target_rule.p_rule == p_g2r2 );
+    TTEST( p_g1r1c1c1->p_rule == p_g1r1c1c1 );   // Points to self
+    TTEST( p_g1r1c1c1->p_type == p_g2r2 );
+    }
+}
+
 TFEATURETODO( "Add linking execution tests" )

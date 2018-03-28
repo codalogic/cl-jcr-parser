@@ -1,4 +1,4 @@
-Tests run on Wed Mar 28 14:34:22 2018
+Tests run on Wed Mar 28 14:41:03 2018
 
     Config - Configuration [test-config.cpp:40]
     ===========================================
@@ -253,6 +253,20 @@ Tests run on Wed Mar 28 14:34:22 2018
     ok: jp.link( p_g1 ) != JCRParser::S_OK
       #### Must error if child links to rules that have multiple member names ####
     ok: jp.link( p_g1 ) != JCRParser::S_OK
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    Child linking - multiple grammars [test-linking.cpp:938]
+    ========================================================
+      #### Unaliased import ####
+    ok: jp.link( p_g1 ) == JCRParser::S_OK
+    ok: p_g1r1c1c1->target_rule.p_rule == p_g2r2
+    ok: p_g1r1c1c1->p_rule == p_g1r1c1c1
+    ok: p_g1r1c1c1->p_type == p_g2r2
+      #### Aliased import ####
+    ok: jp.link( p_g1 ) == JCRParser::S_OK
+    ok: p_g1r1c1c1->target_rule.p_rule == p_g2r2
+    ok: p_g1r1c1c1->p_rule == p_g1r1c1c1
+    ok: p_g1r1c1c1->p_type == p_g2r2
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
@@ -2720,9 +2734,9 @@ jcr-version
 
 TODOs (4):
 ------------------------
-- Add linking execution tests [test-linking.cpp:938]
+- Add linking execution tests [test-linking.cpp:986]
 - Test low level GrammarSet class [test-low-level-objects.cpp:379]
 - Investigate changes needed to remove requirement for g++ -Wno-parentheses flag [test-main.cpp:39]
 - Update copyright dates! [test-main.cpp:40]
 
-0 error(s), 4 todo(s), 2085 test(s)
+0 error(s), 4 todo(s), 2094 test(s)
