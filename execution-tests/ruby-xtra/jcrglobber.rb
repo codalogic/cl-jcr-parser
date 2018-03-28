@@ -30,12 +30,14 @@ class JCRGlobber
 
     def run
         Dir.glob( '*' ).select { |name| File.directory? name }.each do |dir|
+            args = ''
+            args += '--no-link' if File.exists?( dir + '/$test-opt.no-link' )
             Dir.glob( "#{dir}/*.jcr" ) do |jcr|
                 @file_count += 1
                 is_zinc_match = is_zinc_present = is_output_present = false
                 output = jcr.sub( /\.jcr$/, '.txt' )
                 zinc = jcr.sub( /\.jcr$/, '.zinc.txt' )
-                on_process_jcr jcr, output, zinc
+                on_process_jcr args, jcr, output, zinc
                 @process_block.call( jcr, output, zinc ) if @process_block
                 if File.exists? output and File.size( output ) > 0
                     is_output_present = true
@@ -69,7 +71,7 @@ class JCRGlobber
         @all_results
     end
 
-    def on_process_jcr jcr, output, zinc
+    def on_process_jcr args, jcr, output, zinc
     end
 
     def on_zinc_match jcr, output, zinc

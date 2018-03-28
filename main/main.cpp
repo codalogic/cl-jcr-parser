@@ -12,6 +12,13 @@
 
 #include <iostream>
 
+struct TestConfig
+{
+    bool link;
+    
+    TestConfig() : link( true ) {}
+};
+
 void help()
 {
     std::cerr <<
@@ -32,7 +39,7 @@ void help()
             ;
 }
 
-bool capture_command_line( cljcr::Config * p_config, int argc, char ** argv )
+bool capture_command_line( TestConfig * p_test_config, cljcr::Config * p_config, int argc, char ** argv )
 {
     clutils::CommandLineArgs cla( argc, argv );
 
@@ -48,6 +55,11 @@ bool capture_command_line( cljcr::Config * p_config, int argc, char ** argv )
         {
             help();
             return false;
+        }
+
+        else if( cla.is_flag( "no-link" ) )
+        {
+            p_test_config->link = false;
         }
 
         else if( cla.is_flag( "json", 1, "-json flag must include name of JSON file to validate" ) )
@@ -73,7 +85,7 @@ bool capture_command_line( cljcr::Config * p_config, int argc, char ** argv )
     return true;
 }
 
-bool parse_config_jcrs( cljcr::GrammarSet * p_grammar_set, const cljcr::Config & r_config )
+bool parse_config_jcrs( cljcr::GrammarSet * p_grammar_set, const TestConfig & r_test_config, const cljcr::Config & r_config )
 {
     cljcr::JCRParserWithReporter jcr_parser( p_grammar_set );
     bool is_errored = false;
@@ -94,6 +106,9 @@ bool parse_config_jcrs( cljcr::GrammarSet * p_grammar_set, const cljcr::Config &
         }
     }
 
+    if( ! is_errored && r_test_config.link )
+        is_errored = (jcr_parser.link() != cljcr::JCRParser::S_OK);
+
     std::cout << p_grammar_set->error_count() << " error(s), " << p_grammar_set->warning_count() << " warning(s)\n";
 
     return ! is_errored;
@@ -101,14 +116,15 @@ bool parse_config_jcrs( cljcr::GrammarSet * p_grammar_set, const cljcr::Config &
 
 int main( int argc, char * argv[] )
 {
+    TestConfig test_config;
     cljcr::Config config;
 
-    if( ! capture_command_line( &config, argc, argv ) )
+    if( ! capture_command_line( &test_config, &config, argc, argv ) )
         return -1;
 
     cljcr::GrammarSet grammar_set;
 
-    if( ! parse_config_jcrs( &grammar_set, config ) )
+    if( ! parse_config_jcrs( &grammar_set, test_config, config ) )
         return -1;
 
     return 0;

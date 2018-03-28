@@ -3710,7 +3710,7 @@ void Linker::check_for_duplicate_rule_names( Grammar * p_grammar )
             Rule * p_possible_duplicate = &(p_grammar->rules[j]);
             if( p_rule_under_test->rule_name == p_possible_duplicate->rule_name )
                 error( p_rule_under_test,
-                        "Duplicate <rule-name> '%0' found at (line: '%1', char: '%2')",
+                        "Duplicate <rule-name> '$%0' found at (line: '%1', char: '%2')",
                         clutils::str_args( p_rule_under_test->rule_name ) <<
                             p_possible_duplicate->line_number <<
                             p_possible_duplicate->column_number );
@@ -3749,7 +3749,7 @@ void Linker::do_link( LinkResult * p_link_result, LoopDetector * p_loop_detector
         Rule * p_target_rule = p_global_rule->find_target_rule();
         if( ! p_target_rule )
         {
-            error( p_global_rule, "Unable to find Target rule '%0' for global rule '%1'",
+            error( p_global_rule, "Unable to find Target rule '$%0' for global rule '$%1'",
                     p_global_rule->target_rule,
                     p_global_rule->get_rule_name() );
         }
@@ -3758,7 +3758,7 @@ void Linker::do_link( LinkResult * p_link_result, LoopDetector * p_loop_detector
             LoopDetector loop_detector( p_loop_detector, p_target_rule );
             if( loop_detector.is_looped() )
             {
-                error( p_target_rule, "Target rule '%0' loops back to itself when linking global rule '%1'",
+                error( p_target_rule, "Target rule '$%0' loops back to itself when linking global rule '$%1'",
                         p_target_rule->rule_name,
                         p_global_rule->get_rule_name() );
             }
@@ -3768,9 +3768,9 @@ void Linker::do_link( LinkResult * p_link_result, LoopDetector * p_loop_detector
                 if( p_target_rule->is_member_rule() )
                 {
                     if( p_link_result->p_member_rule->is_member_rule() )
-                        error( p_link_result->p_member_rule, "Member rule links to Member rule '%0' when linking global rule '%1'",
-                                p_link_result->p_member_rule->target_rule,
-                                p_global_rule->get_rule_name() );
+                        error( p_link_result->p_member_rule, "Global member rule '$%0' links to another Member rule: '%1'",
+                                p_global_rule->get_rule_name(),
+                                p_link_result->p_member_rule->target_rule );
                     else
                         p_link_result->p_member_rule = p_target_rule;
                 }
@@ -3804,8 +3804,8 @@ void Linker::link_child_rule( Rule * p_rule )
             if( p_target_rule->is_member_rule() )
             {
                 if( p_rule->is_member_rule() )
-                    error( p_rule, "Member rule links to Member rule '%0'",
-                            p_rule->target_rule );
+                    error( p_rule, "Member rule links to another Member rule: '$%0'",
+                            p_target_rule->p_rule->rule_name );
                 else
             p_rule->p_rule = p_target_rule->p_rule;
             }

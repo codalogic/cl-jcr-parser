@@ -6,10 +6,10 @@
 require_relative 'ruby-xtra/jcrglobber.rb'
 
 class TestRunner < JCRGlobber
-    def on_process_jcr jcr, output, zinc
+    def on_process_jcr args, jcr, output, zinc
         # puts "Testing: #{jcr}"
         File.unlink output if File.exists? output
-        `#{$jcrcheck_exe} #{jcr} > #{output}`
+        `#{$jcrcheck_exe} #{args} #{jcr} > #{output}`
     end
 
     def on_zinc_match jcr, output, zinc
