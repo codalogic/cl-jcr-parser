@@ -1,4 +1,4 @@
-Tests run on Tue Mar 27 14:32:53 2018
+Tests run on Wed Mar 28 09:32:06 2018
 
     Config - Configuration [test-config.cpp:40]
     ===========================================
@@ -170,6 +170,10 @@ Tests run on Tue Mar 27 14:32:53 2018
     ok: jp.link() != JCRParser::S_OK
       #### Must error with multiple grammars with same ruleset-id - test 3 ####
     ok: jp.link() != JCRParser::S_OK
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
+    ok: ! _CrtMemDifference( &s3, &s1, &s2 )
+
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
@@ -2635,10 +2639,13 @@ jcr-version
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
 
-TODOs (3):
+TODOs (6):
 ------------------------
 - Test linking across multiple grammars [test-linking.cpp:639]
+- Test linking child rules [test-linking.cpp:640]
+- Add linking execution tests [test-linking.cpp:641]
 - Test low level GrammarSet class [test-low-level-objects.cpp:379]
 - Investigate changes needed to remove requirement for g++ -Wno-parentheses flag [test-main.cpp:39]
+- Update copyright dates! [test-main.cpp:40]
 
-0 error(s), 3 todo(s), 2024 test(s)
+0 error(s), 6 todo(s), 2026 test(s)

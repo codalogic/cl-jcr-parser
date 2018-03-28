@@ -637,3 +637,5 @@ TFEATURE( "Multiple grammar linking - Check for duplicately (or multiply) named 
 }
 
 TFEATURETODO( "Test linking across multiple grammars" )
+TFEATURETODO( "Test linking child rules" )
+TFEATURETODO( "Add linking execution tests" )
