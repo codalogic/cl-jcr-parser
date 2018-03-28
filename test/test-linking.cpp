@@ -636,6 +636,119 @@ TFEATURE( "Multiple grammar linking - Check for duplicately (or multiply) named 
     }
 }
 
-TFEATURETODO( "Test linking across multiple grammars" )
+TFEATURE( "Multiple grammar linking - global rule linking" )
+{
+    {
+    TDOC( "Unaliased imports - first ruleset doing linking" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs ).unaliased_import( "g2" ).unaliased_import( "g3" );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g2r1" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_rule_name( "g3r1" );
+    Grammar * p_g2 = GrammarMaker( gs ).ruleset_id( "g2" );
+    Rule * p_g2r1 = RuleMaker( p_g2 ).rule_name( "g2r1" );
+    Grammar * p_g3 = GrammarMaker( gs ).ruleset_id( "g3" );
+    Rule * p_g3r1 = RuleMaker( p_g3 ).rule_name( "g3r1" );
+
+    JCRParser jp( &gs );
+
+    TCRITICALTEST( jp.link() == JCRParser::S_OK );
+    TTEST( p_g1r1->target_rule.p_rule == p_g2r1 );
+    TTEST( p_g1r1->p_rule == p_g1r1 );
+    TTEST( p_g1r1->p_type == p_g2r1 );
+
+    TTEST( p_g1r2->target_rule.p_rule == p_g3r1 );
+    TTEST( p_g1r2->p_rule == p_g1r2 );
+    TTEST( p_g1r2->p_type == p_g3r1 );
+    }
+    {
+    TDOC( "Unaliased imports - second ruleset doing linking" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs ).ruleset_id( "g1" );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" );
+
+    Grammar * p_g2 = GrammarMaker( gs ).ruleset_id( "g2" ).unaliased_import( "g1" ).unaliased_import( "g3" );
+    Rule * p_g2r1 = RuleMaker( p_g2 ).rule_name( "g2r1" ).target_rule_name( "g1r1" );
+    Rule * p_g2r2 = RuleMaker( p_g2 ).rule_name( "g2r2" ).target_rule_name( "g3r1" );
+
+    Grammar * p_g3 = GrammarMaker( gs ).ruleset_id( "g3" );
+    Rule * p_g3r1 = RuleMaker( p_g3 ).rule_name( "g3r1" );
+
+    JCRParser jp( &gs );
+
+    TCRITICALTEST( jp.link() == JCRParser::S_OK );
+    TTEST( p_g2r1->target_rule.p_rule == p_g1r1 );
+    TTEST( p_g2r1->p_rule == p_g2r1 );
+    TTEST( p_g2r1->p_type == p_g1r1 );
+
+    TTEST( p_g2r2->target_rule.p_rule == p_g3r1 );
+    TTEST( p_g2r2->p_rule == p_g2r2 );
+    TTEST( p_g2r2->p_type == p_g3r1 );
+    }
+    {
+    TDOC( "Must fail to link to rule without a suitable import" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs ).ruleset_id( "g1" );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_rule_name( "g2r1" );
+
+    Grammar * p_g2 = GrammarMaker( gs ).ruleset_id( "g2" );
+    Rule * p_g2r1 = RuleMaker( p_g2 ).rule_name( "g2r1" ).target_rule_name( "g1r1" );
+
+    JCRParser jp( &gs );
+
+    TCRITICALTEST( jp.link() != JCRParser::S_OK );
+    }
+    {
+    TDOC( "Aliased imports - first ruleset doing linking" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" ).target_ruleset_id( "g2" ).target_rule_name( "g2r1" );
+    Rule * p_g1r2 = RuleMaker( p_g1 ).rule_name( "g1r2" ).target_ruleset_id( "g3" ).target_rule_name( "g3r1" );
+    Grammar * p_g2 = GrammarMaker( gs ).ruleset_id( "g2" );
+    Rule * p_g2r1 = RuleMaker( p_g2 ).rule_name( "g2r1" );
+    Grammar * p_g3 = GrammarMaker( gs ).ruleset_id( "g3" );
+    Rule * p_g3r1 = RuleMaker( p_g3 ).rule_name( "g3r1" );
+
+    JCRParser jp( &gs );
+
+    TCRITICALTEST( jp.link() == JCRParser::S_OK );
+    TTEST( p_g1r1->target_rule.p_rule == p_g2r1 );
+    TTEST( p_g1r1->p_rule == p_g1r1 );
+    TTEST( p_g1r1->p_type == p_g2r1 );
+
+    TTEST( p_g1r2->target_rule.p_rule == p_g3r1 );
+    TTEST( p_g1r2->p_rule == p_g1r2 );
+    TTEST( p_g1r2->p_type == p_g3r1 );
+    }
+    {
+    TDOC( "Aliased imports - second ruleset doing linking" );
+    GrammarSet gs;
+
+    Grammar * p_g1 = GrammarMaker( gs ).ruleset_id( "g1" );
+    Rule * p_g1r1 = RuleMaker( p_g1 ).rule_name( "g1r1" );
+
+    Grammar * p_g2 = GrammarMaker( gs ).ruleset_id( "g2" );
+    Rule * p_g2r1 = RuleMaker( p_g2 ).rule_name( "g2r1" ).target_ruleset_id( "g1" ).target_rule_name( "g1r1" );
+    Rule * p_g2r2 = RuleMaker( p_g2 ).rule_name( "g2r2" ).target_ruleset_id( "g3" ).target_rule_name( "g3r1" );
+
+    Grammar * p_g3 = GrammarMaker( gs ).ruleset_id( "g3" );
+    Rule * p_g3r1 = RuleMaker( p_g3 ).rule_name( "g3r1" );
+
+    JCRParser jp( &gs );
+
+    TCRITICALTEST( jp.link() == JCRParser::S_OK );
+    TTEST( p_g2r1->target_rule.p_rule == p_g1r1 );
+    TTEST( p_g2r1->p_rule == p_g2r1 );
+    TTEST( p_g2r1->p_type == p_g1r1 );
+
+    TTEST( p_g2r2->target_rule.p_rule == p_g3r1 );
+    TTEST( p_g2r2->p_rule == p_g2r2 );
+    TTEST( p_g2r2->p_type == p_g3r1 );
+    }
+}
+
 TFEATURETODO( "Test linking child rules" )
 TFEATURETODO( "Add linking execution tests" )

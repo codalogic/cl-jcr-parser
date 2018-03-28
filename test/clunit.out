@@ -1,4 +1,4 @@
-Tests run on Wed Mar 28 09:32:06 2018
+Tests run on Wed Mar 28 13:15:29 2018
 
     Config - Configuration [test-config.cpp:40]
     ===========================================
@@ -172,6 +172,42 @@ Tests run on Wed Mar 28 09:32:06 2018
     ok: jp.link() != JCRParser::S_OK
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
+    Multiple grammar linking - global rule linking [test-linking.cpp:639]
+    =====================================================================
+      #### Unaliased imports - first ruleset doing linking ####
+    ok: jp.link() == JCRParser::S_OK
+    ok: p_g1r1->target_rule.p_rule == p_g2r1
+    ok: p_g1r1->p_rule == p_g1r1
+    ok: p_g1r1->p_type == p_g2r1
+    ok: p_g1r2->target_rule.p_rule == p_g3r1
+    ok: p_g1r2->p_rule == p_g1r2
+    ok: p_g1r2->p_type == p_g3r1
+      #### Unaliased imports - second ruleset doing linking ####
+    ok: jp.link() == JCRParser::S_OK
+    ok: p_g2r1->target_rule.p_rule == p_g1r1
+    ok: p_g2r1->p_rule == p_g2r1
+    ok: p_g2r1->p_type == p_g1r1
+    ok: p_g2r2->target_rule.p_rule == p_g3r1
+    ok: p_g2r2->p_rule == p_g2r2
+    ok: p_g2r2->p_type == p_g3r1
+      #### Must fail to link to rule without a suitable import ####
+    ok: jp.link() != JCRParser::S_OK
+      #### Aliased imports - first ruleset doing linking ####
+    ok: jp.link() == JCRParser::S_OK
+    ok: p_g1r1->target_rule.p_rule == p_g2r1
+    ok: p_g1r1->p_rule == p_g1r1
+    ok: p_g1r1->p_type == p_g2r1
+    ok: p_g1r2->target_rule.p_rule == p_g3r1
+    ok: p_g1r2->p_rule == p_g1r2
+    ok: p_g1r2->p_type == p_g3r1
+      #### Aliased imports - second ruleset doing linking ####
+    ok: jp.link() == JCRParser::S_OK
+    ok: p_g2r1->target_rule.p_rule == p_g1r1
+    ok: p_g2r1->p_rule == p_g2r1
+    ok: p_g2r1->p_type == p_g1r1
+    ok: p_g2r2->target_rule.p_rule == p_g3r1
+    ok: p_g2r2->p_rule == p_g2r2
+    ok: p_g2r2->p_type == p_g3r1
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
 
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
@@ -2639,13 +2675,12 @@ jcr-version
     ok: ! _CrtMemDifference( &s3, &s1, &s2 )
     ok: _CrtCheckMemory() != 0
 
-TODOs (6):
+TODOs (5):
 ------------------------
-- Test linking across multiple grammars [test-linking.cpp:639]
-- Test linking child rules [test-linking.cpp:640]
-- Add linking execution tests [test-linking.cpp:641]
+- Test linking child rules [test-linking.cpp:753]
+- Add linking execution tests [test-linking.cpp:754]
 - Test low level GrammarSet class [test-low-level-objects.cpp:379]
 - Investigate changes needed to remove requirement for g++ -Wno-parentheses flag [test-main.cpp:39]
 - Update copyright dates! [test-main.cpp:40]
 
-0 error(s), 6 todo(s), 2026 test(s)
+0 error(s), 5 todo(s), 2055 test(s)
