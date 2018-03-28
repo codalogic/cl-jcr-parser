@@ -982,5 +982,3 @@ TFEATURE( "Child linking - multiple grammars" )
     TTEST( p_g1r1c1c1->p_type == p_g2r2 );
     }
 }
-
-TFEATURETODO( "Add linking execution tests" )

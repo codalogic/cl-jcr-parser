@@ -1,0 +1,7 @@
+Error: 90-linking/bad-global-link-looped.jcr (line: 3, char: 1):
+      Target rule '$r3' loops back to itself when linking global rule '$r5'
+Error: 90-linking/bad-global-link-looped.jcr (line: 4, char: 1):
+      Target rule '$r4' loops back to itself when linking global rule '$r3'
+Error: 90-linking/bad-global-link-looped.jcr (line: 5, char: 1):
+      Target rule '$r5' loops back to itself when linking global rule '$r4'
+3 error(s), 0 warning(s)

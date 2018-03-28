@@ -1,0 +1,4 @@
+$r1 = "name" : { $r2 }
+$r2 = "other" : $r3
+$r3 = "more" : $r4
+$r4 = integer

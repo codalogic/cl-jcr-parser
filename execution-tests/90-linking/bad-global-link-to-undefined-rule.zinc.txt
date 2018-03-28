@@ -1,0 +1,3 @@
+Error: 90-linking/bad-global-link-to-undefined-rule.jcr (line: 1, char: 17):
+      Unable to find Target rule '$r-unknown'
+1 error(s), 0 warning(s)

@@ -1,0 +1,3 @@
+Error: 90-linking/bad-child-link-to-multiple-member-rules.jcr (line: 1, char: 17):
+      Member rule links to another Member rule: '$r3'
+1 error(s), 0 warning(s)

@@ -1,0 +1,3 @@
+$r1 = "name" : { "other" : $r2 }
+$r2 = string
+$r2 = integer
