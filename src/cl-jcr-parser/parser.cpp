@@ -867,7 +867,7 @@ bool GrammarParser::multi_line_tbd_directive_d()
     if( directive_name() &&
         optional( one_star_sp_cmt() && tbd_directive_parameters_accumulator.select() && multi_line_directive_parameters() ) )
     {
-        warning( (std::string( "Unknown directive: " ) + tbd_directive_name_accumulator.get()).c_str() ); // See Leave_as_warning
+        warning( "Unknown directive: %0", tbd_directive_name_accumulator.get() ); // See Leave_as_warning
         return true;
     }
 
