@@ -217,7 +217,7 @@ TFEATURE( "GrammarParser - Syntax parsing - multi-line directive" )
     {
         TSETUP( ParserHarness ph(
                         "#{constraint foo\n"
-                        "    $name == /p\\d{1,5}/ && ; Must allow } and { in comments\n"
+                        "    $name == re(\"/p\\\\d{1,5}/\") && ; Must allow } and { in comments\n" // \\\\ - due to C++ string needs escaping, then q-string in JCR needs escaping
                         "    $when == \"} with {\"\n"
                         "}\n"
                         "$my_rule = $other_rule\n" ) );
@@ -2639,21 +2639,21 @@ TFEATURE( "GrammarParser - Syntax parsing - repetition" )
 TFEATURE( "GrammarParser - Syntax parsing - annotations" )
 {
     TCALL( test_parsing_only(
-                        "$my_rule = @{not} $other_rule\n" ) );
+                        "$my_rule = @{not} $other_rule " ) );
     TCALL( test_parsing_only(
-                        "$my_rule = [ @{id type} string, float ]\n" ) );
+                        "$my_rule = [ @{id type} string, float ] " ) );
     TCALL( test_parsing_only(
-                        "$my_rule = [ @{id type} string, @{when $type} float? ]\n" ) );
+                        "$my_rule = [ @{id type} string, @{when $type} float? ] " ) );
     TCALL( test_parsing_only(
-                        "$my_rule = [ @{id type} string, @{when $type}@{assert $ > 15.0} float ? ]\n" ) );
+                        "$my_rule = [ @{id type} string, @{when $type}@{assert $ > 15.0} float ? ] " ) );
     TCALL( test_parsing_only(
-                        "$my_rule = [ @{id type}@{assert $==\"in\" || $==\"out\"} string, float ? ]\n" ) );
+                        "$my_rule = [ @{id type}@{assert $==\"in\" || $==\"out\"} string, float ? ] " ) );
     TCALL( test_parsing_only(
-                        "$my_rule = [ @{id type}@{assert $==/^\\w{1,4}$/} string, float? ]\n" ) );
+                        "$my_rule = [ @{id type}@{assert $==re(\"/^\\\\w{1,4}$/\")} string, float? ] " ) ); // \\\\ - due to C++ string needs escaping, then q-string in JCR needs escaping
     TCALL( test_parsing_only(
-                        "$my_rule = [ @{id type}@{assert $==/^\\w{1,4}$/ ; Must for 4 or less chars{}\n} string, float? ]\n" ) );
+                        "$my_rule = [ @{id type}@{assert $==re(\"/^\\\\w{1,4}$/\") ; Must for 4 or less chars{}\n} string, float? ] " ) );
     TCALL( test_parsing_only(
-                        "$my_rule=[@{not}string,float ]\n" ) );
+                        "$my_rule=[@{not}string,float ] " ) );
 
     {
         TSETUP( ParserHarness ph( "$my_rule= @{exclude-min} 0..100\n" ) );

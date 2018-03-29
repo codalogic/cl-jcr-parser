@@ -6,7 +6,7 @@
 // this file, you can obtain one at http://opensource.org/licenses/LGPL-3.0.
 //----------------------------------------------------------------------------
 
-// Implements jcr-abnf - 2018-03-22
+// Implements jcr-abnf - 2018-03-29
 
 //----------------------------------------------------------------------------
 // Notes:
@@ -887,29 +887,29 @@ bool GrammarParser::multi_line_directive_parameters()
 bool GrammarParser::multi_line_parameters()
 {
     /* ABNF:
-    multi-line-parameters = *(comment / q-string / regex /
+    multi-line-parameters = *(comment / q-string /
                    not-multi-line-special)
     */
-    // *(comment() || q_string() || regex() || not_multi_line_special())
+    // *(comment() || q_string() || not_multi_line_special())
 
-    while( comment() || q_string() || regex() || not_multi_line_special() )
+    while( comment() || q_string() || not_multi_line_special() )
     {}
 
     return true;
 }
 
-cl::alphabet_char_class not_dquote_or_slash_or_semicolon_or_right_brace( "^\"/;}" );
+cl::alphabet_char_class not_dquote_or_semicolon_or_right_brace( "^\";}" );
 
 bool GrammarParser::not_multi_line_special()
 {
     /* ABNF:
-    not-multi-line-special = spaces / %x21 / %x23-2E / %x30-3A / %x3C-7C /
-                   %x7E-10FFFF ; not ", /, ; or }
+    not-multi-line-special = spaces / %x21 / %x23-3A /
+                   %x3C-7C / %x7E-10FFFF ; not ", ; or }
     */
-    // spaces() / %x21 / %x23-2E / %x30-3A / %x3C-7C /
-    //                    %x7E-10FFFF ; not ", /, ; or }
+    // spaces() / %x21 / %x23-3A /
+    //                    %x3C-7C / %x7E-10FFFF ; not ", ; or }
 
-    return skip( not_dquote_or_slash_or_semicolon_or_right_brace ) > 0;
+    return skip( not_dquote_or_semicolon_or_right_brace ) > 0;
 }
 
 bool GrammarParser::root_rule()
@@ -2928,7 +2928,7 @@ bool GrammarParser::escape()
     return accumulate( '\\' );
 }
 
-cl::alphabet_char_class escape_code_alphabet( "\"\\/bfnrt" );
+cl::alphabet_char_class escape_code_alphabet( "\"\\\\/bfnrt" );     // \\\\ - \\ to make a single \ in C++ string, \\\\ to make \\ in char class
 
 bool GrammarParser::escape_code()
 {

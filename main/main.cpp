@@ -15,7 +15,7 @@
 struct TestConfig
 {
     bool link;
-    
+
     TestConfig() : link( true ) {}
 };
 

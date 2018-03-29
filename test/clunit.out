@@ -719,7 +719,7 @@ jcr-version
   $id == 'None' }
  ####
     ok: status == JCRParser::S_OK
-      : ParserHarness ph( "#{constraint foo\n" "    $name == /p\\d{1,5}/ && ; Must allow } and { in comments\n" "    $when == \"} with {\"\n" "}\n" "$my_rule = $other_rule\n" )
+      : ParserHarness ph( "#{constraint foo\n" "    $name == re(\"/p\\\\d{1,5}/\") && ; Must allow } and { in comments\n" "    $when == \"} with {\"\n" "}\n" "$my_rule = $other_rule\n" )
     ok: ph.status() == JCRParser::S_OK
     ok: ph.grammar().rules.size() == 1
     ok: ph.grammar().rules[0].rule_name == "my_rule"
@@ -2640,38 +2640,30 @@ jcr-version
 
     GrammarParser - Syntax parsing - annotations [test-parsing-only.cpp:2639]
     =========================================================================
-      Calling: test_parsing_only( "$my_rule = @{not} $other_rule\n" ) (2642)
-      #### $my_rule = @{not} $other_rule
- ####
+      Calling: test_parsing_only( "$my_rule = @{not} $other_rule " ) (2642)
+      #### $my_rule = @{not} $other_rule  ####
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "$my_rule = [ @{id type} string, float ]\n" ) (2644)
-      #### $my_rule = [ @{id type} string, float ]
- ####
+      Calling: test_parsing_only( "$my_rule = [ @{id type} string, float ] " ) (2644)
+      #### $my_rule = [ @{id type} string, float ]  ####
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "$my_rule = [ @{id type} string, @{when $type} float? ]\n" ) (2646)
-      #### $my_rule = [ @{id type} string, @{when $type} float? ]
- ####
+      Calling: test_parsing_only( "$my_rule = [ @{id type} string, @{when $type} float? ] " ) (2646)
+      #### $my_rule = [ @{id type} string, @{when $type} float? ]  ####
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "$my_rule = [ @{id type} string, @{when $type}@{assert $ > 15.0} float ? ]\n" ) (2648)
-      #### $my_rule = [ @{id type} string, @{when $type}@{assert $ > 15.0} float ? ]
- ####
+      Calling: test_parsing_only( "$my_rule = [ @{id type} string, @{when $type}@{assert $ > 15.0} float ? ] " ) (2648)
+      #### $my_rule = [ @{id type} string, @{when $type}@{assert $ > 15.0} float ? ]  ####
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "$my_rule = [ @{id type}@{assert $==\"in\" || $==\"out\"} string, float ? ]\n" ) (2650)
-      #### $my_rule = [ @{id type}@{assert $=="in" || $=="out"} string, float ? ]
- ####
+      Calling: test_parsing_only( "$my_rule = [ @{id type}@{assert $==\"in\" || $==\"out\"} string, float ? ] " ) (2650)
+      #### $my_rule = [ @{id type}@{assert $=="in" || $=="out"} string, float ? ]  ####
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "$my_rule = [ @{id type}@{assert $==/^\\w{1,4}$/} string, float? ]\n" ) (2652)
-      #### $my_rule = [ @{id type}@{assert $==/^\w{1,4}$/} string, float? ]
- ####
+      Calling: test_parsing_only( "$my_rule = [ @{id type}@{assert $==re(\"/^\\\\w{1,4}$/\")} string, float? ] " ) (2652)
+      #### $my_rule = [ @{id type}@{assert $==re("/^\\w{1,4}$/")} string, float? ]  ####
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "$my_rule = [ @{id type}@{assert $==/^\\w{1,4}$/ ; Must for 4 or less chars{}\n} string, float? ]\n" ) (2654)
-      #### $my_rule = [ @{id type}@{assert $==/^\w{1,4}$/ ; Must for 4 or less chars{}
-} string, float? ]
- ####
+      Calling: test_parsing_only( "$my_rule = [ @{id type}@{assert $==re(\"/^\\\\w{1,4}$/\") ; Must for 4 or less chars{}\n} string, float? ] " ) (2654)
+      #### $my_rule = [ @{id type}@{assert $==re("/^\\w{1,4}$/") ; Must for 4 or less chars{}
+} string, float? ]  ####
     ok: status == JCRParser::S_OK
-      Calling: test_parsing_only( "$my_rule=[@{not}string,float ]\n" ) (2656)
-      #### $my_rule=[@{not}string,float ]
- ####
+      Calling: test_parsing_only( "$my_rule=[@{not}string,float ] " ) (2656)
+      #### $my_rule=[@{not}string,float ]  ####
     ok: status == JCRParser::S_OK
       : ParserHarness ph( "$my_rule= @{exclude-min} 0..100\n" )
     ok: ph.status() == JCRParser::S_OK
