@@ -74,7 +74,7 @@ class JCRGlobber
     
     def test_args base
         args = ''
-        args += ' --no-link' if File.exists?( base + 'test-opt.no-link' )
+        args += ' --parse-only' if File.exists?( base + 'test-opt.parse-only' )
         return args
     end
 
