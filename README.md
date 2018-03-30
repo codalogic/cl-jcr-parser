@@ -24,8 +24,8 @@ Windows explorer is more natural.)
 the JCR test files in order to set command-line flags for running the tests.  If
 `$test-opt.parse-only` is present in a sub-directory, then all tests for that
 sub-directory will have the `-parse-only` command-line flag set.  For
-per-JCR-file test options, if, for example, `foo.jcr` is being tested, and a
-file called `foo.test-opt.parse-only` is present, then the `-parse-only` flag
+per-JCR-file test options, if `<name>.jcr` is being tested, and the
+file `<name>.test-opt.parse-only` is present, then the `-parse-only` flag
 will be included specifically for that test.
 
 `zinc-reviewer.rb` is a Ruby/Tk based program that facilitates reviewing the
