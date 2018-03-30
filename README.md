@@ -20,13 +20,13 @@ are stored in files named `<name>.zinc.txt`.  (The reference file names are
 augmented with `zinc` rather than `gold` so that the order of display in
 Windows explorer is more natural.)
 
-`test-runner.rb` will look at various files in the sub-directories containing
-the JCR test files to set command-line flags for running the tests.  If
-`$test-opt.parse-only` is present in the sub-directory, then all tests for that
+`test-runner.rb` will look for various files in the sub-directories containing
+the JCR test files in order to set command-line flags for running the tests.  If
+`$test-opt.parse-only` is present in a sub-directory, then all tests for that
 sub-directory will have the `-parse-only` command-line flag set.  For
-per-JCR-file test options, if, for example, a test file called `foo.jcr`
-is present, and a file called `foo.test-opt.parse-only` is present, then the
-`-parse-only` flag will be included specifically for that test.
+per-JCR-file test options, if, for example, `foo.jcr` is being tested, and a
+file called `foo.test-opt.parse-only` is present, then the `-parse-only` flag
+will be included specifically for that test.
 
 `zinc-reviewer.rb` is a Ruby/Tk based program that facilitates reviewing the
 results of tests run by `test-runner.rb` and selecting vetted zinc references.
