@@ -1,5 +1,5 @@
-Error: 6-annotations/annotations-unknown.jcr (line: 1, char: 19):
+Error: 6-annotations/annotations-unknown.jcr (line: 1, char: 18):
       Unknown <annotation>: 'foo'
-Error: 6-annotations/annotations-unknown.jcr (line: 1, char: 31):
+Error: 6-annotations/annotations-unknown.jcr (line: 1, char: 26):
       Unknown <annotation>: 'bar'
 2 error(s), 0 warning(s)

@@ -1,3 +1,3 @@
-Error: 6-annotations/annotations-unknown-2.jcr (line: 1, char: 21):
+Error: 6-annotations/annotations-unknown-2.jcr (line: 1, char: 16):
       Unknown <annotation>: 'bar'
 1 error(s), 0 warning(s)

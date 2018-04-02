@@ -1423,14 +1423,17 @@ bool GrammarParser::tbd_annotation()
 
     cl::accumulator name_accumulator( this );
 
-    annotation_name() && optional( spaces() && name_accumulator.none() && annotation_parameters() );
+    annotation_name();
 
+    // Report errors relating to the annotation name, near where the name is specified
     if( name_accumulator.get() == "id" || name_accumulator.get() == "assert" || name_accumulator.get() == "when" || name_accumulator.get() == "doc" )
         warning( "Unimplemented <annotation>: '%0'", name_accumulator.get() ); // See Leave_as_warning
     else if( ! name_accumulator.get().empty() )
         error( "Unknown <annotation>: '%0'", name_accumulator.get() );
     else
         fatal( "Expected <annotation> name. Got: '%0'", error_token() );
+
+    optional( spaces() && name_accumulator.none() && annotation_parameters() );
 
     return true;    // We've 'accepted' this path despite having decided to error
 }

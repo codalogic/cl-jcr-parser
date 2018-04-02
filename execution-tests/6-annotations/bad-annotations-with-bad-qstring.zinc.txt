@@ -1,3 +1,5 @@
+Error: 6-annotations/bad-annotations-with-bad-qstring.jcr (line: 1, char: 24):
+      Unknown <annotation>: 'undefined'
 Fatal error: 6-annotations/bad-annotations-with-bad-qstring.jcr (line: 1, char: 33):
       Badly formed QString. Got 'bar\u12'
-1 error(s), 0 warning(s)
+2 error(s), 0 warning(s)
