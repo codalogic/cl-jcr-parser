@@ -146,7 +146,7 @@ private:
     bool import_d( DirectiveForm::Enum form );
     bool ruleset_id();
     bool ruleset_id_alias();
-    bool infer_types_d( DirectiveForm::Enum form );
+    bool infer_types_d();
     bool one_line_tbd_directive_d();
     bool directive_name();
     bool one_line_directive_parameters();
@@ -618,7 +618,7 @@ bool GrammarParser::directive_def( DirectiveForm::Enum form )
     return rewind_on_reject( jcr_version_d( form ) ) ||
             rewind_on_reject( ruleset_id_d( form ) ) ||
             rewind_on_reject( import_d( form ) ) ||
-            rewind_on_reject( infer_types_d( form ) );
+            rewind_on_reject( infer_types_d() );
 }
 
 bool GrammarParser::jcr_version_d( DirectiveForm::Enum form )
@@ -796,7 +796,7 @@ bool GrammarParser::ruleset_id_alias()
     return name();
 }
 
-bool GrammarParser::infer_types_d( DirectiveForm::Enum form )
+bool GrammarParser::infer_types_d()
 {
     /* ABNF: 
     infer-types-d    = infer-types-kw

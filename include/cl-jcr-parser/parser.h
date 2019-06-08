@@ -302,11 +302,11 @@ struct Rule : private detail::NonCopyable
         p_rule = p_type = this;
     }
 
-    Rule * append_child_rule( uniq_ptr pu_child_rule )
+    Rule * append_child_rule( uniq_ptr & ru_child_rule )
     {
-        pu_child_rule->p_parent = this;
-        children.push_back( pu_child_rule.get() );
-        return pu_child_rule.release();
+        ru_child_rule->p_parent = this;
+        children.push_back( ru_child_rule.get() );
+        return ru_child_rule.release();
     }
 
     void merge_target_annotations()
@@ -399,11 +399,11 @@ struct Grammar : private detail::NonCopyable
             return AliasLookupResult( i_alias->second );
         return AliasLookupResult();
     }
-    Rule * append_rule( Rule::uniq_ptr pu_rule )
+    Rule * append_rule( Rule::uniq_ptr & ru_rule )
     {
-        pu_rule->p_parent = 0;
-        rules.push_back( pu_rule.get() );
-        return pu_rule.release();
+        ru_rule->p_parent = 0;
+        rules.push_back( ru_rule.get() );
+        return ru_rule.release();
     }
     const Rule * find_rule( const std::string & r_sought_rule_name ) const
     {
