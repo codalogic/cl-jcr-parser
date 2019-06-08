@@ -52,11 +52,11 @@
 | GrammarParser - Syntax parsing - TBD directive | 230 |
 | GrammarParser - Syntax parsing - target_rule_name | 244 |
 | GrammarParser - Syntax parsing - Primitive rules | 267 |
-| GrammarParser - Syntax parsing - root rule | 1377 |
-| GrammarParser - Syntax parsing - Member name | 1448 |
-| GrammarParser - Syntax parsing - type-choice | 1510 |
-| GrammarParser - Syntax parsing - object | 1606 |
-| GrammarParser - Syntax parsing - array | 1925 |
-| GrammarParser - Syntax parsing - group | 2173 |
-| GrammarParser - Syntax parsing - repetition | 2352 |
-| GrammarParser - Syntax parsing - annotations | 2639 |
+| GrammarParser - Syntax parsing - root rule | 1465 |
+| GrammarParser - Syntax parsing - Member name | 1536 |
+| GrammarParser - Syntax parsing - type-choice | 1598 |
+| GrammarParser - Syntax parsing - object | 1694 |
+| GrammarParser - Syntax parsing - array | 2013 |
+| GrammarParser - Syntax parsing - group | 2261 |
+| GrammarParser - Syntax parsing - repetition | 2440 |
+| GrammarParser - Syntax parsing - annotations | 2679 |

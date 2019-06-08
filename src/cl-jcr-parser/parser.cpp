@@ -70,6 +70,7 @@ private:
         cl::reader & r_reader;
         bool is_errored;
         JCRParser::Status status;
+        bool is_infer_types;
 
         Rule * p_rule;
 
@@ -85,6 +86,7 @@ private:
             r_reader( r_reader_in ),
             is_errored( false ),
             status( JCRParser::S_OK ),
+            is_infer_types( false ),
             p_rule( 0 )
         {}
     } m;
@@ -144,6 +146,7 @@ private:
     bool import_d( DirectiveForm::Enum form );
     bool ruleset_id();
     bool ruleset_id_alias();
+    bool infer_types_d( DirectiveForm::Enum form );
     bool one_line_tbd_directive_d();
     bool directive_name();
     bool one_line_directive_parameters();
@@ -158,6 +161,7 @@ private:
     bool rule();
     bool rule_name();
     bool target_rule_name();
+    bool target_rule_name_reader( TargetRule & r_target_rule );
     bool name();
     bool rule_def();
     bool type_designator();
@@ -179,6 +183,9 @@ private:
     bool exclude_max_annotation( Annotations & );
     bool default_annotation( Annotations & );
     bool primitive_value();
+    bool format_annotation( Annotations & );
+    bool choice_annotation( Annotations & );
+    bool augments_annotation( Annotations & );
     bool tbd_annotation();
     bool annotation_name();
     bool annotation_parameters();
@@ -251,7 +258,6 @@ private:
     bool repetition_range();
     bool min_max_repetition();
     bool min_repetition();
-    bool max_repetition();
     bool min_repeat();
     bool max_repeat();
     bool specific_repetition();
@@ -287,11 +293,13 @@ private:
     bool uri_scheme();
     bool any_kw();
     bool as_kw();
+    bool augments_kw();
     bool base32_kw();
     bool base32hex_kw();
     bool base64_kw();
     bool base64url_kw();
     bool boolean_kw();
+    bool choice_kw();
     bool date_kw();
     bool datetime_kw();
     bool default_kw();
@@ -301,10 +309,12 @@ private:
     bool exclude_min_kw();
     bool false_kw();
     bool float_kw();
+    bool format_kw();
     bool fqdn_kw();
     bool hex_kw();
     bool idn_kw();
     bool import_kw();
+    bool infer_types_kw();
     bool int_kw();
     bool integer_kw();
     bool ipaddr_kw();
@@ -599,15 +609,16 @@ bool GrammarParser::multi_line_directive()
 bool GrammarParser::directive_def( DirectiveForm::Enum form )
 {
     /* ABNF:
-    directive-def    = jcr-version-d / ruleset-id-d / import-d
+    directive-def    = jcr-version-d / ruleset-id-d / import-d / infer-types-d
     */
-    // jcr_version_d() || ruleset_id_d() || import_d()
+    // jcr_version_d() || ruleset_id_d() || import_d() || infer_types_d()
 
     cl::locator loc( this );
 
     return rewind_on_reject( jcr_version_d( form ) ) ||
             rewind_on_reject( ruleset_id_d( form ) ) ||
-            rewind_on_reject( import_d( form ) );
+            rewind_on_reject( import_d( form ) ) ||
+            rewind_on_reject( infer_types_d( form ) );
 }
 
 bool GrammarParser::jcr_version_d( DirectiveForm::Enum form )
@@ -783,6 +794,23 @@ bool GrammarParser::ruleset_id_alias()
     // name()
 
     return name();
+}
+
+bool GrammarParser::infer_types_d( DirectiveForm::Enum form )
+{
+    /* ABNF: 
+    infer-types-d    = infer-types-kw
+    */
+    // infer_types_kw()
+
+    if( infer_types_kw() )
+    {
+        m.is_infer_types = true;
+
+        return true;
+    }
+
+    return false;
 }
 
 bool GrammarParser::one_line_tbd_directive_d()
@@ -991,8 +1019,23 @@ bool GrammarParser::target_rule_name()
     // in the right place
 
     Annotations target_rule_name_annotations;
+    TargetRule target_rule_name;
 
-    if( annotations( target_rule_name_annotations ) && is_get_char( '$' ) )
+    if( annotations( target_rule_name_annotations ) && target_rule_name_reader( target_rule_name ) )
+    {
+        m.p_rule->type = Rule::TARGET_RULE;
+        m.p_rule->annotations.merge( target_rule_name_annotations );
+        m.p_rule->target_rule = target_rule_name;
+
+        return true;
+    }
+
+    return false;
+}
+
+bool GrammarParser::target_rule_name_reader( TargetRule & r_target_rule )
+{
+    if( is_get_char( '$' ) )
     {
         cl::accumulator name_accumulator( this );
 
@@ -1009,19 +1052,16 @@ bool GrammarParser::target_rule_name()
 
             if( rule_name() )
             {
-                m.p_rule->target_rule.ruleset_id = alias_lookup_result;
-                m.p_rule->target_rule.rule_name = name_accumulator.get();
+                r_target_rule.ruleset_id = alias_lookup_result;
+                r_target_rule.rule_name = name_accumulator.get();
             }
             else
                 return fatal( "Expected <rule_name> in <target_rule_name> with format \"$<ruleset_id_alias>.<rule-name>\". Got '$%0.%1'", alias_name, error_token() );
         }
         else
         {
-            m.p_rule->target_rule.rule_name = name_accumulator.get();
+            r_target_rule.rule_name = name_accumulator.get();
         }
-
-        m.p_rule->type = Rule::TARGET_RULE;
-        m.p_rule->annotations.merge( target_rule_name_annotations );
 
         return true;
     }
@@ -1198,9 +1238,17 @@ bool GrammarParser::member_name_spec()
 
 bool GrammarParser::convert_member_name_to_string_type()
 {
-    m.p_rule->type = m.p_rule->member_name.is_literal() ? Rule::STRING_LITERAL : Rule::STRING_REGEX;
-    m.p_rule->min = m.p_rule->max = m.p_rule->member_name.name();
-    m.p_rule->member_name.clear();
+    if( ! m.is_infer_types )
+    {
+        m.p_rule->type = m.p_rule->member_name.is_literal() ? Rule::STRING_LITERAL : Rule::STRING_REGEX;
+        m.p_rule->min = m.p_rule->max = m.p_rule->member_name.name();
+        m.p_rule->member_name.clear();
+    }
+
+    else
+    {
+        m.p_rule->type = Rule::STRING_TYPE;
+    }
 
     return true;
 }
@@ -1306,8 +1354,11 @@ bool GrammarParser::annotation_set( Annotations & r_annotations )
                        root-annotation /
                        exclude-min-annotation / exclude-max-annotation /
                        default-annotation / tbd-annotation
+                       default-annotation / format-annotation /
+                       choice-annotation / augments-annotation /
+                       tbd-annotation
     */
-    // not_annotation() || unordered_annotation() || root_annotation() || exclude_min_annotation() || exclude_max_annotation() || default_annotation() || tbd_annotation()
+    // not_annotation() || unordered_annotation() || root_annotation() || exclude_min_annotation() || exclude_max_annotation() || default_annotation() || format_annotation() || choice_annotation() || augments_annotation() || tbd_annotation()
 
     cl::locator loc( this );    // Current annotations don't benefit from rewind_on_reject(), but maintain the pattern for consistency and possible future proofing
 
@@ -1317,6 +1368,9 @@ bool GrammarParser::annotation_set( Annotations & r_annotations )
             rewind_on_reject( exclude_min_annotation( r_annotations ) ) ||
             rewind_on_reject( exclude_max_annotation( r_annotations ) ) ||
             rewind_on_reject( default_annotation( r_annotations ) ) ||
+            rewind_on_reject( format_annotation( r_annotations ) ) ||
+            rewind_on_reject( choice_annotation( r_annotations ) ) ||
+            rewind_on_reject( augments_annotation( r_annotations ) ) ||
             rewind_on_reject( tbd_annotation() ) ||
             fatal( "Unrecognised <annotation> format. Got: '%0'" );     // Calling fatal() will throw an exception
 }
@@ -1382,10 +1436,10 @@ bool GrammarParser::default_annotation( Annotations & r_annotations )
     {
         cl::accumulator default_accumulator( this );
 
-         if( (spaces() || fatal( "Expected <spaces> after 'default' keyword in @{default} <annotation>. Got '%0'", error_token() )) &&
-                 (primitive_value() || fatal( "Expected <primitive-value> in @{default} <annotation>. Got '%0'", error_token() )) &&
-                 set( r_annotations.is_defaulted, true ) )
+        if( (spaces() || fatal( "Expected <spaces> after 'default' keyword in @{default} <annotation>. Got '%0'", error_token() )) &&
+                 (primitive_value() || fatal( "Expected <primitive-value> in @{default} <annotation>. Got '%0'", error_token() )) )
         {
+            r_annotations.is_defaulted = true;
             r_annotations.default_value = default_accumulator.get();
         }
 
@@ -1412,6 +1466,69 @@ bool GrammarParser::primitive_value()
             rewind_on_reject( accumulate_atomic( float_num() ) ) ||
             rewind_on_reject( accumulate_atomic( integer() ) ) ||
             rewind_on_reject( accumulate_atomic( q_string() ) );
+}
+
+bool GrammarParser::format_annotation( Annotations & r_annotations )
+{
+    /* ABNF: 
+    format-annotation = format-kw spaces id
+    */
+    // format_kw() && spaces() && id()
+
+    if( format_kw() )
+    {
+        cl::accumulator id_accumulator( this );
+
+        if( (spaces() || fatal( "Expected <spaces> after 'format' keyword in @{format} <annotation>. Got '%0'", error_token() )) &&
+                 (id() || fatal( "Expected <id> in @{format} <annotation>. Got '%0'", error_token() )) )
+        {
+            r_annotations.format = id_accumulator.get();
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+bool GrammarParser::choice_annotation( Annotations & r_annotations )
+{
+    /* ABNF: 
+    choice-annotation = choice-kw
+    */
+    // choice_kw()
+
+    if( choice_kw() )
+    {
+        r_annotations.is_choice = true;
+
+        return true;
+    }
+
+    return false;
+}
+
+bool GrammarParser::augments_annotation( Annotations & r_annotations )
+{
+    /* ABNF: 
+    augments-annotation = augments-kw *(spaces target-rule-name)
+    */
+    // augments_kw() && *(spaces() && target_rule_name())
+
+    if( augments_kw() )
+    {
+        TargetRule target_rule_name;
+        
+        while( spaces() && target_rule_name_reader( target_rule_name ) )
+        {
+            r_annotations.augments.push_back( target_rule_name );
+            target_rule_name.clear();
+        }
+
+        return true;
+    }
+
+    return false;
 }
 
 bool GrammarParser::tbd_annotation()
@@ -1565,10 +1682,17 @@ bool GrammarParser::true_value()
     */
     // true_kw()
 
-    return true_kw() &&
-            set( m.p_rule->type, Rule::BOOLEAN ) &&
-            set( m.p_rule->min, true ) &&
-            set( m.p_rule->max, true );
+    if( true_kw() )
+    {
+        m.p_rule->type = Rule::BOOLEAN;
+        if( ! m.is_infer_types )
+        {
+            m.p_rule->min = m.p_rule->max = true;
+        }
+        return true;
+    }
+    
+    return false;
 }
 
 bool GrammarParser::false_value()
@@ -1578,10 +1702,17 @@ bool GrammarParser::false_value()
     */
     // false_kw()
 
-    return false_kw() &&
-            set( m.p_rule->type, Rule::BOOLEAN ) &&
-            set( m.p_rule->min, false ) &&
-            set( m.p_rule->max, false );
+    if( false_kw() )
+    {
+        m.p_rule->type = Rule::BOOLEAN;
+        if( ! m.is_infer_types )
+        {
+            m.p_rule->min = m.p_rule->max = false;
+        }
+        return true;
+    }
+    
+    return false;
 }
 
 bool GrammarParser::string_type()
@@ -1605,8 +1736,15 @@ bool GrammarParser::string_value()
 
     if( q_string_as_utf8() )
     {
-        m.p_rule->type = Rule::STRING_LITERAL;
-        m.p_rule->min = m.p_rule->max = q_string_accumulator.get();
+        if( ! m.is_infer_types )
+        {
+            m.p_rule->type = Rule::STRING_LITERAL;
+            m.p_rule->min = m.p_rule->max = q_string_accumulator.get();
+        }
+        else
+        {
+            m.p_rule->type = Rule::STRING_TYPE;
+        }
 
         return true;
     }
@@ -1732,10 +1870,17 @@ bool GrammarParser::float_value()
 
     cl::accumulator float_accumulator( this );
 
-    return float_num() &&
-            set( m.p_rule->type, Rule::DOUBLE ) &&
-            set( m.p_rule->min, float_accumulator.to_float() ) &&
-            set( m.p_rule->max, float_accumulator.to_float() );
+    if( float_num() )
+    {
+        m.p_rule->type = Rule::DOUBLE;
+        if( ! m.is_infer_types )
+        {
+            m.p_rule->min = m.p_rule->max = float_accumulator.to_float();
+        }
+        return true;
+    }
+
+    return false;
 }
 
 bool GrammarParser::integer_type()
@@ -1827,7 +1972,11 @@ bool GrammarParser::integer_value()
 
     if( integer() )
     {
-        if( integer_accumulator.get()[0] == '-' )
+        if( m.is_infer_types )
+        {
+            m.p_rule->type = Rule::INTEGER;
+        }
+        else if( integer_accumulator.get()[0] == '-' )
         {
             m.p_rule->type = Rule::INTEGER;
             m.p_rule->min = m.p_rule->max = integer_accumulator.to_int64();
@@ -2589,10 +2738,10 @@ bool GrammarParser::repetition_range()
     /* ABNF:
     repetition-range = "*" *sp-cmt (
                    min-max-repetition / min-repetition /
-                   max-repetition / specific-repetition )
+                   specific-repetition )
     */
     // "*" && *sp_cmt() && (
-    //                    min_max_repetition() || min_repetition() || max_repetition() || specific_repetition() )
+    //                    min_max_repetition() || min_repetition() || specific_repetition() )
 
     cl::locator loc_outer( this );
 
@@ -2603,7 +2752,6 @@ bool GrammarParser::repetition_range()
         // The order of these routines is important
         if( rewind_on_reject( min_max_repetition() ) ||
                 rewind_on_reject( min_repetition() ) ||
-                rewind_on_reject( max_repetition() ) ||
                 rewind_on_reject( specific_repetition() ) )
             return true;   // if false, fall through to restore loc_outer recorded location (we'll want to re-scan the '*')
     }
@@ -2639,20 +2787,6 @@ bool GrammarParser::min_repetition()
 
     return min_repeat() && fixed( ".." ) &&
             set( m.p_rule->repetition.min, min_accumulator.to_int() ) && set( m.p_rule->repetition.max, -1 ) &&
-            optional( repetition_step() );
-}
-
-bool GrammarParser::max_repetition()
-{
-    /* ABNF:
-    max-repetition   = ".."  max-repeat [ repetition-step ]
-    */
-    // ".." && max_repeat() [ repetition_step() ]
-
-    cl::accumulator max_accumulator( this );
-
-    return fixed( ".." ) && max_repeat() &&
-            set( m.p_rule->repetition.min, 0 ) && set( m.p_rule->repetition.max, max_accumulator.to_int() ) &&
             optional( repetition_step() );
 }
 
@@ -3079,6 +3213,16 @@ bool GrammarParser::as_kw()
     return fixed( "as" );
 }
 
+bool GrammarParser::augments_kw()
+{
+    /* ABNF: 
+    augments-kw      = %x61.75.67.6D.65.6E.74.73       ; "augments"
+    */
+    // %x61.75.67.6D.65.6E.74.73       ; "augments"
+
+    return fixed( "augments" );
+}
+
 bool GrammarParser::base32_kw()
 {
     /* ABNF:
@@ -3127,6 +3271,16 @@ bool GrammarParser::boolean_kw()
     // %x62.6F.6F.6C.65.61.6E          ; "boolean"
 
     return fixed( "boolean" );
+}
+
+bool GrammarParser::choice_kw()
+{
+    /* ABNF: 
+    choice-kw        = %x63.68.6F.69.63.65             ; "choice"
+    */
+    // %x63.68.6F.69.63.65             ; "choice"
+
+    return fixed( "choice" );
 }
 
 bool GrammarParser::date_kw()
@@ -3219,6 +3373,16 @@ bool GrammarParser::float_kw()
     return fixed( "float" );
 }
 
+bool GrammarParser::format_kw()
+{
+    /* ABNF: 
+    format-kw        = %x66.6F.72.6D.61.74             ; "format"
+    */
+    // %x66.6F.72.6D.61.74             ; "format"
+
+    return fixed( "format" );
+}
+
 bool GrammarParser::fqdn_kw()
 {
     /* ABNF:
@@ -3257,6 +3421,16 @@ bool GrammarParser::import_kw()
     // %x69.6D.70.6F.72.74             ; "import"
 
     return fixed( "import" );
+}
+
+bool GrammarParser::infer_types_kw()
+{
+    /* ABNF: 
+    infer-types-kw   = %x69.6E.66.65.72.2D.74.79.70.65.73 ; "infer-types"
+    */
+    // %x69.6E.66.65.72.2D.74.79.70.65.73 ; "infer-types"
+
+    return fixed( "infer-types" );
 }
 
 bool GrammarParser::int_kw()

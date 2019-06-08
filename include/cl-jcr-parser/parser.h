@@ -104,6 +104,18 @@ inline std::ostream & operator << ( std::ostream & r_os, const Severity & r_v ) 
 //                   Classes representing JCR constructs
 //----------------------------------------------------------------------------
 
+struct Rule;
+
+struct TargetRule
+{
+    std::string ruleset_id;
+    std::string rule_name;
+    Rule * p_rule;      // Filled in when 'compiled'
+
+    TargetRule() : p_rule( 0 ) {}
+    void clear() { ruleset_id.empty(); rule_name.empty(); }
+};
+
 struct Repetition
 {
     int min;
@@ -122,6 +134,9 @@ struct Annotations
     bool is_exclude_max;
     bool is_defaulted;
     std::string default_value;
+    std::string format;
+    bool is_choice;
+    std::vector<TargetRule> augments;
 
     Annotations() { clear(); }
     void clear() { is_not = is_unordered = is_root = is_exclude_min = is_exclude_max = is_defaulted = false; }
@@ -135,6 +150,10 @@ struct Annotations
         is_defaulted = ( is_defaulted || r_rhs.is_defaulted );
         if( r_rhs.is_defaulted )
             default_value = r_rhs.default_value;
+        if( format.empty() && ! r_rhs.format.empty() )
+            format = r_rhs.format;
+        if( augments.empty() && ! r_rhs.augments.empty() )
+            augments = r_rhs.augments;
         return true;
     }
 };
@@ -231,17 +250,6 @@ public:
     int64 as_int() const { assert( m.form == Members::int_form ); return m.int_value; }
     uint64 as_uint() const { assert( m.form == Members::uint_form ); return m.uint_value; }
     double as_float() const { assert( m.form == Members::float_form ); return m.float_value; }
-};
-
-struct Rule;
-
-struct TargetRule
-{
-    std::string ruleset_id;
-    std::string rule_name;
-    Rule * p_rule;      // Filled in when 'compiled'
-
-    TargetRule() : p_rule( 0 ) {}
 };
 
 std::ostream & operator << ( std::ostream & r_os, const TargetRule & r_tr );
